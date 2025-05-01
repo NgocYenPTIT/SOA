@@ -1,4 +1,4 @@
-package com.example.subject_service.config;
+package com.example.credit_rule_service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.example.subject_service.util;
+package com.example.credit_rule_service.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;

@@ -1,4 +1,4 @@
-package com.example.subject_service.DTOs;
+package com.example.credit_rule_service.DTOs;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public  class LoginRequest {
-    private String username;
-    private String password;
+public  class JwtResponse {
+    private String token;
 }
