@@ -1,4 +1,4 @@
-package  com.example.subject_service.swagger ;
+package  com.example.course_service.swagger ;
 
 
 import io.swagger.v3.oas.models.Components;

@@ -1,4 +1,4 @@
-package com.example.subject_service.security;
+package com.example.course_service.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

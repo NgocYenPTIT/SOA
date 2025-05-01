@@ -1,0 +1,17 @@
+package com.example.course_service.controller;
+
+import com.example.course_service.security.JwtTokenProvider;
+import com.example.course_service.service.CourseService;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+public class CourseController {
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final CourseService courseService;
+
+    public CourseController(JwtTokenProvider jwtTokenProvider, com.example.subject_service.service.CourseService courseService) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.courseService = courseService;
+    }
+}

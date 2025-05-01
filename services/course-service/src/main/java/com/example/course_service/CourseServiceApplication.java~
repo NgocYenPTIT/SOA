@@ -1,4 +1,4 @@
-package com.example.subject_service;
+package com.example.course_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,7 +8,7 @@ public class SubjectServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SubjectServiceApplication.class, args);
-        System.out.println("hi from Subject Service");
+        System.out.println("hi from Course Service");
     }
 
 }

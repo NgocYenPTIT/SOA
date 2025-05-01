@@ -1,4 +1,4 @@
-package com.example.subject_service.security;
+package com.example.course_service.security;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
