@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Othello Tournament - Chi Tiết Giải Đấu</title>
+    <!-- Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #1abc9c;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+
+        body {
+            background-color: var(--light-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--light-color) !important;
+        }
+
+        .navbar-brand .game-icon {
+            margin-right: 10px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>') no-repeat;
+            background-size: cover;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 1rem 0 3rem;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #16a085;
+            border-color: #16a085;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+
+        .username {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        /* Tournament details styles */
+        .tournament-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .tournament-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .tournament-status {
+            font-size: 1rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .status-active {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .status-upcoming {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .status-completed {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .info-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.5s forwards;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 1.25rem;
+            font-weight: bold;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-card-header i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        .info-card-body {
+            padding: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            margin-bottom: 1.25rem;
+            align-items: flex-start;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: var(--dark-color);
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            margin-right: 20px; /* Added spacing between label and value */
+        }
+
+        .info-label i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+            width: 20px;
+            text-align: center;
+        }
+
+        .info-value {
+            color: #7f8c8d;
+            flex: 1;
+        }
+
+        /* Round card styles */
+        .round-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .round-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .round-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .round-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .round-title i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+
+        .round-status {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+
+        .round-body {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .round-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            color: #7f8c8d;
+        }
+
+        .round-info:last-child {
+            margin-bottom: 0;
+        }
+
+        .round-info i {
+            width: 20px;
+            color: var(--secondary-color);
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.75rem 2rem;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn i {
+            margin-right: 10px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-update {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        .btn-update:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+        .btn-delete {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+
+        .btn-kickoff {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-kickoff:hover {
+            background-color: #d35400;
+            border-color: #d35400;
+        }
+
+        .btn-join {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-join:hover {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+
+        .btn-leave {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-leave:hover {
+            background-color: #d35400;
+            border-color: #d35400;
+        }
+
+        .back-btn {
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-color);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            text-decoration: none;
+            color: var(--secondary-color);
+            transform: translateX(-5px);
+        }
+
+        .back-btn i {
+            margin-right: 8px;
+        }
+
+        /* Modal style */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-color), #c0392b);
+            color: white;
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+
+        .modal-header.kickoff-header {
+            background: linear-gradient(135deg, var(--warning-color), #d35400);
+        }
+
+        .modal-title {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-title i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem 1.5rem;
+            color: #505050;
+            font-size: 1.1rem;
+        }
+
+        .modal-footer {
+            border-top: none;
+            padding: 1rem 1.5rem 1.5rem;
+        }
+
+        .modal-btn {
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            border-radius: 50px;
+        }
+
+        /* Othello piece animation */
+        @keyframes flip {
+            0% {
+                transform: rotateY(0deg);
+            }
+            50% {
+                transform: rotateY(180deg);
+            }
+            100% {
+                transform: rotateY(360deg);
+            }
+        }
+
+        .othello-piece {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(to right, black 50%, white 50%);
+            animation: flip 3s infinite linear;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        /* Card animations */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .round-card:nth-child(1) {
+            animation: fadeInUp 0.5s forwards;
+            animation-delay: 0.2s;
+        }
+
+        .round-card:nth-child(2) {
+            animation: fadeInUp 0.5s forwards;
+            animation-delay: 0.3s;
+        }
+
+        .round-card:nth-child(3) {
+            animation: fadeInUp 0.5s forwards;
+            animation-delay: 0.4s;
+        }
+
+        .round-card:nth-child(4) {
+            animation: fadeInUp 0.5s forwards;
+            animation-delay: 0.5s;
+        }
+
+        .round-card:nth-child(5) {
+            animation: fadeInUp 0.5s forwards;
+            animation-delay: 0.6s;
+        }
+
+        /* Floating elements */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Pulse animation */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .description-box {
+            background-color: rgba(0, 0, 0, 0.02);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .action-button {
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand animate__animated animate__fadeIn" href="/home">
+            <span class="othello-piece"></span> Othello Tournament
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown mr-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user-circle mr-1"></i> <span th:text="${username}">Othello Player</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/profile"><i class="fas fa-id-card mr-2"></i> Hồ sơ</a>
+                        <a class="dropdown-item" href="/settings"><i class="fas fa-cog mr-2"></i> Cài đặt</a>
+                        <div class="dropdown-divider"></div>
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt mr-2"></i> Đăng
+                                xuất
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header">
+    <div class="container">
+        <div class="tournament-header">
+            <div class="animate__animated animate__fadeIn">
+                <h1 class="tournament-title" th:text="${tournament.name}">aaaaaa</h1>
+                <span class="tournament-status"
+                      th:classappend="${tournament.status == 'ĐANG DIỄN RA' ? 'status-active' :
+                                   (tournament.status == 'CHƯA BẮT ĐẦU' ? 'status-upcoming' : 'status-completed')}"
+                      th:text="${tournament.status}">CHƯA BẮT ĐẦU</span>
+                <div class="text-white">
+                    <i class="far fa-calendar-alt mr-2"></i>
+                    <span th:text="'Giải đấu diễn ra từ ' + ${tournament.startDate} + ' đến ' + ${tournament.endDate}">
+                        Từ 17/04/2025 21:00 đến 24/04/2025 18:00
+                    </span>
+                </div>
+            </div>
+            <div class="d-none d-md-block animate__animated animate__fadeIn animate__delay-1s">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPmNpcmNsZXtmaWxsOndoaXRlO3N0cm9rZTpibGFjaztzdHJva2Utd2lkdGg6Mn08L3N0eWxlPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwLDEwKSI+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMzAiIGN5PSIxMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNTAiIGN5PSIxMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNzAiIGN5PSIxMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMTAiIGN5PSIzMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNTAiIGN5PSIzMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNzAiIGN5PSIzMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMTAiIGN5PSI1MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMzAiIGN5PSI1MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNzAiIGN5PSI1MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMTAiIGN5PSI3MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMzAiIGN5PSI3MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNTAiIGN5PSI3MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNzAiIGN5PSI3MCIgcj0iMTAiIC8+PC9nPjwvc3ZnPg=="
+                     alt="Othello Board" class="floating" style="width: 100px; height: 100px;">
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <!-- Back Button -->
+        <a href="/tournaments/all" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Quay lại Danh sách Giải đấu
+        </a>
+
+        <!-- Tournament Details -->
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Tournament Info Card -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="fas fa-info-circle"></i> Thông tin Giải đấu
+                    </div>
+                    <div class="info-card-body">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user-tie"></i> Người tổ chức
+                            </div>
+                            <div class="info-value" th:text="${tournament.organizer}">Name of Organizer</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-chess-board"></i> Loại bàn cờ
+                            </div>
+                            <div class="info-value" th:text="${tournament.boardType}">Bàn cờ 8x8</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-sitemap"></i> Phương thức tổ chức
+                            </div>
+                            <div class="info-value" th:text="${tournament.organizingMethod}">7 vòng đấu</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-users"></i> Số người tham gia tối đa
+                            </div>
+                            <div class="info-value" th:text="${tournament.maxPlayer}">8</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-ticket-alt"></i> Tham gia miễn phí
+                            </div>
+                            <div class="info-value" th:text="${tournament.freeToJoin ? 'Có' : 'Không'}">Không</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-align-left"></i> Mô tả
+                            </div>
+                            <div class="info-value description-box" th:text="${tournament.description}">akkkd</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tournament Rounds Card -->
+                <div class="info-card" style="animation-delay: 0.1s;">
+                    <div class="info-card-header">
+                        <i class="fas fa-layer-group"></i> Các vòng đấu
+                    </div>
+                    <div class="info-card-body">
+                        <div th:if="${tournament.rounds != null && !tournament.rounds.empty}" class="rounds-container">
+                            <div th:each="round : ${tournament.rounds}" class="round-card">
+                                <div class="round-header">
+                                    <div class="round-title">
+                                        <i class="fas fa-trophy"></i> Vòng đấu
+                                        <span th:text="${round.roundNumber}">1</span>
+                                    </div>
+                                    <span class="round-status"
+                                          th:classappend="${round.status == 'ĐANG DIỄN RA' ? 'status-active' :
+                                                       (round.status == 'CHƯA BẮT ĐẦU' ? 'status-upcoming' : 'status-completed')}"
+                                          th:text="${round.status}">Status</span>
+                                </div>
+                                <div class="round-body">
+                                    <div class="round-info">
+                                        <i class="far fa-calendar-alt"></i>
+                                        <span th:text="'Bắt đầu: ' + ${round.startDate}">Bắt đầu: 17/04/2025 21:00</span>
+                                    </div>
+                                    <div class="round-info">
+                                        <i class="far fa-calendar-check"></i>
+                                        <span th:text="'Kết thúc: ' + ${round.endDate}">Kết thúc: 18/04/2025 19:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${tournament.rounds == null || tournament.rounds.empty}" class="text-center py-4">
+                            <i class="fas fa-exclamation-circle fa-3x text-muted mb-3"></i>
+                            <p>Chưa có vòng đấu nào được tạo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <!-- Quick Actions Card -->
+                <div class="info-card" style="animation-delay: 0.2s;">
+                    <div class="info-card-header">
+                        <i class="fas fa-bolt"></i> Hành động nhanh
+                    </div>
+                    <div class="info-card-body">
+                        <div class="d-grid gap-3">
+                            <!-- Các nút luôn hiển thị -->
+                            <a th:href="@{'/tournament/' + ${tournament.id} + '/rankings'}"
+                               class="btn btn-outline-primary btn-block action-button">
+                                <i class="fas fa-trophy mr-2"></i> Bảng xếp hạng
+                            </a>
+
+                            <a th:href="@{'/tournament/' + ${tournament.id} + '/players'}"
+                               class="btn btn-outline-primary btn-block action-button">
+                                <i class="fas fa-users mr-2"></i> Danh sách cờ thủ
+                            </a>
+
+                            <!-- Nút Mời người chơi - chỉ dành cho người tổ chức -->
+                            <a th:if="${role == 'host'}"
+                               th:href="@{'/tournament/' + ${tournament.id} + '/invite'}"
+                               class="btn btn-outline-primary btn-block action-button">
+                                <i class="fas fa-user-plus mr-2"></i> Mời người chơi
+                            </a>
+
+                            <!-- Nút Tham gia - dành cho người chưa tham gia -->
+                            <a th:if="${ !isMember}"
+                               th:href="@{'/tournament/' + ${tournament.id} + '/join'}"
+                               class="btn btn-join btn-block action-button">
+                                <i class="fas fa-sign-in-alt mr-2"></i> Tham gia
+                            </a>
+
+                            <!-- Nút Rời đi - dành cho người đã tham gia -->
+                            <a th:if="${ isMember}"
+                               th:href="@{'/tournament/' + ${tournament.id} + '/leave'}"
+                               class="btn btn-leave btn-block action-button">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Rời khỏi
+                            </a>
+
+                            <!-- Nút Kick Off - chỉ dành cho người tổ chức -->
+                            <div th:if="${isKickOff}" class="mt-4">
+                                <button type="button" class="btn btn-kickoff btn-block pulse action-button" data-toggle="modal" data-target="#kickoffModal">
+                                    <i class="fas fa-flag-checkered mr-2"></i> Kick Off giải đấu
+                                </button>
+                            </div>
+
+                            <!-- Nút cập nhật - chỉ dành cho người tổ chức -->
+                            <div th:if="${showButtonUpdate}" class="mt-2">
+                                <a th:href="@{'/tournament/' + ${tournament.id} + '/update'}" class="btn btn-update btn-block action-button">
+                                    <i class="fas fa-edit mr-2"></i> Cập nhật giải đấu
+                                </a>
+                            </div>
+
+                            <!-- Nút xóa - chỉ dành cho người tổ chức -->
+                            <div th:if="${showButtonDelete}" class="mt-2">
+                                <button type="button" class="btn btn-delete btn-block action-button" data-toggle="modal" data-target="#deleteModal">
+                                    <i class="fas fa-trash-alt mr-2"></i> Xóa giải đấu
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tournament Status Card -->
+                <div class="info-card" style="animation-delay: 0.3s;">
+                    <div class="info-card-header">
+                        <i class="fas fa-chart-pie"></i> Trạng thái
+                    </div>
+                    <div class="info-card-body p-4">
+                        <div class="text-center">
+                            <div class="mb-4">
+                                <span th:if="${tournament.status == 'ĐANG DIỄN RA'}" class="fa-stack fa-3x text-success">
+                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                    <i class="fas fa-play fa-stack-1x fa-inverse"></i>
+                                </span>
+                                <span th:if="${tournament.status == 'CHƯA BẮT ĐẦU'}" class="fa-stack fa-3x text-primary">
+                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                    <i class="fas fa-hourglass-start fa-stack-1x fa-inverse"></i>
+                                </span>
+                                <span th:if="${tournament.status == 'ĐÃ KẾT THÚC'}" class="fa-stack fa-3x text-secondary">
+                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                    <i class="fas fa-flag-checkered fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </div>
+                            <h4 class="mb-3" th:text="${tournament.status}">CHƯA BẮT ĐẦU</h4>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-success" role="progressbar"
+                                     th:style="${tournament.status == 'ĐANG DIỄN RA' ? 'width: 50%' :
+                                                (tournament.status == 'ĐÃ KẾT THÚC' ? 'width: 100%' : 'width: 0%')}">
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                <i class="far fa-clock mr-1"></i>
+                                <span th:if="${tournament.status == 'ĐANG DIỄN RA'}">Đang diễn ra</span>
+                                <span th:if="${tournament.status == 'CHƯA BẮT ĐẦU'}">Sắp bắt đầu</span>
+                                <span th:if="${tournament.status == 'ĐÃ KẾT THÚC'}">Đã kết thúc</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content animate__animated animate__fadeIn">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle"></i> Xác nhận xóa
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa giải đấu này không?</p>
+                <p><strong>Lưu ý:</strong> Tất cả dữ liệu liên quan đến giải đấu này bao gồm:</p>
+                <ul>
+                    <li>Người chơi tham gia</li>
+                    <li>Các vòng đấu</li>
+                    <li>Kết quả thi đấu</li>
+                    <li>Bảng xếp hạng</li>
+                </ul>
+                <p>đều sẽ bị xóa vĩnh viễn và không thể khôi phục.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-btn" data-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Hủy
+                </button>
+                <form th:action="@{'/tournament/' + ${tournament.id} + '/delete'}" method="post">
+                    <button type="submit" class="btn btn-danger modal-btn">
+                        <i class="fas fa-trash-alt mr-1"></i> Xác nhận xóa
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kickoff Confirmation Modal -->
+<div class="modal fade" id="kickoffModal" tabindex="-1" role="dialog" aria-labelledby="kickoffModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content animate__animated animate__fadeIn">
+            <div class="modal-header kickoff-header">
+                <h5 class="modal-title" id="kickoffModalLabel">
+                    <i class="fas fa-flag-checkered"></i> Xác nhận Kick Off
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn Kick Off giải đấu này không?</p>
+                <p><strong>Lưu ý:</strong> Sau khi Kick Off:</p>
+                <ul>
+                    <li>Giải đấu sẽ chuyển sang trạng thái <strong>ĐANG DIỄN RA</strong></li>
+                    <li>Vòng đấu đầu tiên sẽ được bắt đầu</li>
+                    <li>Bạn sẽ không thể thay đổi các thông tin cơ bản của giải đấu</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-btn" data-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Hủy
+                </button>
+                <form th:action="@{'/tournament/' + ${tournament.id} + '/kickoff'}" method="post">
+                    <button type="submit" class="btn btn-warning modal-btn">
+                        <i class="fas fa-flag-checkered mr-1"></i> Xác nhận Kick Off
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container text-center">
+        <p class="mb-0">© 2025 Othello Tournament.</p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS, Popper.js, and jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Trigger animations when scrolling
+        $(window).scroll(function () {
+            $('.info-card, .round-card').each(function () {
+                const position = $(this).offset().top;
+                const scroll = $(window).scrollTop();
+                const windowHeight = $(window).height();
+
+                if (scroll > position - windowHeight + 100) {
+                    $(this).css('opacity', '1');
+                    $(this).css('transform', 'translateY(0)');
+                }
+            });
+        });
+
+        // Trigger scroll to start animations
+        setTimeout(function() {
+            $(window).trigger('scroll');
+        }, 100);
+
+        // Confirm delete action
+        $('.btn-delete').click(function() {
+            $('#deleteModal').modal('show');
+        });
+
+        // Confirm kickoff action
+        $('.btn-kickoff').click(function() {
+            $('#kickoffModal').modal('show');
+        });
+    });
+</script>
+</body>
+</html>

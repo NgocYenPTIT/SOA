@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Othello Tournament - Quản lý Giải đấu</title>
+    <!-- Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #1abc9c;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+
+        body {
+            background-color: var(--light-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--light-color) !important;
+        }
+
+        .navbar-brand .game-icon {
+            margin-right: 10px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 1rem 0 3rem;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #16a085;
+            border-color: #16a085;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-logout {
+            background-color: var(--accent-color);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+
+        .username {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        /* Tournament styles */
+        .tournament-filters {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-option {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--primary-color);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .filter-option:hover, .filter-option.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .filter-option.active {
+            font-weight: bold;
+        }
+
+        .notification-badge {
+            position: relative;
+            display: inline-block;
+        }
+
+        .badge-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.7rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+            }
+            70% {
+                transform: scale(1.1);
+                box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+            }
+        }
+
+        /* Othello piece rotating animation */
+        @keyframes flip {
+            0% {
+                transform: rotateY(0deg);
+            }
+            50% {
+                transform: rotateY(180deg);
+            }
+            100% {
+                transform: rotateY(360deg);
+            }
+        }
+
+        .othello-piece {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(to right, black 50%, white 50%);
+            animation: flip 3s infinite linear;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        /* Tournament tab content animation */
+        .tab-content > .tab-pane {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .tab-content > .active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Create tournament button animation */
+        .btn-create-tournament {
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-create-tournament:after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 490%;
+            width: 140%;
+            background: rgba(255, 255, 255, 0.2);
+            -webkit-transition: all .5s ease-in-out;
+            transition: all .5s ease-in-out;
+            -webkit-transform: translateX(-100%) translateY(-25%) rotate(45deg);
+            transform: translateX(-100%) translateY(-25%) rotate(45deg);
+            z-index: -1;
+        }
+
+        .btn-create-tournament:hover:after {
+            -webkit-transform: translateX(-9%) translateY(-25%) rotate(45deg);
+            transform: translateX(-9%) translateY(-25%) rotate(45deg);
+        }
+
+        .filter-card {
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            height: 100%;
+        }
+
+        .filter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 1rem;
+            font-weight: bold;
+        }
+
+        .filter-card-body {
+            padding: 1.5rem;
+            background-color: white;
+        }
+
+        .filter-description {
+            color: #7f8c8d;
+            margin-bottom: 1rem;
+        }
+
+        .filter-count {
+            font-weight: bold;
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid var(--secondary-color);
+            margin-bottom: 2rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--primary-color);
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-tabs .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-tabs .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-tabs .nav-link.active {
+            background-color: transparent;
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .nav-tabs .nav-link.active::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand animate__animated animate__fadeIn" href="/home">
+            <span class="othello-piece"></span> Othello Tournament
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown mr-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user-circle mr-1"></i> <span th:text="${user?.username}">Username</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/profile"><i class="fas fa-id-card mr-2"></i> Hồ sơ</a>
+                        <a class="dropdown-item" href="/settings"><i class="fas fa-cog mr-2"></i> Cài đặt</a>
+                        <div class="dropdown-divider"></div>
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt mr-2"></i> Đăng xuất</button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="animate__animated animate__fadeIn"><i class="fas fa-trophy mr-2"></i> Quản lý Giải đấu</h2>
+            <a href="/tournament/create" class="btn btn-primary btn-create-tournament animate__animated animate__bounceIn">
+                <i class="fas fa-plus-circle mr-2"></i> Tạo Giải đấu Mới
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs mb-4" id="tournamentTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="tournaments-tab" data-toggle="tab" href="#tournaments" role="tab" aria-controls="tournaments" aria-selected="true">
+                    <i class="fas fa-list mr-2"></i> Giải đấu
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="invitations-tab" data-toggle="tab" href="#invitations" role="tab" aria-controls="invitations" aria-selected="false">
+                    <div class="notification-badge">
+                        <i class="fas fa-envelope mr-2"></i> Lời mời
+                        <span class="badge-count">3</span>
+                    </div>
+                </a>
+            </li>
+            <!-- <li class="nav-item">
+                <a class="nav-link" id="rankings-tab" data-toggle="tab" href="#rankings" role="tab" aria-controls="rankings" aria-selected="false">
+                    <i class="fas fa-medal mr-2"></i> Bảng xếp hạng
+                </a>
+            </li> -->
+            <!-- <li class="nav-item">
+                <a class="nav-link" id="stats-tab" data-toggle="tab" href="#stats" role="tab" aria-controls="stats" aria-selected="false">
+                    <i class="fas fa-chart-bar mr-2"></i> Thống kê
+                </a>
+            </li> -->
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="tournamentTabsContent">
+            <!-- Tournaments Tab -->
+            <div class="tab-pane fade show active" id="tournaments" role="tabpanel" aria-labelledby="tournaments-tab">
+                <div class="row">
+                    <!-- All Tournaments Card -->
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="card filter-card shadow">
+                            <div class="filter-card-header">
+                                <i class="fas fa-th-list mr-2"></i> Tất cả giải đấu
+                            </div>
+                            <div class="filter-card-body">
+                                <p class="filter-description">Xem tất cả các giải đấu bạn đã tham gia hoặc tổ chức</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="filter-count" th:text="${flag_all} + ' giải đấu'">24 giải đấu</div>
+                                    <a href="/tournaments/all?name=&currentPage=1&pageSize=10&flag=all" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-arrow-right mr-1"></i> Xem
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Organize & Participate Card -->
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="card filter-card shadow">
+                            <div class="filter-card-header">
+                                <i class="fas fa-user-plus mr-2"></i> Tổ chức & Tham gia
+                            </div>
+                            <div class="filter-card-body">
+                                <p class="filter-description">Các giải đấu do bạn tổ chức và tham gia</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="filter-count" th:text="${flag_create_and_join} + ' giải đấu'">6 giải đấu</div>
+                                    <a href="/tournaments/create-and-join?name=&currentPage=1&pageSize=10&flag=create-and-join" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-arrow-right mr-1"></i> Xem
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Only Organize Card -->
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="card filter-card shadow">
+                            <div class="filter-card-header">
+                                <i class="fas fa-user-tie mr-2"></i> Chỉ tổ chức
+                            </div>
+                            <div class="filter-card-body">
+                                <p class="filter-description">Các giải đấu do bạn tổ chức nhưng không tham gia</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="filter-count" th:text="${flag_only_create} + ' giải đấu'">8 giải đấu</div>
+                                    <a href="/tournaments/only-create?name=&currentPage=1&pageSize=10&flag=only-create" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-arrow-right mr-1"></i> Xem
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Only Participate Card -->
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="card filter-card shadow">
+                            <div class="filter-card-header">
+                                <i class="fas fa-user-friends mr-2"></i> Chỉ tham gia
+                            </div>
+                            <div class="filter-card-body">
+                                <p class="filter-description">Các giải đấu bạn tham gia với tư cách người chơi</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="filter-count" th:text="${flag_only_join} + ' giải đấu'">10 giải đấu</div>
+                                    <a href="/tournaments/only-join?name=&currentPage=1&pageSize=10&flag=only-join" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-arrow-right mr-1"></i> Xem
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invitations Tab -->
+            <div class="tab-pane fade" id="invitations" role="tabpanel" aria-labelledby="invitations-tab">
+                <!-- Invitations to Your Tournaments -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-envelope-open-text mr-2"></i> Lời mời tham gia giải đấu của bạn</h5>
+                            <span class="badge badge-light rounded-pill px-3 py-2">
+                                <i class="fas fa-user-plus mr-1"></i> 4 lời mời
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th>Tên giải đấu</th>
+                                    <th>Người tham gia</th>
+                                    <th>Thời gian bắt đầu</th>
+                                    <th>Thời gian kết thúc</th>
+                                    <th>Số lượng</th>
+                                    <th>Thời gian yêu cầu</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Invitation rows would go here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Your Invitations to Other Tournaments -->
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-paper-plane mr-2"></i> Lời mời bạn gửi tới giải đấu khác</h5>
+                            <span class="badge badge-light rounded-pill px-3 py-2">
+                                <i class="fas fa-envelope mr-1"></i> 3 lời mời
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th>Tên giải đấu</th>
+                                    <th>Người tổ chức</th>
+                                    <th>Thời gian bắt đầu</th>
+                                    <th>Thời gian kết thúc</th>
+                                    <th>Số lượng</th>
+                                    <th>Thời gian gửi</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Invitation rows would go here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rankings Tab -->
+            <div class="tab-pane fade" id="rankings" role="tabpanel" aria-labelledby="rankings-tab">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle mr-2"></i> Bảng xếp hạng được cập nhật hàng tuần
+                </div>
+                <!-- Rankings content will be here -->
+                <p>Điều hướng tới trang riêng để xem bảng xếp hạng chi tiết</p>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div class="tab-pane fade" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle mr-2"></i> Thống kê hiệu suất của bạn trong các giải đấu
+                </div>
+                <!-- Statistics content will be here -->
+                <p>Điều hướng tới trang riêng để xem thống kê chi tiết</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container text-center">
+        <p class="mb-0">© 2025 Othello Tournament.</p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS, Popper.js, and jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Card hover effect for filter cards
+        $('.filter-card').hover(
+            function() {
+                $(this).addClass('animate__animated animate__pulse');
+            },
+            function() {
+                $(this).removeClass('animate__animated animate__pulse');
+            }
+        );
+
+        // Fetch tournament counts (example functionality)
+        function fetchTournamentCounts() {
+            // This would be replaced with actual API calls
+            console.log("Fetching tournament counts...");
+        }
+
+        // Call on page load
+        fetchTournamentCounts();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Othello Tournament - Cập Nhật Giải Đấu</title>
+    <!-- Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap4-theme/1.0.0/select2-bootstrap4.min.css">
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #1abc9c;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+
+        body {
+            background-color: var(--light-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(26, 188, 156, 0.1), transparent 70%),
+            radial-gradient(circle at bottom left, rgba(44, 62, 80, 0.1), transparent 70%);
+            z-index: -1;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--light-color) !important;
+        }
+
+        .navbar-brand .game-icon {
+            margin-right: 10px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 1rem 0 3rem;
+            position: relative;
+        }
+
+        .footer {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+
+        /* Othello piece rotating animation */
+        @keyframes flip {
+            0% {
+                transform: rotateY(0deg);
+            }
+            50% {
+                transform: rotateY(180deg);
+            }
+            100% {
+                transform: rotateY(360deg);
+            }
+        }
+
+        .othello-piece {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(to right, black 50%, white 50%);
+            animation: flip 3s infinite linear;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        /* Form styles */
+        .form-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-title {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+
+        .form-title::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group label i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(26, 188, 156, 0.25);
+        }
+
+        .form-control:disabled {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .select2-container--bootstrap4 .select2-selection--single {
+            height: calc(1.5em + 1.5rem + 4px);
+            padding: 0.75rem 1rem;
+        }
+
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+            padding: 0;
+            line-height: 1;
+        }
+
+        .required-field::after {
+            content: '*';
+            color: var(--accent-color);
+            margin-left: 5px;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: width 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn-primary:hover::before {
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #16a085;
+            border-color: #16a085;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(22, 160, 133, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            border-color: #95a5a6;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+            border-color: #7f8c8d;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(127, 140, 141, 0.3);
+        }
+
+        .btn-icon {
+            margin-right: 10px;
+        }
+
+        /* Animation for floating pieces */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .floating-piece {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.2;
+        }
+
+        .floating-piece.black {
+            background-color: #000;
+        }
+
+        .floating-piece.white {
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .floating-piece:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        .floating-piece:nth-child(2) {
+            top: 20%;
+            right: 5%;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        .floating-piece:nth-child(3) {
+            bottom: 15%;
+            left: 10%;
+            animation: float 7s infinite ease-in-out;
+        }
+
+        .floating-piece:nth-child(4) {
+            bottom: 30%;
+            right: 8%;
+            animation: float 9s infinite ease-in-out;
+        }
+
+        /* Board preview animation */
+        .board-preview {
+            width: 100%;
+            aspect-ratio: 1;
+            max-width: 300px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .board-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .board-cell {
+            background-color: #4CAF50;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .board-cell::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .board-cell.black::after {
+            background-color: #000;
+            opacity: 1;
+        }
+
+        .board-cell.white::after {
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            opacity: 1;
+        }
+
+        /* Board animation */
+        @keyframes placeDisc {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .board-cell.animated::after {
+            animation: placeDisc 0.5s forwards;
+        }
+
+        /* Submit button animation */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(26, 188, 156, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(26, 188, 156, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(26, 188, 156, 0);
+            }
+        }
+
+        .btn-submit {
+            animation: pulse 2s infinite;
+        }
+
+        /* Form section animations */
+        .form-section, .round-container {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .form-section.visible, .round-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Card styles for rounds */
+        .round-container {
+            margin-bottom: 40px;
+        }
+
+        .round-container .card {
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .round-container .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .round-container .card-header {
+            background: linear-gradient(to right, rgba(44, 62, 80, 0.1), rgba(26, 188, 156, 0.1));
+            border-bottom: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Status badges for rounds */
+        .badge-not-started {
+            background-color: #6c757d;
+        }
+
+        .badge-in-progress {
+            background-color: #17a2b8;
+        }
+
+        .badge-completed {
+            background-color: #28a745;
+        }
+
+        /* Fixed: Custom datetime input styles */
+        .date-input-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            margin-bottom: 10px;
+        }
+
+        .time-input-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .date-input-group input,
+        .time-input-group input {
+            width: auto;
+            text-align: center;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin: 0 2px;
+        }
+
+        .date-input-group .day-input,
+        .date-input-group .month-input {
+            flex: 0 0 60px;
+            max-width: 60px;
+        }
+
+        .date-input-group .year-input {
+            flex: 0 0 80px;
+            max-width: 80px;
+        }
+
+        .time-input-group .hour-input,
+        .time-input-group .minute-input {
+            flex: 0 0 60px;
+            max-width: 60px;
+        }
+
+        .separator {
+            margin: 0 4px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .datetime-format-hint {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        /* Validation styles */
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .validation-error {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .validation-error.show {
+            display: block;
+        }
+
+        /* Error notification at the top of form */
+        .error-notification {
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .error-notification.show {
+            display: block;
+        }
+
+        /* Summary of validation errors */
+        .validation-summary {
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .validation-summary.show {
+            display: block;
+        }
+
+        .validation-summary ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+
+        .validation-summary li {
+            margin-bottom: 5px;
+        }
+
+        /* Tournament status indicator */
+        .tournament-status {
+            padding: 8px 15px;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .tournament-status.not-started {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .tournament-status.in-progress {
+            background-color: #cff4fc;
+            color: #055160;
+        }
+
+        .tournament-status.completed {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        /* Disabled round container */
+        .round-container.disabled .card {
+            opacity: 0.7;
+            background-color: #f8f9fa;
+        }
+
+        .round-container.disabled .form-control {
+            background-color: #f8f9fa;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .btn-primary, .btn-secondary {
+                padding: 0.6rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand animate__animated animate__fadeIn" href="/home">
+            <span class="othello-piece"></span> Othello Tournament
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown mr-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user-circle mr-1"></i> <span th:text="${username}">Username</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/profile"><i class="fas fa-id-card mr-2"></i> Hồ sơ</a>
+                        <a class="dropdown-item" href="/settings"><i class="fas fa-cog mr-2"></i> Cài đặt</a>
+                        <div class="dropdown-divider"></div>
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt mr-2"></i> Đăng xuất</button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header animate__animated animate__fadeIn">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2>
+                    <i class="fas fa-edit mr-2"></i> Cập Nhật Giải Đấu
+                    <span class="tournament-status not-started" th:if="${tournament.status == 'CHƯA BẮT ĐẦU'}">Chưa bắt đầu</span>
+                    <span class="tournament-status in-progress" th:if="${tournament.status == 'ĐANG DIỄN RA'}">Đang diễn ra</span>
+                    <span class="tournament-status completed" th:if="${tournament.status == 'ĐÃ KẾT THÚC'}">Đã kết thúc</span>
+                </h2>
+            </div>
+            <a href="/tournaments" class="btn btn-outline-light">
+                <i class="fas fa-arrow-left mr-2"></i> Quay lại
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Floating animation elements -->
+    <div class="floating-piece black"></div>
+    <div class="floating-piece white"></div>
+    <div class="floating-piece black"></div>
+    <div class="floating-piece white"></div>
+
+    <!-- Add Success Message Container -->
+    <div class="alert alert-success alert-dismissible fade" id="successNotification" role="alert" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; min-width: 300px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <span id="successMessage"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="form-container animate__animated animate__fadeIn">
+            <!-- Error notification -->
+            <div class="alert alert-danger alert-dismissible fade error-notification" id="errorNotification" role="alert">
+                <h5><i class="fas fa-exclamation-triangle mr-2"></i> Vui lòng kiểm tra lại thông tin</h5>
+                <div class="validation-summary" id="validationSummary">
+                    <ul id="errorList"></ul>
+                </div>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <h3 class="form-title text-center"><i class="fas fa-trophy mr-2"></i> Cập nhật thông tin giải đấu</h3>
+
+            <form id="updateTournamentForm" class="needs-validation" novalidate>
+                <!-- Basic Information Section -->
+                <div class="form-section visible" id="section-basic">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="name" class="required-field"><i class="fas fa-font"></i> Tên giải đấu</label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Nhập tên giải đấu" th:value="${tournament.name}" required>
+                                <div class="validation-error" id="nameError">Vui lòng nhập tên giải đấu</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description"><i class="fas fa-align-left"></i> Mô tả</label>
+                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Mô tả chi tiết về giải đấu" th:text="${tournament.description}"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="board-type-preview text-center">
+                                <h5 class="mb-3"><i class="fas fa-chess-board mr-2"></i> Bàn cờ</h5>
+                                <div class="board-preview mb-3">
+                                    <!-- Board cells will be generated by JS -->
+                                </div>
+                                <div class="badge badge-primary p-2">Bàn cờ 8x8</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tournament Settings Section -->
+                <div class="form-section" id="section-settings">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="boardTypeId"><i class="fas fa-chess-board"></i> Loại bàn cờ</label>
+                                <select class="form-control" id="boardTypeId" name="boardTypeId" disabled>
+                                    <option value="1" selected>Bàn cờ 8x8 </option>
+                                </select>
+                                <small class="text-muted"><i class="fas fa-info-circle mr-1"></i> Loại bàn cờ không thể thay đổi sau khi tạo giải đấu</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="organizingMethodId"><i class="fas fa-sitemap"></i> Số vòng đấu</label>
+                                <select class="form-control" id="organizingMethodId" name="organizingMethodId" disabled>
+                                    <option value="1" th:selected="${tournament.organizingMethodId == 1}">7 vòng</option>
+                                    <option value="2" th:selected="${tournament.organizingMethodId == 2}">9 vòng</option>
+                                    <option value="3" th:selected="${tournament.organizingMethodId == 3}">11 vòng</option>
+                                </select>
+                                <small class="text-muted"><i class="fas fa-info-circle mr-1"></i> Số vòng đấu không thể thay đổi sau khi tạo giải đấu</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="maxPlayer" class="required-field"><i class="fas fa-users"></i> Số người tham gia tối đa</label>
+                                <input type="number" class="form-control" id="maxPlayer" name="maxPlayer" min="${tournament.currentPlayers}" step="2" th:value="${tournament.maxPlayer}" required>
+                                <div class="validation-error" id="maxPlayerError">Vui lòng nhập số người tham gia tối đa (phải >= số người hiện tại và là số chẵn)</div>
+                                <small class="text-muted"><i class="fas fa-info-circle mr-1"></i> Số người tham gia tối đa chỉ có thể tăng, không thể giảm</small>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="autoApprove" name="autoApprove" th:checked="${tournament.freeToJoin}">
+                                    <label class="custom-control-label" for="autoApprove">Tự động chấp nhận người tham gia</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tournament Time Settings Section -->
+                <div class="form-section" id="section-time">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="startDate" class="required-field"><i class="far fa-calendar-alt"></i> Thời gian bắt đầu giải đấu</label>
+                                <!-- Hidden input for actual datetime value -->
+                                <input type="hidden" id="startDate" name="startDate" th:value="${tournament.startDate}" required>
+
+                                <div class="date-time-inputs" id="startDateInputs" th:classappend="${tournament.isStart} ? 'disabled' : ''">
+                                    <div class="date-input-group">
+                                        <input type="number" class="form-control day-input" placeholder="DD" min="1" max="31" th:disabled="${tournament.isStart}" required>
+                                        <div class="separator">/</div>
+                                        <input type="number" class="form-control month-input" placeholder="MM" min="1" max="12" th:disabled="${tournament.isStart}" required>
+                                        <div class="separator">/</div>
+                                        <input type="number" class="form-control year-input" placeholder="YYYY" min="2025" max="2030" th:disabled="${tournament.isStart}" required>
+                                    </div>
+                                    <div class="time-input-group">
+                                        <input type="number" class="form-control hour-input" placeholder="HH" min="0" max="23" th:disabled="${tournament.isStart}" required>
+                                        <div class="separator">:</div>
+                                        <input type="number" class="form-control minute-input" placeholder="MM" min="0" max="59" th:disabled="${tournament.isStart}" required>
+                                    </div>
+                                </div>
+                                <div class="datetime-format-hint">Định dạng: DD/MM/YYYY HH:MM</div>
+                                <div class="validation-error" id="startDateError">Vui lòng nhập thời gian bắt đầu hợp lệ</div>
+                                <small class="text-muted" th:if="${tournament.isStart}"><i class="fas fa-lock mr-1"></i> Không thể thay đổi thời gian bắt đầu khi giải đấu đã diễn ra</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="endDate" class="required-field"><i class="far fa-calendar-check"></i> Thời gian kết thúc giải đấu</label>
+                                <!-- Hidden input for actual datetime value -->
+                                <input type="hidden" id="endDate" name="endDate" th:value="${tournament.endDate}" required>
+
+                                <div class="date-time-inputs" id="endDateInputs" th:classappend="${tournament.isStart} ? 'disabled' : ''">
+                                    <div class="date-input-group">
+                                        <input type="number" class="form-control day-input" placeholder="DD" min="1" max="31" th:disabled="${tournament.isStart}" required>
+                                        <div class="separator">/</div>
+                                        <input type="number" class="form-control month-input" placeholder="MM" min="1" max="12" th:disabled="${tournament.isStart}" required>
+                                        <div class="separator">/</div>
+                                        <input type="number" class="form-control year-input" placeholder="YYYY" min="2025" max="2030" th:disabled="${tournament.isStart}" required>
+                                    </div>
+                                    <div class="time-input-group">
+                                        <input type="number" class="form-control hour-input" placeholder="HH" min="0" max="23" th:disabled="${tournament.isStart}" required>
+                                        <div class="separator">:</div>
+                                        <input type="number" class="form-control minute-input" placeholder="MM" min="0" max="59" th:disabled="${tournament.isStart}" required>
+                                    </div>
+                                </div>
+                                <div class="datetime-format-hint">Định dạng: DD/MM/YYYY HH:MM</div>
+                                <div class="validation-error" id="endDateError">Vui lòng nhập thời gian kết thúc hợp lệ</div>
+                                <small class="text-muted" th:if="${tournament.isStart}"><i class="fas fa-lock mr-1"></i> Không thể thay đổi thời gian kết thúc khi giải đấu đã diễn ra</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="validation-error" id="dateRangeError">Thời gian kết thúc phải sau thời gian bắt đầu</div>
+                </div>
+
+                <!-- Rounds Time Settings Section -->
+                <div class="form-section" id="section-rounds">
+                    <h4 class="mb-4 text-center"><i class="fas fa-chess-clock mr-2"></i> Lịch trình vòng đấu</h4>
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle mr-2"></i> Thời gian cho từng vòng đấu phải nằm trong khoảng thời gian của giải đấu. Các vòng đấu đã bắt đầu hoặc đã kết thúc không thể chỉnh sửa.
+                    </div>
+
+                    <div id="roundsContainer">
+                        <!-- Round time inputs will be generated here dynamically -->
+                    </div>
+                </div>
+
+                <!-- Hidden fields -->
+                <input type="hidden" name="id" id="tournamentId" th:value="${tournament.id}">
+                <input type="hidden" name="organizerId" id="organizerId" th:value="${tournament.organizerId}">
+                <input type="hidden" name="currentPlayers" id="currentPlayers" th:value="${tournament.currentPlayers}">
+
+                <!-- Form Actions -->
+                <div class="form-section visible" id="section-actions">
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="/tournaments" class="btn btn-secondary">
+                            <i class="fas fa-times btn-icon"></i> Huỷ
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-submit">
+                            <i class="fas fa-save btn-icon"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container text-center">
+        <p class="mb-0">© 2025 Othello Tournament Manager. Tất cả các quyền được bảo lưu.</p>
+    </div>
+</footer>
+
+<!-- JavaScript Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Đảm bảo thông báo lỗi sẽ không hiển thị khi trang tải
+        $('#errorNotification').removeClass('show');
+        $('#validationSummary').removeClass('show');
+        $('.validation-error').removeClass('show');
+
+        // Biến theo dõi xem form đã được gửi hay chưa
+        let formSubmitted = false;
+
+        // Thêm biến để xác định giải đấu đã bắt đầu hay chưa (lấy từ model)
+        const tournamentStarted = ${tournament.isStart}; // Giả sử giá trị mặc định là false
+
+        // Mặc định hiển thị là giải đấu chưa bắt đầu
+        const tournamentStatus = "${tournament.status}" || "NOT_STARTED";
+
+        // Animate form sections
+        setTimeout(function() {
+            $('#section-settings').addClass('visible');
+        }, 300);
+
+        setTimeout(function() {
+            $('#section-time').addClass('visible');
+        }, 600);
+
+        setTimeout(function() {
+            $('#section-rounds').addClass('visible');
+        }, 900);
+
+        // Thiết lập giá trị minValue cho maxPlayer
+        const currentPlayers = parseInt($('#currentPlayers').val()) || 2;
+        $('#maxPlayer').attr('min', currentPlayers);
+
+        // Generate Othello board preview
+        generateBoardPreview();
+
+        // Animate board preview with discs
+        animateBoardPreview();
+
+        // Phân tích ngày tháng từ model để điền vào các trường
+        parseAndFillDateTime('#startDate', '#startDateInputs');
+        parseAndFillDateTime('#endDate', '#endDateInputs');
+
+        // Set up real-time validation for required fields
+        $('#name').on('input', function() {
+            if (formSubmitted) {
+                validateField($(this), $('#nameError'), function(value) {
+                    return value.trim() !== '';
+                }, 'Vui lòng nhập tên giải đấu');
+            }
+        });
+
+        // Validate maxPlayer (phải >= số người hiện tại và là số chẵn)
+        $('#maxPlayer').on('input', function() {
+            if (formSubmitted) {
+                validateField($(this), $('#maxPlayerError'), function(value) {
+                    const num = parseInt(value);
+                    if (isNaN(num) || num < currentPlayers) {
+                        $('#maxPlayerError').text(`Số lượng người chơi phải lớn hơn hoặc bằng ${currentPlayers}`);
+                        return false;
+                    } else if (num % 2 !== 0) {
+                        $('#maxPlayerError').text('Số lượng người chơi phải là số chẵn');
+                        return false;
+                    }
+                    return true;
+                }, `Vui lòng nhập số người tham gia tối đa (phải >= ${currentPlayers} và là số chẵn)`);
+            }
+        });
+
+        // Cài đặt hàm xử lý khi người dùng nhập ngày tháng (nếu cho phép chỉnh sửa)
+        if (!tournamentStarted) {
+            $('#startDateInputs input, #endDateInputs input').on('input', function() {
+                const value = $(this).val();
+
+                if (value && !isNaN(parseInt(value))) {
+                    const numValue = parseInt(value);
+                    const min = parseInt($(this).attr('min'));
+                    const max = parseInt($(this).attr('max'));
+
+                    if (numValue >= min && numValue <= max) {
+                        $(this).removeClass('is-invalid');
+                    } else {
+                        $(this).addClass('is-invalid');
+                    }
+                }
+            });
+        }
+
+        // Initial generation of round inputs
+        generateRoundInputs();
+
+        // Form validation and submission
+        $('#updateTournamentForm').on('submit', function(event) {
+            // Ngăn form submit mặc định
+            event.preventDefault();
+
+            // Đánh dấu là form đã được gửi để kích hoạt xác thực real-time
+            formSubmitted = true;
+
+            // Clear previous errors
+            resetValidationErrors();
+
+            // Xác thực form (bao gồm cả format lại ngày tháng)
+            if (!validateForm()) {
+                return false;
+            }
+
+            // If validation passes, show loading state
+            $('.btn-submit').html('<i class="fas fa-spinner fa-spin mr-2"></i> Đang xử lý...');
+            $('.btn-submit').attr('disabled', true);
+
+            // Lấy dữ liệu từ form
+            const formData = {
+                id: $('#tournamentId').val(),
+                name: $('#name').val(),
+                description: $('#description').val() || "",
+                freeToJoin: $('#autoApprove').is(':checked'),
+                boardTypeId: parseInt($('#boardTypeId').val()),
+                organizingMethodId: parseInt($('#organizingMethodId').val()),
+                maxPlayer: parseInt($('#maxPlayer').val()),
+                startDate: tournamentStarted ? $('#startDate').val() : $('#startDate').val(), // Sử dụng giá trị cũ nếu giải đấu đã bắt đầu
+                endDate: tournamentStarted ? $('#endDate').val() : $('#endDate').val(), // Sử dụng giá trị cũ nếu giải đấu đã bắt đầu
+                organizerId: $('#organizerId').val(),
+                rounds: []
+            };
+
+            // Thu thập dữ liệu các vòng đấu
+            $('.round-container').each(function(index) {
+                const roundId = $(this).find('input[name$=".id"]').val();
+                const roundNumber = index + 1;
+                const roundStatus = $(this).data('status');
+
+                // Kiểm tra xem vòng đấu có bị disable không
+                const isDisabled = $(this).hasClass('disabled');
+
+                // Nếu vòng đấu bị disable, sử dụng giá trị hiện tại
+                const startDate = isDisabled ?
+                    $(this).find('input[name$=".startDate"]').val() :
+                    $(`#round${roundNumber}StartDate`).val();
+
+                const endDate = isDisabled ?
+                    $(this).find('input[name$=".endDate"]').val() :
+                    $(`#round${roundNumber}EndDate`).val();
+
+                formData.rounds.push({
+                    id: roundId,
+                    roundNumber: roundNumber,
+                    startDate: startDate,
+                    endDate: endDate,
+                    status: roundStatus
+                });
+            });
+
+            // Gửi dữ liệu bằng fetch API
+            fetch('/tournament/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => {
+                    console.log("Response status:", response.status);
+                    console.log("Response headers:", response.headers);
+                    console.log("Content-Type:", response.headers.get('content-type'));
+
+                    // Store original response for checking redirect status
+                    const originalResponse = response.clone();
+
+                    // Check if the response is a redirect
+                    if (response.redirected) {
+                        console.log("Redirected to:", response.url);
+                        showSuccessMessage("Cập nhật giải đấu thành công!");
+                        setTimeout(() => {
+                            window.location.href = response.url;
+                        }, 1500);
+                        return null;
+                    }
+
+                    // Parse response based on content type
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json().then(data => {
+                            console.log("Parsed JSON data:", data);
+                            if (!response.ok) {
+                                throw { data: data, status: response.status };
+                            }
+                            return { data, originalResponse };
+                        });
+                    } else {
+                        return response.text().then(text => {
+                            console.log("Response as text:", text.substring(0, 100));
+                            if (!response.ok) {
+                                // Try to parse text as JSON if it looks like JSON
+                                if (text.trim().startsWith('[') || text.trim().startsWith('{')) {
+                                    try {
+                                        const jsonData = JSON.parse(text);
+                                        throw { data: jsonData, status: response.status };
+                                    } catch (e) {
+                                        console.error("Failed to parse response as JSON:", e);
+                                    }
+                                }
+                                throw { htmlContent: text, status: response.status };
+                            }
+                            return { data: { message: "Success" }, originalResponse };
+                        });
+                    }
+                })
+                .then(result => {
+                    // Handle success
+                    if (result) {
+                        showSuccessMessage("Cập nhật giải đấu thành công!");
+                        setTimeout(() => {
+                            window.location.href = '/tournaments';
+                        }, 1500);
+                    }
+                })
+                .catch(error => {
+                    // Reset the submit button
+                    $('.btn-submit').html('<i class="fas fa-save btn-icon"></i> Lưu thay đổi');
+                    $('.btn-submit').attr('disabled', false);
+
+                    // Clear previous errors
+                    $('#errorList').empty();
+                    $('#errorNotification').addClass('show');
+                    $('#validationSummary').addClass('show');
+
+                    console.error('Error during form submission:', error);
+
+                    // Process and display error messages
+                    try {
+                        if (error.data) {
+                            console.log("Error data:", error.data);
+                            console.log("Error data type:", typeof error.data);
+
+                            let errorData = error.data;
+
+                            // Handle error data based on type
+                            if (Array.isArray(errorData)) {
+                                // Direct array of errors
+                                processValidationErrors(errorData);
+                            }
+                            else if (typeof errorData === 'string') {
+                                // Try to parse string as JSON
+                                try {
+                                    const parsedData = JSON.parse(errorData);
+                                    console.log("Successfully parsed error string to JSON:", parsedData);
+                                    if (Array.isArray(parsedData)) {
+                                        processValidationErrors(parsedData);
+                                    } else if (parsedData.errors && Array.isArray(parsedData.errors)) {
+                                        processValidationErrors(parsedData.errors);
+                                    } else {
+                                        $('#errorList').append(`<li>${parsedData.message || 'Lỗi không xác định'}</li>`);
+                                    }
+                                } catch (e) {
+                                    // Not valid JSON, display as string
+                                    console.error("Error parsing error data:", e);
+                                    $('#errorList').append(`<li>Lỗi: ${errorData}</li>`);
+                                }
+                            }
+                            else if (errorData.errors && Array.isArray(errorData.errors)) {
+                                // Array inside an object
+                                processValidationErrors(errorData.errors);
+                            }
+                            else if (errorData.errorCode || errorData.field || errorData.message) {
+                                // Single error object
+                                processValidationErrors([errorData]);
+                            }
+                            else {
+                                // Generic error message
+                                $('#errorList').append(`<li>Lỗi: ${errorData.message || 'Đã xảy ra lỗi khi cập nhật giải đấu'}</li>`);
+                            }
+                        }
+                        else if (error.htmlContent) {
+                            // Try to extract error information from HTML
+                            const htmlContent = error.htmlContent;
+                            if (htmlContent.includes('400 Bad Request')) {
+                                $('#errorList').append(`<li>Lỗi yêu cầu không hợp lệ</li>`);
+                            } else {
+                                $('#errorList').append(`<li>Lỗi máy chủ: Vui lòng thử lại sau hoặc liên hệ quản trị viên</li>`);
+                                console.error('Server returned HTML instead of JSON:', htmlContent.substring(0, 200) + '...');
+                            }
+                        }
+                        else {
+                            // Generic error
+                            $('#errorList').append(`<li>Đã xảy ra lỗi: ${error.message || 'Không thể kết nối đến máy chủ'}</li>`);
+                        }
+                    } catch (e) {
+                        console.error("Error in error handling:", e);
+                        $('#errorList').append(`<li>Đã xảy ra lỗi không xác định</li>`);
+                    }
+
+                    // Scroll to the error notification
+                    $('html, body').animate({
+                        scrollTop: $('#errorNotification').offset().top - 100
+                    }, 500);
+                });
+        });
+
+        // Phân tích ngày tháng từ chuỗi và điền vào các trường input
+        function parseAndFillDateTime(hiddenInputSelector, containerSelector) {
+            const dateTimeStr = $(hiddenInputSelector).val();
+            if (!dateTimeStr) return;
+
+            try {
+                // Giả sử định dạng là DD/MM/YYYY HH:MM
+                const parts = dateTimeStr.split(' ');
+                if (parts.length !== 2) return;
+
+                const dateParts = parts[0].split('/');
+                const timeParts = parts[1].split(':');
+
+                if (dateParts.length !== 3 || timeParts.length !== 2) return;
+
+                const day = parseInt(dateParts[0]);
+                const month = parseInt(dateParts[1]);
+                const year = parseInt(dateParts[2]);
+                const hour = parseInt(timeParts[0]);
+                const minute = parseInt(timeParts[1]);
+
+                // Điền giá trị vào các trường input
+                $(containerSelector).find('.day-input').val(day);
+                $(containerSelector).find('.month-input').val(month);
+                $(containerSelector).find('.year-input').val(year);
+                $(containerSelector).find('.hour-input').val(hour);
+                $(containerSelector).find('.minute-input').val(minute);
+            } catch (e) {
+                console.error("Error parsing date:", e);
+            }
+        }
+
+        // Process validation errors from the server
+        function processValidationErrors(errors) {
+            if (!errors || errors.length === 0) {
+                $('#errorList').append(`<li>Đã xảy ra lỗi không xác định</li>`);
+                return;
+            }
+
+            // Process each error and update the form UI
+            errors.forEach(function(err) {
+                let fieldName = err.field || '';
+                let errorMessage = err.message || 'Lỗi không xác định';
+                let errorCode = err.errorCode || '';
+
+                console.log("Processing error:", { fieldName, errorMessage, errorCode });
+
+                // T001-T004: Lỗi liên quan đến tên giải đấu
+                if (errorCode === "T001" || errorCode === "T002" || errorCode === "T003" ||
+                    errorCode === "T004" || errorCode === "NAME_ALREADY_EXISTS" ||
+                    fieldName === "name") {
+                    showValidationError($('#name'), $('#nameError'), errorMessage);
+                }
+                // T401-T405: Lỗi liên quan đến số lượng người chơi
+                else if (errorCode === "T401" || errorCode === "T402" || errorCode === "T403" ||
+                    errorCode === "T404" || errorCode === "T405" ||
+                    errorCode === "MAX_PLAYER_LESS_THAN_ONE" || errorCode === "MAX_PLAYER_NOT_EVEN" ||
+                    errorCode === "MAX_PLAYER_TOO_LARGE" || errorCode === "MAX_PLAYER_TOO_SMALL" ||
+                    fieldName === "maxPlayer") {
+                    showValidationError($('#maxPlayer'), $('#maxPlayerError'), errorMessage);
+                }
+                // T101-T105: Lỗi liên quan đến ngày bắt đầu
+                else if (errorCode === "T101" || errorCode === "T102" || errorCode === "T103" ||
+                    errorCode === "T104" || errorCode === "T105" ||
+                    errorCode === "START_DATE_EMPTY" || errorCode === "START_DATE_INVALID_FORMAT" ||
+                    errorCode === "START_DATE_PARSE_ERROR" || errorCode === "START_DATE_IN_PAST" ||
+                    fieldName === "startDate") {
+                    showValidationError($('#startDateInputs'), $('#startDateError'), errorMessage);
+                }
+                // T201-T204: Lỗi liên quan đến ngày kết thúc
+                else if (errorCode === "T201" || errorCode === "T202" || errorCode === "T203" ||
+                    errorCode === "T204" ||
+                    errorCode === "END_DATE_EMPTY" || errorCode === "END_DATE_INVALID_FORMAT" ||
+                    errorCode === "END_DATE_PARSE_ERROR" || fieldName === "endDate") {
+                    showValidationError($('#endDateInputs'), $('#endDateError'), errorMessage);
+                }
+                // T301-T303: Lỗi liên quan đến thời gian
+                else if (errorCode === "T301" || errorCode === "T302" || errorCode === "T303" ||
+                    errorCode === "START_DATE_AFTER_END_DATE" || errorCode === "TOURNAMENT_DURATION_TOO_SHORT" ||
+                    errorCode === "TOURNAMENT_DURATION_TOO_LONG" || fieldName === "dateRange") {
+                    showValidationError($('#endDateInputs'), $('#dateRangeError'), errorMessage);
+                }
+                // T901-T902: Lỗi hệ thống
+                else if (errorCode === "T901" || errorCode === "T902" ||
+                    errorCode === "SYSTEM_ERROR" || errorCode === "DATABASE_ERROR") {
+                    $('#errorList').append(`<li>Lỗi hệ thống: ${errorMessage}</li>`);
+                }
+                else {
+                    // For any other errors, add to the error list
+                    $('#errorList').append(`<li>${errorMessage} ${fieldName ? `(${fieldName})` : ''}</li>`);
+                }
+            });
+        }
+    });
+
+    // Show success message
+    function showSuccessMessage(message) {
+        $('#successMessage').text(message);
+        $('#successNotification').css('display', 'block').addClass('show');
+
+        // Auto hide after 3 seconds
+        setTimeout(() => {
+            $('#successNotification').removeClass('show');
+            setTimeout(() => {
+                $('#successNotification').css('display', 'none');
+            }, 300);
+        }, 3000);
+    }
+
+    // Clear all validation errors
+    function resetValidationErrors() {
+        $('.validation-error').removeClass('show');
+        $('.form-control').removeClass('is-invalid');
+        $('#errorList').empty();
+        $('#errorNotification').removeClass('show');
+        $('#validationSummary').removeClass('show');
+    }
+
+    // Show validation error
+    function showValidationError(inputElement, errorElement, message) {
+        inputElement.addClass('is-invalid');
+        errorElement.text(message).addClass('show');
+
+        // Add to error summary if not already there
+        let errorExists = false;
+        $('#errorList li').each(function() {
+            if ($(this).text() === message) {
+                errorExists = true;
+                return false;
+            }
+        });
+
+        if (!errorExists) {
+            $('#errorList').append(`<li>${message}</li>`);
+            $('#errorNotification').addClass('show');
+            $('#validationSummary').addClass('show');
+        }
+    }
+
+    // Clear validation error
+    function clearValidationError(inputElement, errorElement) {
+        inputElement.removeClass('is-invalid');
+        errorElement.removeClass('show');
+
+        // Remove from error summary if exists
+        const message = errorElement.text();
+        $('#errorList li').each(function() {
+            if ($(this).text() === message) {
+                $(this).remove();
+                return false;
+            }
+        });
+
+        if ($('#errorList li').length === 0) {
+            $('#errorNotification').removeClass('show');
+            $('#validationSummary').removeClass('show');
+        }
+    }
+
+    // Format date with leading zeros
+    function formatDate(day, month, year, hour, minute) {
+        return `${padZero(parseInt(day))}/${padZero(parseInt(month))}/${year} ${padZero(parseInt(hour))}:${padZero(parseInt(minute))}`;
+    }
+
+    // Update hidden date input based on separate inputs
+    function updateDateInput(containerSelector, hiddenInputSelector) {
+        const container = $(containerSelector);
+        const day = container.find('.day-input').val();
+        const month = container.find('.month-input').val();
+        const year = container.find('.year-input').val();
+        const hour = container.find('.hour-input').val();
+        const minute = container.find('.minute-input').val();
+
+        // Kiểm tra nếu tất cả giá trị đều có
+        if (day && month && year && hour && minute) {
+            const dayVal = parseInt(day);
+            const monthVal = parseInt(month);
+            const yearVal = parseInt(year);
+            const hourVal = parseInt(hour);
+            const minuteVal = parseInt(minute);
+
+            if (
+                !isNaN(dayVal) && dayVal >= 1 && dayVal <= 31 &&
+                !isNaN(monthVal) && monthVal >= 1 && monthVal <= 12 &&
+                !isNaN(yearVal) && yearVal >= 2025 && yearVal <= 2030 &&
+                !isNaN(hourVal) && hourVal >= 0 && hourVal <= 23 &&
+                !isNaN(minuteVal) && minuteVal >= 0 && minuteVal <= 59
+            ) {
+                const formattedDate = formatDate(day, month, year, hour, minute);
+                $(hiddenInputSelector).val(formattedDate);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Update all date inputs before form submission
+    function updateAllDateInputs() {
+        let isValid = true;
+        const tournamentStarted = ${tournament.isStart} || false;
+
+        // Chỉ cập nhật nếu giải đấu chưa bắt đầu
+        if (!tournamentStarted) {
+            isValid = updateDateInput('#startDateInputs', '#startDate') && isValid;
+            isValid = updateDateInput('#endDateInputs', '#endDate') && isValid;
+        }
+
+        // Cập nhật tất cả các input ngày tháng của các vòng đấu chưa bắt đầu
+        $('.round-container:not(.disabled)').each(function() {
+            const roundNumber = $(this).data('round-number');
+            isValid = updateDateInput(`#round${roundNumber}StartDateInputs`, `#round${roundNumber}StartDate`) && isValid;
+            isValid = updateDateInput(`#round${roundNumber}EndDateInputs`, `#round${roundNumber}EndDate`) && isValid;
+        });
+
+        return isValid;
+    }
+
+    // Add leading zero to numbers less than 10
+    function padZero(num) {
+        return num < 10 ? '0' + num : num;
+    }
+
+    // Validate a single field
+    function validateField(inputElement, errorElement, validationFunc, errorMessage) {
+        const value = inputElement.val();
+        if (!validationFunc(value)) {
+            showValidationError(inputElement, errorElement, errorMessage);
+            return false;
+        } else {
+            clearValidationError(inputElement, errorElement);
+            return true;
+        }
+    }
+
+    // Validate date format
+    function isValidDateTimeFormat(dateTimeStr) {
+        if (!dateTimeStr) return false;
+
+        // Regex để chấp nhận cả 1 hoặc 2 chữ số
+        const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{1,2})$/;
+        if (!regex.test(dateTimeStr)) return false;
+
+        // Tiếp tục xác thực giá trị ngày tháng
+        const matches = dateTimeStr.match(regex);
+        const day = parseInt(matches[1], 10);
+        const month = parseInt(matches[2], 10);
+        const year = parseInt(matches[3], 10);
+        const hour = parseInt(matches[4], 10);
+        const minute = parseInt(matches[5], 10);
+
+        // Xác thực các giá trị
+        return (
+            day >= 1 && day <= 31 &&
+            month >= 1 && month <= 12 &&
+            year >= 2025 && year <= 2030 &&
+            hour >= 0 && hour <= 23 &&
+            minute >= 0 && minute <= 59
+        );
+    }
+
+    // Validate the date range
+    function validateDateRange() {
+        const tournamentStarted = ${tournament.isStart} || false;
+
+        // Nếu giải đấu đã bắt đầu, không cần kiểm tra ngày tháng
+        if (tournamentStarted) {
+            return true;
+        }
+
+        const startDate = $('#startDate').val();
+        const endDate = $('#endDate').val();
+
+        if (!startDate || !endDate) return;
+
+        const startMoment = moment(startDate, 'DD/MM/YYYY HH:mm');
+        const endMoment = moment(endDate, 'DD/MM/YYYY HH:mm');
+
+        if (!startMoment.isValid() || !endMoment.isValid()) return;
+
+        // Kiểm tra startDate phải trước endDate
+        if (endMoment.isSameOrBefore(startMoment)) {
+            showValidationError($('#endDateInputs'), $('#dateRangeError'), 'Thời gian kết thúc phải sau thời gian bắt đầu');
+            return false;
+        }
+
+        // Kiểm tra startDate phải sau thời điểm hiện tại
+        const now = moment();
+        if (startMoment.isSameOrBefore(now)) {
+            showValidationError($('#startDateInputs'), $('#startDateError'), 'Ngày bắt đầu phải sau ngày hiện tại');
+            return false;
+        }
+
+        // Kiểm tra khoảng thời gian giữa startDate và endDate
+        const diffInDays = endMoment.diff(startMoment, 'days');
+        const roundCount = parseInt($('#organizingMethodId').val());
+
+        // Nếu số vòng đấu > 7, cần ít nhất 2 ngày
+        if (roundCount > 1 && diffInDays < 2) {
+            showValidationError($('#endDateInputs'), $('#dateRangeError'), 'Giải đấu với nhiều vòng cần ít nhất 2 ngày');
+            return false;
+        }
+
+        clearValidationError($('#endDateInputs'), $('#dateRangeError'));
+        clearValidationError($('#startDateInputs'), $('#startDateError'));
+        return true;
+    }
+
+    // Validate round dates against tournament timeframe
+    function validateRoundDates(tournamentStartMoment, tournamentEndMoment) {
+        let isValid = true;
+        const errors = [];
+
+        // Chỉ xác thực các vòng đấu chưa bắt đầu
+        $('.round-container:not(.disabled)').each(function() {
+            const roundId = $(this).find('input[type="hidden"][name$=".id"]').val();
+            const roundNumber = $(this).data('round-number');
+
+            const roundStartDate = $(`#round${roundNumber}StartDate`).val();
+            const roundEndDate = $(`#round${roundNumber}EndDate`).val();
+
+            if (!isValidDateTimeFormat(roundStartDate) || !isValidDateTimeFormat(roundEndDate)) {
+                showValidationError($(`#round${roundNumber}StartDateInputs`),
+                    $(`#round${roundNumber}StartDateError`),
+                    `Vui lòng nhập đúng định dạng ngày giờ cho Vòng ${roundNumber}`);
+                errors.push(`Vui lòng nhập đúng định dạng ngày giờ cho Vòng ${roundNumber}`);
+                isValid = false;
+                return;
+            }
+
+            const roundStartMoment = moment(roundStartDate, 'DD/MM/YYYY HH:mm');
+            const roundEndMoment = moment(roundEndDate, 'DD/MM/YYYY HH:mm');
+
+            if (roundEndMoment.isSameOrBefore(roundStartMoment)) {
+                showValidationError($(`#round${roundNumber}EndDateInputs`),
+                    $(`#round${roundNumber}DateRangeError`),
+                    `Thời gian kết thúc phải sau thời gian bắt đầu cho Vòng ${roundNumber}`);
+                errors.push(`Thời gian kết thúc phải sau thời gian bắt đầu cho Vòng ${roundNumber}`);
+                isValid = false;
+                return;
+            }
+
+            // Check if round dates are within tournament timeframe
+            if (roundStartMoment.isBefore(tournamentStartMoment)) {
+                showValidationError($(`#round${roundNumber}StartDateInputs`),
+                    $(`#round${roundNumber}StartDateError`),
+                    `Thời gian bắt đầu Vòng ${roundNumber} phải sau thời gian bắt đầu giải đấu`);
+                errors.push(`Thời gian bắt đầu Vòng ${roundNumber} phải sau thời gian bắt đầu giải đấu`);
+                isValid = false;
+            }
+
+            if (roundEndMoment.isAfter(tournamentEndMoment)) {
+                showValidationError($(`#round${roundNumber}EndDateInputs`),
+                    $(`#round${roundNumber}EndDateError`),
+                    `Thời gian kết thúc Vòng ${roundNumber} phải trước thời gian kết thúc giải đấu`);
+                errors.push(`Thời gian kết thúc Vòng ${roundNumber} phải trước thời gian kết thúc giải đấu`);
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
+    // Generate Othello board preview
+    function generateBoardPreview() {
+        const boardPreview = $('.board-preview');
+        boardPreview.empty();
+
+        // Create 8x8 board
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                const cell = $('<div class="board-cell"></div>');
+                boardPreview.append(cell);
+            }
+        }
+
+        // Set initial discs (standard Othello setup)
+        const cells = boardPreview.find('.board-cell');
+        cells.eq(27).addClass('white');
+        cells.eq(28).addClass('black');
+        cells.eq(35).addClass('black');
+        cells.eq(36).addClass('white');
+    }
+
+    // Animate board preview with random disc placements
+    function animateBoardPreview() {
+        const cells = $('.board-preview .board-cell');
+        const availableCells = [];
+
+        // Find empty cells
+        cells.each(function(index) {
+            if (!$(this).hasClass('white') && !$(this).hasClass('black')) {
+                availableCells.push(index);
+            }
+        });
+
+        // Shuffle available cells
+        availableCells.sort(() => Math.random() - 0.5);
+
+        // Animate disc placements
+        let counter = 0;
+        const interval = setInterval(function() {
+            if (counter >= 10 || availableCells.length === 0) {
+                clearInterval(interval);
+                setTimeout(resetBoardAnimation, 3000);
+                return;
+            }
+
+            const cellIndex = availableCells.pop();
+            const color = Math.random() > 0.5 ? 'white' : 'black';
+
+            cells.eq(cellIndex).addClass(color + ' animated');
+            counter++;
+        }, 600);
+    }
+
+    // Reset board animation
+    function resetBoardAnimation() {
+        const cells = $('.board-preview .board-cell');
+
+        // Reset to initial state
+        cells.removeClass('white black animated');
+
+        cells.eq(27).addClass('white');
+        cells.eq(28).addClass('black');
+        cells.eq(35).addClass('black');
+        cells.eq(36).addClass('white');
+
+        // Start new animation after delay
+        setTimeout(animateBoardPreview, 1000);
+    }
+
+    // Generate inputs for rounds based on selection
+    function generateRoundInputs() {
+        const roundsContainer = $('#roundsContainer');
+        roundsContainer.empty();
+
+        const numRounds = parseInt($('#organizingMethodId').val(), 10);
+        let rounds = 0;
+
+        switch(numRounds) {
+            case 1:
+                rounds = 7;
+                break;
+            case 2:
+                rounds = 9;
+                break;
+            case 3:
+                rounds = 11;
+                break;
+            default:
+                rounds = 7;
+        }
+
+        // Mảng trạng thái mẫu cho demo - trong thực tế sẽ lấy từ model
+        const roundStatuses = ${tournament.roundStatuses != null ? tournament.roundStatuses : ["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED", "NOT_STARTED"]};
+
+        // Mảng ID của các vòng đấu - trong thực tế sẽ lấy từ model
+        const roundIds = ${tournament.roundIds != null ? tournament.roundIds : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]};
+
+        // Mảng ngày bắt đầu và kết thúc của các vòng - trong thực tế sẽ lấy từ model
+        const roundStartDates = ${tournament.roundStartDates != null ? tournament.roundStartDates : ["01/05/2025 09:00", "01/05/2025 14:00", "02/05/2025 09:00", "02/05/2025 14:00", "03/05/2025 09:00", "03/05/2025 14:00", "04/05/2025 09:00", "04/05/2025 14:00", "05/05/2025 09:00", "05/05/2025 14:00", "06/05/2025 09:00"]};
+        const roundEndDates = ${tournament.roundEndDates != null ? tournament.roundEndDates : ["01/05/2025 13:00", "01/05/2025 18:00", "02/05/2025 13:00", "02/05/2025 18:00", "03/05/2025 13:00", "03/05/2025 18:00", "04/05/2025 13:00", "04/05/2025 18:00", "05/05/2025 13:00", "05/05/2025 18:00", "06/05/2025 13:00"]};
+
+        // Generate time inputs for each round
+        for (let i = 1; i <= rounds; i++) {
+            // Xác định trạng thái vòng đấu (mẫu)
+            const roundStatus = roundStatuses[i-1] || "NOT_STARTED";
+            const roundId = roundIds[i-1] || i;
+            const startDate = roundStartDates[i-1] || "";
+            const endDate = roundEndDates[i-1] || "";
+
+            // Xác định xem vòng này có thể chỉnh sửa không
+            const isDisabled = roundStatus === "IN_PROGRESS" || roundStatus === "COMPLETED";
+            const disabledClass = isDisabled ? "disabled" : "";
+
+            // Hiển thị status badge tương ứng
+            let statusBadge = "";
+            if (roundStatus === "NOT_STARTED") {
+                statusBadge = '<span class="badge badge-secondary">Chưa bắt đầu</span>';
+            } else if (roundStatus === "IN_PROGRESS") {
+                statusBadge = '<span class="badge badge-info">Đang diễn ra</span>';
+            } else if (roundStatus === "COMPLETED") {
+                statusBadge = '<span class="badge badge-success">Đã kết thúc</span>';
+            }
+
+            const roundHtml = `
+        <div class="round-container mb-4 ${disabledClass}" data-status="${roundStatus}" data-round-number="${i}">
+          <div class="card">
+            <div class="card-header bg-light">
+              <h5 class="mb-0">
+                <i class="fas fa-flag-checkered mr-2"></i> Vòng ${i}
+              </h5>
+              ${statusBadge}
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="round${i}StartDate" class="required-field">
+                      <i class="far fa-calendar-alt"></i> Thời gian bắt đầu
+                    </label>
+                    <!-- Hidden inputs for data -->
+                    <input type="hidden" id="round${i}StartDate" name="rounds[${i-1}].startDate" value="${startDate}" required>
+                    <input type="hidden" name="rounds[${i-1}].id" value="${roundId}">
+
+                    <div class="date-time-inputs round-datetime-container" id="round${i}StartDateInputs">
+                      <div class="date-input-group">
+                        <input type="number" class="form-control day-input" placeholder="DD" min="1" max="31" ${isDisabled ? 'disabled' : ''} required>
+                        <div class="separator">/</div>
+                        <input type="number" class="form-control month-input" placeholder="MM" min="1" max="12" ${isDisabled ? 'disabled' : ''} required>
+                        <div class="separator">/</div>
+                        <input type="number" class="form-control year-input" placeholder="YYYY" min="2025" max="2030" ${isDisabled ? 'disabled' : ''} required>
+                      </div>
+                      <div class="time-input-group">
+                        <input type="number" class="form-control hour-input" placeholder="HH" min="0" max="23" ${isDisabled ? 'disabled' : ''} required>
+                        <div class="separator">:</div>
+                        <input type="number" class="form-control minute-input" placeholder="MM" min="0" max="59" ${isDisabled ? 'disabled' : ''} required>
+                      </div>
+                    </div>
+                    <div class="datetime-format-hint">Định dạng: DD/MM/YYYY HH:MM</div>
+                    <div class="validation-error" id="round${i}StartDateError">Vui lòng nhập thời gian bắt đầu hợp lệ</div>
+                    ${isDisabled ? '<small class="text-muted"><i class="fas fa-lock mr-1"></i> Không thể thay đổi thời gian cho vòng đấu đã diễn ra</small>' : ''}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="round${i}EndDate" class="required-field">
+                      <i class="far fa-calendar-check"></i> Thời gian kết thúc
+                    </label>
+                    <!-- Hidden input for actual datetime value -->
+                    <input type="hidden" id="round${i}EndDate" name="rounds[${i-1}].endDate" value="${endDate}" required>
+
+                    <div class="date-time-inputs round-datetime-container" id="round${i}EndDateInputs">
+                      <div class="date-input-group">
+                        <input type="number" class="form-control day-input" placeholder="DD" min="1" max="31" ${isDisabled ? 'disabled' : ''} required>
+                        <div class="separator">/</div>
+                        <input type="number" class="form-control month-input" placeholder="MM" min="1" max="12" ${isDisabled ? 'disabled' : ''} required>
+                        <div class="separator">/</div>
+                        <input type="number" class="form-control year-input" placeholder="YYYY" min="2025" max="2030" ${isDisabled ? 'disabled' : ''} required>
+                      </div>
+                      <div class="time-input-group">
+                        <input type="number" class="form-control hour-input" placeholder="HH" min="0" max="23" ${isDisabled ? 'disabled' : ''} required>
+                        <div class="separator">:</div>
+                        <input type="number" class="form-control minute-input" placeholder="MM" min="0" max="59" ${isDisabled ? 'disabled' : ''} required>
+                      </div>
+                    </div>
+                    <div class="datetime-format-hint">Định dạng: DD/MM/YYYY HH:MM</div>
+                    <div class="validation-error" id="round${i}EndDateError">Vui lòng nhập thời gian kết thúc hợp lệ</div>
+                  </div>
+                </div>
+              </div>
+              <div class="validation-error" id="round${i}DateRangeError">Thời gian kết thúc vòng đấu phải sau thời gian bắt đầu vòng đấu</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+            roundsContainer.append(roundHtml);
+
+            // Phân tích và điền giá trị ngày tháng
+            parseAndFillDateTime(`#round${i}StartDate`, `#round${i}StartDateInputs`);
+            parseAndFillDateTime(`#round${i}EndDate`, `#round${i}EndDateInputs`);
+
+            // Thêm validation cho các vòng đấu chưa bắt đầu
+            if (!isDisabled) {
+                $(`#round${i}StartDateInputs input, #round${i}EndDateInputs input`).on('input', function() {
+                    const value = $(this).val();
+
+                    if (value && !isNaN(parseInt(value))) {
+                        const numValue = parseInt(value);
+                        const min = parseInt($(this).attr('min'));
+                        const max = parseInt($(this).attr('max'));
+
+                        if (numValue >= min && numValue <= max) {
+                            $(this).removeClass('is-invalid');
+                        } else {
+                            $(this).addClass('is-invalid');
+                        }
+                    }
+                });
+
+                // Validate date range whenever either date changes
+                $(`#round${i}StartDateInputs input, #round${i}EndDateInputs input`).on('change', function() {
+                    if (formSubmitted) {
+                        validateRoundDateRange(i);
+                    }
+                });
+            }
+        }
+
+        // Add animation to newly added elements
+        $('.round-container').each(function(index) {
+            const element = $(this);
+            setTimeout(function() {
+                element.addClass('visible');
+            }, 200 * index);
+        });
+    }
+
+    // Validate round date range
+    function validateRoundDateRange(roundNumber) {
+        const startDate = $(`#round${roundNumber}StartDate`).val();
+        const endDate = $(`#round${roundNumber}EndDate`).val();
+
+        if (!startDate || !endDate) return;
+
+        const startMoment = moment(startDate, 'DD/MM/YYYY HH:mm');
+        const endMoment = moment(endDate, 'DD/MM/YYYY HH:mm');
+
+        if (!startMoment.isValid() || !endMoment.isValid()) return;
+
+        if (endMoment.isSameOrBefore(startMoment)) {
+            showValidationError($(`#round${roundNumber}EndDateInputs`),
+                $(`#round${roundNumber}DateRangeError`),
+                `Thời gian kết thúc Vòng ${roundNumber} phải sau thời gian bắt đầu`);
+            return false;
+        } else {
+            clearValidationError($(`#round${roundNumber}EndDateInputs`),
+                $(`#round${roundNumber}DateRangeError`));
+
+            // Check if round dates are within tournament timeframe
+            const tournamentStartDate = $('#startDate').val();
+            const tournamentEndDate = $('#endDate').val();
+
+            if (!tournamentStartDate || !tournamentEndDate) return true;
+
+            const tournamentStartMoment = moment(tournamentStartDate, 'DD/MM/YYYY HH:mm');
+            const tournamentEndMoment = moment(tournamentEndDate, 'DD/MM/YYYY HH:mm');
+
+            if (!tournamentStartMoment.isValid() || !tournamentEndMoment.isValid()) return true;
+
+            if (startMoment.isBefore(tournamentStartMoment)) {
+                showValidationError($(`#round${roundNumber}StartDateInputs`),
+                    $(`#round${roundNumber}StartDateError`),
+                    `Thời gian bắt đầu Vòng ${roundNumber} phải sau thời gian bắt đầu giải đấu`);
+                return false;
+            } else {
+                clearValidationError($(`#round${roundNumber}StartDateInputs`),
+                    $(`#round${roundNumber}StartDateError`));
+            }
+
+            if (endMoment.isAfter(tournamentEndMoment)) {
+                showValidationError($(`#round${roundNumber}EndDateInputs`),
+                    $(`#round${roundNumber}EndDateError`),
+                    `Thời gian kết thúc Vòng ${roundNumber} phải trước thời gian kết thúc giải đấu`);
+                return false;
+            } else {
+                clearValidationError($(`#round${roundNumber}EndDateInputs`),
+                    $(`#round${roundNumber}EndDateError`));
+            }
+
+            return true;
+        }
+    }
+
+    // Validate form before submission
+    function validateForm() {
+        let isValid = true;
+        const tournamentStarted = ${tournament.isStart} || false;
+
+        // Validate tournament name
+        if (!validateField($('#name'), $('#nameError'), function(value) {
+            return value.trim() !== '';
+        }, 'Vui lòng nhập tên giải đấu')) {
+            isValid = false;
+        }
+
+        // Get current number of players
+        const currentPlayers = parseInt($('#currentPlayers').val()) || 2;
+
+        // Validate max players (phải >= số người hiện tại và là số chẵn)
+        if (!validateField($('#maxPlayer'), $('#maxPlayerError'), function(value) {
+            const num = parseInt(value);
+            if (isNaN(num) || num < currentPlayers) {
+                $('#maxPlayerError').text(`Số lượng người chơi phải lớn hơn hoặc bằng ${currentPlayers}`);
+                return false;
+            } else if (num % 2 !== 0) {
+                $('#maxPlayerError').text('Số lượng người chơi phải là số chẵn');
+                return false;
+            }
+            return true;
+        }, `Vui lòng nhập số người tham gia tối đa (phải >= ${currentPlayers} và là số chẵn)`)) {
+            isValid = false;
+        }
+
+        // Đảm bảo rằng tất cả ngày tháng đều được format hợp lệ
+        if (!updateAllDateInputs()) {
+            isValid = false;
+        }
+
+        // Chỉ xác thực ngày tháng nếu giải đấu chưa bắt đầu
+        if (!tournamentStarted) {
+            // Validate date range
+            const startDate = $('#startDate').val();
+            const endDate = $('#endDate').val();
+
+            if (!startDate) {
+                showValidationError($('#startDateInputs'), $('#startDateError'), 'Vui lòng nhập thời gian bắt đầu');
+                isValid = false;
+            }
+
+            if (!endDate) {
+                showValidationError($('#endDateInputs'), $('#endDateError'), 'Vui lòng nhập thời gian kết thúc');
+                isValid = false;
+            }
+
+            if (startDate && endDate) {
+                const startMoment = moment(startDate, 'DD/MM/YYYY HH:mm');
+                const endMoment = moment(endDate, 'DD/MM/YYYY HH:mm');
+
+                // Kiểm tra định dạng và logic ngày tháng
+                if (!validateDateRange()) {
+                    isValid = false;
+                } else {
+                    // Nếu ngày tháng giải đấu hợp lệ, kiểm tra ngày tháng các vòng đấu chưa bắt đầu
+                    if (!validateRoundDates(startMoment, endMoment)) {
+                        isValid = false;
+                    }
+                }
+            }
+        }
+
+        if (!isValid) {
+            // Scroll to first error
+            $('html, body').animate({
+                scrollTop: $('.validation-error.show').first().offset().top - 100
+            }, 500);
+        }
+
+        return isValid;
+    }
+</script>
+</body>
+</html>

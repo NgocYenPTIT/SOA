@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Othello Tournament - Mời người chơi</title>
+    <!-- Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #1abc9c;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+
+        body {
+            background-color: var(--light-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--light-color) !important;
+        }
+
+        .navbar-brand .game-icon {
+            margin-right: 10px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>') no-repeat;
+            background-size: cover;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 1rem 0 3rem;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #16a085;
+            border-color: #16a085;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+
+        .othello-piece {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(to right, black 50%, white 50%);
+            animation: flip 3s infinite linear;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes flip {
+            0% {
+                transform: rotateY(0deg);
+            }
+            50% {
+                transform: rotateY(180deg);
+            }
+            100% {
+                transform: rotateY(360deg);
+            }
+        }
+
+        .back-btn {
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-color);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            text-decoration: none;
+            color: var(--secondary-color);
+            transform: translateX(-5px);
+        }
+
+        .back-btn i {
+            margin-right: 8px;
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Invite specific styles */
+        .search-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.5s forwards;
+        }
+
+        .search-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 1.25rem;
+            font-weight: bold;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-card-header i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        .search-card-body {
+            padding: 1.5rem;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 20px;
+            top: 18px;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+
+        .search-input {
+            padding: 1.5rem 1rem 1.5rem 50px;
+            border-radius: 50px;
+            border: 2px solid #dfe6e9;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.25);
+            border-color: var(--secondary-color);
+        }
+
+        .player-results {
+            margin-top: 2rem;
+        }
+
+        .player-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0;
+            animation: fadeInRight 0.5s forwards;
+        }
+
+        .player-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .player-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .player-avatar i {
+            font-size: 1.5rem;
+        }
+
+        .player-details {
+            flex-grow: 1;
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .player-username {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .player-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-invite {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(26, 188, 156, 0.3);
+        }
+
+        .btn-invite:hover {
+            background-color: #16a085;
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(22, 160, 133, 0.4);
+        }
+
+        .btn-invited {
+            background-color: #95a5a6;
+            pointer-events: none;
+        }
+
+        .results-message {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+        }
+
+        .results-message i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #bdc3c7;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+            border: 2px dashed #dfe6e9;
+            border-radius: 10px;
+            margin-top: 2rem;
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #bdc3c7;
+        }
+
+        .invite-sent {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            animation: slideInRight 0.3s forwards, slideOutRight 0.3s forwards 3s;
+            max-width: 300px;
+        }
+
+        .invite-sent i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .tooltip-inner {
+            background-color: var(--dark-color);
+        }
+
+        .player-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .player-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .player-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .player-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .player-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand animate__animated animate__fadeIn" href="/home">
+            <span class="othello-piece"></span> Othello Tournament
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown mr-3">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user-circle mr-1"></i> <span>Othello Player</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/profile"><i class="fas fa-id-card mr-2"></i> Hồ sơ</a>
+                        <a class="dropdown-item" href="/settings"><i class="fas fa-cog mr-2"></i> Cài đặt</a>
+                        <div class="dropdown-divider"></div>
+                        <form action="/logout" method="post">
+                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt mr-2"></i> Đăng
+                                xuất
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Header -->
+<header class="page-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="animate__animated animate__fadeIn">
+                <h1 class="h2 font-weight-bold mb-2">Mời người chơi tham gia</h1>
+                <div class="text-white-50">
+                    <span>Giải đấu Othello Mùa Xuân 2025</span>
+                </div>
+            </div>
+            <div class="d-none d-md-block animate__animated animate__fadeIn animate__delay-1s">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPmNpcmNsZXtmaWxsOndoaXRlO3N0cm9rZTpibGFjaztzdHJva2Utd2lkdGg6Mn08L3N0eWxlPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwLDEwKSI+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMzAiIGN5PSIxMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNTAiIGN5PSIxMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNzAiIGN5PSIxMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMTAiIGN5PSIzMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNTAiIGN5PSIzMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNzAiIGN5PSIzMCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMTAiIGN5PSI1MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMzAiIGN5PSI1MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNzAiIGN5PSI1MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMTAiIGN5PSI3MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iMzAiIGN5PSI3MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNTAiIGN5PSI3MCIgcj0iMTAiIC8+PGNpcmNsZSBjeD0iNzAiIGN5PSI3MCIgcj0iMTAiIC8+PC9nPjwvc3ZnPg=="
+                     alt="Othello Board" class="floating" style="width: 80px; height: 80px;">
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <!-- Back Button -->
+        <a href="/tournament/123" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Quay lại Chi tiết Giải đấu
+        </a>
+
+        <!-- Search Card -->
+        <div class="search-card">
+            <div class="search-card-header">
+                <i class="fas fa-user-plus"></i> Tìm kiếm người chơi
+            </div>
+            <div class="search-card-body">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control search-input" id="playerSearch" placeholder="Nhập tên người chơi để tìm kiếm...">
+                </div>
+
+                <div id="initialMessage" class="results-message">
+                    <i class="fas fa-users"></i>
+                    <h4>Tìm kiếm người chơi</h4>
+                    <p>Nhập tên người chơi vào ô tìm kiếm để hiển thị kết quả</p>
+                </div>
+
+                <div id="noResults" class="no-results" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <h4>Không tìm thấy kết quả</h4>
+                    <p>Không tìm thấy người chơi nào phù hợp với từ khóa tìm kiếm.</p>
+                </div>
+
+                <div id="playerResults" class="player-results" style="display: none;">
+                    <h5 class="mb-3">Kết quả tìm kiếm:</h5>
+                    
+                    <div class="player-card">
+                        <div class="player-info">
+                            <div class="player-avatar" style="background-color: #3498db;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="player-details">
+                                <div class="player-name">Nguyễn Văn An</div>
+                                <div class="player-username">@nguyenvanan</div>
+                            </div>
+                        </div>
+                        <div class="player-actions">
+                            <button class="btn btn-invite" data-toggle="tooltip" data-placement="top" title="Mời tham gia">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="player-card">
+                        <div class="player-info">
+                            <div class="player-avatar" style="background-color: #9b59b6;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="player-details">
+                                <div class="player-name">Trần Anh Minh</div>
+                                <div class="player-username">@minhanh123</div>
+                            </div>
+                        </div>
+                        <div class="player-actions">
+                            <button class="btn btn-invite" data-toggle="tooltip" data-placement="top" title="Mời tham gia">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="player-card">
+                        <div class="player-info">
+                            <div class="player-avatar" style="background-color: #e67e22;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="player-details">
+                                <div class="player-name">Lê Hoàng Anh</div>
+                                <div class="player-username">@hoanganh456</div>
+                            </div>
+                        </div>
+                        <div class="player-actions">
+                            <button class="btn btn-invite btn-invited" data-toggle="tooltip" data-placement="top" title="Đã gửi lời mời">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="player-card">
+                        <div class="player-info">
+                            <div class="player-avatar" style="background-color: #16a085;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="player-details">
+                                <div class="player-name">Phạm Thanh An</div>
+                                <div class="player-username">@phamthanhan</div>
+                            </div>
+                        </div>
+                        <div class="player-actions">
+                            <button class="btn btn-invite" data-toggle="tooltip" data-placement="top" title="Mời tham gia">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="player-card">
+                        <div class="player-info">
+                            <div class="player-avatar" style="background-color: #d35400;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="player-details">
+                                <div class="player-name">Trương Thị Lan Anh</div>
+                                <div class="player-username">@lananh2025</div>
+                            </div>
+                        </div>
+                        <div class="player-actions">
+                            <button class="btn btn-invite" data-toggle="tooltip" data-placement="top" title="Mời tham gia">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Notification Toast (Hidden by default) -->
+<div class="invite-sent" id="inviteNotification" style="display: none;">
+    <i class="fas fa-check-circle"></i>
+    <div>
+        <div class="font-weight-bold">Lời mời đã được gửi!</div>
+        <small>Người chơi sẽ nhận được thông báo</small>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container text-center">
+        <p class="mb-0">© 2025 Othello Tournament.</p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS, Popper.js, and jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Enable tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+        
+        // Handle search
+        $('#playerSearch').on('keyup', function() {
+            var value = $(this).val().toLowerCase();
+            
+            if (value.length >= 2) {
+                // Hide initial message
+                $('#initialMessage').hide();
+                
+                // Show results
+                $('#playerResults').show();
+                $('#noResults').hide();
+                
+                // Demo: Filter existing results
+                var matchCount = 0;
+                $(".player-card").each(function() {
+                    var playerName = $(this).find(".player-name").text().toLowerCase();
+                    var playerUsername = $(this).find(".player-username").text().toLowerCase();
+                    
+                    if (playerName.indexOf(value) > -1 || playerUsername.indexOf(value) > -1) {
+                        $(this).show();
+                        matchCount++;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+                
+                // Show no results message if no matches
+                if (matchCount === 0) {
+                    $('#playerResults').hide();
+                    $('#noResults').show();
+                }
+            } else if (value.length === 0) {
+                // Reset to initial state
+                $('#initialMessage').show();
+                $('#playerResults').hide();
+                $('#noResults').hide();
+            }
+        });
+        
+        // Handle invite button click
+        $('.btn-invite:not(.btn-invited)').click(function() {
+            // Change button to invited
+            $(this).addClass('btn-invited');
+            $(this).html('<i class="fas fa-check"></i>');
+            $(this).attr('title', 'Đã gửi lời mời');
+            $(this).tooltip('dispose');
+            $(this).tooltip();
+            
+            // Show notification
+            $('#inviteNotification').show();
+            
+            // Hide notification after 3 seconds
+            setTimeout(function() {
+                $('#inviteNotification').hide();
+            }, 3000);
+        });
+    });
+</script>
+</body>
+</html>
