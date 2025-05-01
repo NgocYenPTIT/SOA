@@ -1,0 +1,17 @@
+package com.example.semester_service.controller;
+
+import com.example.semester_service.security.JwtTokenProvider;
+import com.example.semester_service.service.SemesterService;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+public class SemesterController {
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final SemesterService semesterService;
+
+    public SemesterController(JwtTokenProvider jwtTokenProvider, SemesterService semesterService) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.semesterService = semesterService;
+    }
+}
