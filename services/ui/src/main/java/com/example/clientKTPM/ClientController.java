@@ -52,7 +52,7 @@ public class ClientController {
             session.setAttribute("user", token.getUser());
 
             // Chuyển đến trang home
-            return "redirect:/home";
+            return "register";
         } catch (Exception e) {
             model.addAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng!");
             return "login";

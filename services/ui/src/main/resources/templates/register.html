@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký môn học - Học kỳ 2 2024-2025</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2980b9;
+            --accent: #1abc9c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            border: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 15px 20px;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table thead {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .table thead th {
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .table tbody tr {
+            transition: background-color 0.2s;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .badge-status {
+            background-color: var(--accent);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            border-radius: 25px;
+            padding-left: 40px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .search-box input:focus {
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+            border-color: var(--primary);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #999;
+        }
+        
+        .btn-actions {
+            background-color: var(--primary);
+            color: white;
+            border-radius: 6px;
+            padding: 5px 10px;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-actions:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-remove {
+            background-color: #e74c3c;
+        }
+        
+        .btn-remove:hover {
+            background-color: #c0392b;
+        }
+
+        .status-section {
+            background-color: var(--light);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.8s ease;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .message-area {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            min-height: 80px;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .table-icon {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <!-- Header Section -->
+        <div class="header mb-4">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="mb-0">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        ĐĂNG KÝ MÔN HỌC HỌC KỲ 2 - NĂM HỌC 2024 - 2025
+                    </h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Available Courses Section -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-book-open me-2"></i>
+                        Danh sách môn học mở cho đăng ký
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="search-box">
+                        <input type="text" class="form-control" placeholder="Tìm kiếm môn học...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%"></th>
+                                    <th style="width: 10%">Mã MH <i class="fas fa-sort"></i></th>
+                                    <th style="width: 35%">Tên môn học</th>
+                                    <th style="width: 10%">Nhóm</th>
+                                    <th style="width: 5%">Tổ</th>
+                                    <th style="width: 5%">Số TC</th>
+                                    
+                                    <th style="width: 8%">Số lượng</th>
+                                    <th style="width: 8%">Còn lại</th>
+                                    <th style="width: 10%">Thời khóa biểu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Fake data for available courses -->
+                                <tr>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
+                                    <td>INT1501</td>
+                                    <td>Lập trình Java nâng cao</td>
+                                    <td>01</td>
+                                    <td>1</td>
+                                    <td>3</td>
+
+                                    <td>40</td>
+                                    <td>15</td>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
+                                    <td>INT1502</td>
+                                    <td>Phân tích dữ liệu lớn</td>
+                                    <td>02</td>
+                                    <td>1</td>
+                                    <td>4</td>
+
+                                    <td>30</td>
+                                    <td>8</td>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
+                                    <td>INT1503</td>
+                                    <td>Học máy</td>
+                                    <td>01</td>
+                                    <td>2</td>
+                                    <td>3</td>
+
+                                    <td>45</td>
+                                    <td>12</td>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
+                                    <td>INT1504</td>
+                                    <td>An toàn và bảo mật thông tin</td>
+                                    <td>02</td>
+                                    <td>1</td>
+                                    <td>3</td>
+
+                                    <td>35</td>
+                                    <td>5</td>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registered Courses Section -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-clipboard-check me-2"></i>
+                        Danh sách môn học đã đăng ký: 
+                        <span class="badge bg-info ms-2">6 môn, 16 tín chỉ</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%">Xóa</th>
+                                    <th style="width: 10%">Mã MH <i class="fas fa-sort"></i></th>
+                                    <th style="width: 40%">Tên môn học</th>
+                                    <th style="width: 6%">Nhóm</th>
+                                    <th style="width: 4%">Tổ</th>
+                                    <th style="width: 5%">Số TC</th>
+
+                                    <th style="width: 12%">Ngày đăng ký</th>
+                                    <th style="width: 8%">Trạng thái</th>
+                                    <th style="width: 10%">Thời khóa biểu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Fake data for registered courses -->
+                                <tr>
+                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
+                                    <td>INT1449</td>
+                                    <td>Phát triển ứng dụng cho các thiết bị di động</td>
+                                    <td>04</td>
+                                    <td>2</td>
+                                    <td>1</td>
+                                    <td>3</td>
+
+                                    <td>17/12/2024 12:58:15</td>
+                                    <td><span class="badge badge-status">Đã khóa</span></td>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
+                                    <td>INT1408</td>
+                                    <td>Chuyên đề công nghệ phần mềm</td>
+                                    <td>03</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>2</td>
+                                    <td>2</td>
+
+                                    <td>17/12/2024 12:58:32</td>
+                                    <td><span class="badge badge-status">Đã khóa</span></td>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
+                                    <td>INT1427</td>
+                                    <td>Kiến trúc và thiết kế phần mềm</td>
+                                    <td>05</td>
+                                    <td>1</td>
+                                    <td>3</td>
+
+                                    <td>17/12/2024 12:58:46</td>
+                                    <td><span class="badge badge-status">Đã khóa</span></td>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
+                                    <td>INT1416</td>
+                                    <td>Đảm bảo chất lượng phần mềm</td>
+                                    <td>03</td>
+                                    <td>3</td>
+
+                                    <td>17/12/2024 12:58:53</td>
+                                    <td><span class="badge badge-status">Đã khóa</span></td>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
+                                    <td>INT1448</td>
+                                    <td>Phát triển phần mềm hướng dịch vụ</td>
+                                    <td>04</td>
+                                    <td>3</td>
+
+                                    <td>17/12/2024 12:59:45</td>
+                                    <td><span class="badge badge-status">Đã khóa</span></td>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
+                                    <td>INT1461</td>
+                                    <td>Xây dựng các hệ thống nhúng</td>
+                                    <td>03</td>
+                                    <td>2</td>
+                                    <td>*</td>
+                                    <td>17/12/2024 13:06:00</td>
+                                    <td><span class="badge badge-status">Đã khóa</span></td>
+                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-5 py-4 text-center text-muted">
+        <div class="container">
+            <p>© 2024-2025 Hệ thống đăng ký môn học</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add some animations when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Stagger the animations of table rows
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach((row, index) => {
+                row.style.animation = `fadeIn 0.3s ease ${index * 0.05}s both`;
+                row.style.opacity = '0';
+            });
+            
+            // Add click animations for buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    this.classList.add('animate-pulse');
+                    setTimeout(() => {
+                        this.classList.remove('animate-pulse');
+                    }, 500);
+                });
+            });
+            
+            // Add search functionality
+            const searchInput = document.querySelector('.search-box input');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const availableRows = document.querySelectorAll('table:first-of-type tbody tr');
+                
+                availableRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+    
+        // Schedule modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const scheduleButtons = document.querySelectorAll('.btn-actions i.fa-calendar');
+            
+            scheduleButtons.forEach(button => {
+                button.parentElement.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Get the course name from the row
+                    const row = this.closest('tr');
+                    const courseName = row.querySelector('td:nth-child(3)').textContent;
+                    
+                    // Set the course name in the modal
+                    document.getElementById('scheduleModalLabel').textContent = 'Thời Khóa Biểu: ' + courseName;
+                    
+                    // Generate fake schedule data (would be replaced with real data)
+                    let scheduleData = '';
+                    
+                    // Different schedule data for different courses
+                    if(courseName.includes('di động')) {
+                        scheduleData = `<li>Thứ 2, 7:00-9:00, Giảng viên: Nguyễn Văn A, Phòng 305 Nhà A2</li>
+                                        <li>Thứ 4, 13:00-15:00, Giảng viên: Nguyễn Văn A, Phòng 207 Nhà B1</li>`;
+                    } else if(courseName.includes('công nghệ')) {
+                        scheduleData = `<li>Thứ 3, 9:00-11:00, Giảng viên: Trần Thị B, Phòng 101 Nhà B2</li>
+                                        <li>Thứ 5, 15:00-17:00, Giảng viên: Trần Thị B, Phòng 405 Nhà A3</li>`;
+                    } else if(courseName.includes('kiến trúc')) {
+                        scheduleData = `<li>Thứ 4, 7:00-10:00, Giảng viên: Lê Văn C, Phòng 206 Nhà A2</li>`;
+                    } else if(courseName.includes('chất lượng')) {
+                        scheduleData = `<li>Thứ 6, 13:00-16:00, Giảng viên: Phạm Thị D, Phòng 303 Nhà B4</li>`;
+                    } else if(courseName.includes('dịch vụ')) {
+                        scheduleData = `<li>Thứ 2, 15:00-17:00, Giảng viên: Hoàng Văn E, Phòng 202 Nhà A1</li>
+                                        <li>Thứ 5, 7:00-9:00, Giảng viên: Hoàng Văn E, Phòng 308 Nhà B3</li>`;
+                    } else if(courseName.includes('hệ thống')) {
+                        scheduleData = `<li>Thứ 3, 13:00-15:00, Giảng viên: Vũ Thị F, Phòng 105 Nhà A2</li>
+                                        <li>Thứ 6, 9:00-11:00, Giảng viên: Vũ Thị F, Phòng 201 Nhà B1</li>`;
+                    } else if(courseName.includes('Java')) {
+                        scheduleData = `<li>Thứ 2, 13:00-15:00, Giảng viên: Đỗ Văn G, Phòng 301 Nhà A1</li>
+                                        <li>Thứ 4, 7:00-9:00, Giảng viên: Đỗ Văn G, Phòng 209 Nhà B2</li>`;
+                    } else if(courseName.includes('dữ liệu')) {
+                        scheduleData = `<li>Thứ 3, 7:00-10:00, Giảng viên: Lý Thị H, Phòng 205 Nhà A3</li>
+                                        <li>Thứ 5, 13:00-16:00, Giảng viên: Lý Thị H, Phòng 403 Nhà B4</li>`;
+                    } else if(courseName.includes('máy')) {
+                        scheduleData = `<li>Thứ 2, 9:00-11:00, Giảng viên: Ngô Văn I, Phòng 207 Nhà A4</li>
+                                        <li>Thứ 6, 15:00-17:00, Giảng viên: Ngô Văn I, Phòng 302 Nhà B1</li>`;
+                    } else if(courseName.includes('bảo mật')) {
+                        scheduleData = `<li>Thứ 4, 9:00-11:00, Giảng viên: Mai Thị K, Phòng 301 Nhà A2</li>
+                                        <li>Thứ 6, 13:00-15:00, Giảng viên: Mai Thị K, Phòng 406 Nhà B3</li>`;
+                    } else {
+                        scheduleData = `<li>Chưa có lịch học cho môn này</li>`;
+                    }
+                    
+                    document.getElementById('scheduleList').innerHTML = scheduleData;
+                    
+                    // Show the modal
+                    const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+                    scheduleModal.show();
+                });
+            });
+        });
+    </script>
+    
+    <!-- Schedule Modal -->
+    <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;">
+                    <h5 class="modal-title" id="scheduleModalLabel">Thời Khóa Biểu</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="scheduleList" class="list-group list-group-flush">
+                        <!-- Schedule will be inserted here -->
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
