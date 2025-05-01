@@ -1,0 +1,20 @@
+package com.example.subject_service.service;
+
+import com.example.subject_service.model.Subject;
+import com.example.subject_service.repository.SubjectRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+public class SubjectService {
+
+    private final SubjectRepository userRepository;
+
+    @Autowired
+    public SubjectService(SubjectRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+}
