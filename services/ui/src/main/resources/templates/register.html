@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -74,6 +74,7 @@
             font-weight: 600;
             color: var(--dark);
             border-bottom: 2px solid var(--primary);
+            vertical-align: middle;
         }
         
         .table tbody tr {
@@ -139,23 +140,21 @@
             background-color: #c0392b;
         }
 
-        .status-section {
-            background-color: var(--light);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            animation: fadeIn 0.8s ease;
+        .schedule-cell {
+            max-width: 250px;
+            font-size: 0.85rem;
         }
 
-        .status-label {
-            font-weight: 600;
-            color: var(--dark);
+        .schedule-item {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin-bottom: 4px;
+            display: block;
         }
 
-        .message-area {
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            min-height: 80px;
+        .schedule-item:last-child {
+            margin-bottom: 0;
         }
 
         .animate-pulse {
@@ -168,14 +167,6 @@
             100% { opacity: 1; }
         }
 
-        .table-icon {
-            width: 18px;
-            height: 18px;
-            display: inline-block;
-            margin-right: 5px;
-        }
-
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -229,66 +220,78 @@
                             <thead>
                                 <tr>
                                     <th style="width: 5%"></th>
-                                    <th style="width: 10%">Mã MH <i class="fas fa-sort"></i></th>
-                                    <th style="width: 35%">Tên môn học</th>
-                                    <th style="width: 10%">Nhóm</th>
+                                    <th style="width: 8%">Mã MH</th>
+                                    <th style="width: 10%">Mã học phần</th>
+                                    <th style="width: 20%">Tên môn học</th>
+                                    <th style="width: 5%">Nhóm</th>
                                     <th style="width: 5%">Tổ</th>
                                     <th style="width: 5%">Số TC</th>
-                                    
-                                    <th style="width: 8%">Số lượng</th>
-                                    <th style="width: 8%">Còn lại</th>
-                                    <th style="width: 10%">Thời khóa biểu</th>
+                                    <th style="width: 7%">Số lượng</th>
+                                    <th style="width: 7%">Còn lại</th>
+                                    <th style="width: 28%">Thời khóa biểu</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Fake data for available courses -->
+                                <!-- Available courses data -->
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
                                     <td>INT1501</td>
+                                    <td>CSE1055</td>
                                     <td>Lập trình Java nâng cao</td>
                                     <td>01</td>
                                     <td>1</td>
                                     <td>3</td>
-
                                     <td>40</td>
                                     <td>15</td>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                    <td class="schedule-cell">
+                                        <span class="schedule-item">Thứ 2, 13:00-15:00, P301-A1</span>
+                                        <span class="schedule-item">Thứ 4, 7:00-9:00, P209-B2</span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
                                     <td>INT1502</td>
+                                    <td>CSE2086</td>
                                     <td>Phân tích dữ liệu lớn</td>
                                     <td>02</td>
                                     <td>1</td>
                                     <td>4</td>
-
                                     <td>30</td>
                                     <td>8</td>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                    <td class="schedule-cell">
+                                        <span class="schedule-item">Thứ 3, 7:00-10:00, P205-A3</span>
+                                        <span class="schedule-item">Thứ 5, 13:00-16:00, P403-B4</span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
                                     <td>INT1503</td>
+                                    <td>CSE3027</td>
                                     <td>Học máy</td>
                                     <td>01</td>
                                     <td>2</td>
                                     <td>3</td>
-
                                     <td>45</td>
                                     <td>12</td>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                    <td class="schedule-cell">
+                                        <span class="schedule-item">Thứ 2, 9:00-11:00, P207-A4</span>
+                                        <span class="schedule-item">Thứ 6, 15:00-17:00, P302-B1</span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
                                     <td>INT1504</td>
+                                    <td>CSE4018</td>
                                     <td>An toàn và bảo mật thông tin</td>
                                     <td>02</td>
                                     <td>1</td>
                                     <td>3</td>
-
                                     <td>35</td>
                                     <td>5</td>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                    <td class="schedule-cell">
+                                        <span class="schedule-item">Thứ 4, 9:00-11:00, P301-A2</span>
+                                        <span class="schedule-item">Thứ 6, 13:00-15:00, P406-B3</span>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -311,98 +314,112 @@
                             <thead>
                                 <tr>
                                     <th style="width: 5%">Xóa</th>
-                                    <th style="width: 10%">Mã MH <i class="fas fa-sort"></i></th>
-                                    <th style="width: 40%">Tên môn học</th>
-                                    <th style="width: 6%">Nhóm</th>
-                                    <th style="width: 4%">Tổ</th>
+                                    <th style="width: 8%">Mã MH</th>
+                                    <th style="width: 10%">Mã học phần</th>
+                                    <th style="width: 20%">Tên môn học</th>
+                                    <th style="width: 5%">Nhóm</th>
+                                    <th style="width: 5%">Tổ</th>
                                     <th style="width: 5%">Số TC</th>
-
-                                    <th style="width: 12%">Ngày đăng ký</th>
-                                    <th style="width: 8%">Trạng thái</th>
-                                    <th style="width: 10%">Thời khóa biểu</th>
+                                    <th style="width: 7%">Ngày ĐK</th>
+                                    <th style="width: 7%">Trạng thái</th>
+                                    <th style="width: 28%">Thời khóa biểu</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Fake data for registered courses -->
+                                <!-- Registered courses data -->
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
                                     <td>INT1449</td>
+                                    <td>CSE2031</td>
                                     <td>Phát triển ứng dụng cho các thiết bị di động</td>
                                     <td>04</td>
                                     <td>2</td>
-                                    <td>1</td>
                                     <td>3</td>
-
-                                    <td>17/12/2024 12:58:15</td>
+                                    <td>17/12/24</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                    <td class="schedule-cell">
+                                        <span class="schedule-item">Thứ 2, 7:00-9:00, P305-A2</span>
+                                        <span class="schedule-item">Thứ 4, 13:00-15:00, P207-B1</span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
                                     <td>INT1408</td>
+                                    <td>CSE3042</td>
                                     <td>Chuyên đề công nghệ phần mềm</td>
                                     <td>03</td>
                                     <td>1</td>
-                                    <td>1</td>
                                     <td>2</td>
-                                    <td>2</td>
-
-                                    <td>17/12/2024 12:58:32</td>
+                                    <td>17/12/24</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                    <td class="schedule-cell">
+                                        <span class="schedule-item">Thứ 3, 9:00-11:00, P101-B2</span>
+                                        <span class="schedule-item">Thứ 5, 15:00-17:00, P405-A3</span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
                                     <td>INT1427</td>
+                                    <td>CSE4063</td>
                                     <td>Kiến trúc và thiết kế phần mềm</td>
                                     <td>05</td>
                                     <td>1</td>
                                     <td>3</td>
-
-                                    <td>17/12/2024 12:58:46</td>
+                                    <td>17/12/24</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                    <td class="schedule-cell">
+                                        <span class="schedule-item">Thứ 4, 7:00-10:00, P206-A2</span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
                                     <td>INT1416</td>
+                                    <td>CSE3074</td>
                                     <td>Đảm bảo chất lượng phần mềm</td>
                                     <td>03</td>
+                                    <td>1</td>
                                     <td>3</td>
-
-                                    <td>17/12/2024 12:58:53</td>
+                                    <td>17/12/24</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                    <td class="schedule-cell">
+                                        <span class="schedule-item">Thứ 6, 13:00-16:00, P303-B4</span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
                                     <td>INT1448</td>
+                                    <td>CSE4095</td>
                                     <td>Phát triển phần mềm hướng dịch vụ</td>
                                     <td>04</td>
+                                    <td>1</td>
                                     <td>3</td>
-
-                                    <td>17/12/2024 12:59:45</td>
+                                    <td>17/12/24</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                    <td class="schedule-cell">
+                                        <span class="schedule-item">Thứ 2, 15:00-17:00, P202-A1</span>
+                                        <span class="schedule-item">Thứ 5, 7:00-9:00, P308-B3</span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
                                     <td>INT1461</td>
+                                    <td>CSE3086</td>
                                     <td>Xây dựng các hệ thống nhúng</td>
                                     <td>03</td>
+                                    <td>1</td>
                                     <td>2</td>
-                                    <td>*</td>
-                                    <td>17/12/2024 13:06:00</td>
+                                    <td>17/12/24</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-calendar"></i></button></td>
+                                    <td class="schedule-cell">
+                                        <span class="schedule-item">Thứ 3, 13:00-15:00, P105-A2</span>
+                                        <span class="schedule-item">Thứ 6, 9:00-11:00, P201-B1</span>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
 
@@ -415,7 +432,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Add some animations when the page loads
+        // Add animations when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Stagger the animations of table rows
             const tableRows = document.querySelectorAll('tbody tr');
@@ -440,7 +457,7 @@
             const searchInput = document.querySelector('.search-box input');
             searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
-                const availableRows = document.querySelectorAll('table:first-of-type tbody tr');
+                const availableRows = document.querySelectorAll('.card:first-of-type tbody tr');
                 
                 availableRows.forEach(row => {
                     const text = row.textContent.toLowerCase();
@@ -452,86 +469,6 @@
                 });
             });
         });
-    
-        // Schedule modal functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const scheduleButtons = document.querySelectorAll('.btn-actions i.fa-calendar');
-            
-            scheduleButtons.forEach(button => {
-                button.parentElement.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Get the course name from the row
-                    const row = this.closest('tr');
-                    const courseName = row.querySelector('td:nth-child(3)').textContent;
-                    
-                    // Set the course name in the modal
-                    document.getElementById('scheduleModalLabel').textContent = 'Thời Khóa Biểu: ' + courseName;
-                    
-                    // Generate fake schedule data (would be replaced with real data)
-                    let scheduleData = '';
-                    
-                    // Different schedule data for different courses
-                    if(courseName.includes('di động')) {
-                        scheduleData = `<li>Thứ 2, 7:00-9:00, Giảng viên: Nguyễn Văn A, Phòng 305 Nhà A2</li>
-                                        <li>Thứ 4, 13:00-15:00, Giảng viên: Nguyễn Văn A, Phòng 207 Nhà B1</li>`;
-                    } else if(courseName.includes('công nghệ')) {
-                        scheduleData = `<li>Thứ 3, 9:00-11:00, Giảng viên: Trần Thị B, Phòng 101 Nhà B2</li>
-                                        <li>Thứ 5, 15:00-17:00, Giảng viên: Trần Thị B, Phòng 405 Nhà A3</li>`;
-                    } else if(courseName.includes('kiến trúc')) {
-                        scheduleData = `<li>Thứ 4, 7:00-10:00, Giảng viên: Lê Văn C, Phòng 206 Nhà A2</li>`;
-                    } else if(courseName.includes('chất lượng')) {
-                        scheduleData = `<li>Thứ 6, 13:00-16:00, Giảng viên: Phạm Thị D, Phòng 303 Nhà B4</li>`;
-                    } else if(courseName.includes('dịch vụ')) {
-                        scheduleData = `<li>Thứ 2, 15:00-17:00, Giảng viên: Hoàng Văn E, Phòng 202 Nhà A1</li>
-                                        <li>Thứ 5, 7:00-9:00, Giảng viên: Hoàng Văn E, Phòng 308 Nhà B3</li>`;
-                    } else if(courseName.includes('hệ thống')) {
-                        scheduleData = `<li>Thứ 3, 13:00-15:00, Giảng viên: Vũ Thị F, Phòng 105 Nhà A2</li>
-                                        <li>Thứ 6, 9:00-11:00, Giảng viên: Vũ Thị F, Phòng 201 Nhà B1</li>`;
-                    } else if(courseName.includes('Java')) {
-                        scheduleData = `<li>Thứ 2, 13:00-15:00, Giảng viên: Đỗ Văn G, Phòng 301 Nhà A1</li>
-                                        <li>Thứ 4, 7:00-9:00, Giảng viên: Đỗ Văn G, Phòng 209 Nhà B2</li>`;
-                    } else if(courseName.includes('dữ liệu')) {
-                        scheduleData = `<li>Thứ 3, 7:00-10:00, Giảng viên: Lý Thị H, Phòng 205 Nhà A3</li>
-                                        <li>Thứ 5, 13:00-16:00, Giảng viên: Lý Thị H, Phòng 403 Nhà B4</li>`;
-                    } else if(courseName.includes('máy')) {
-                        scheduleData = `<li>Thứ 2, 9:00-11:00, Giảng viên: Ngô Văn I, Phòng 207 Nhà A4</li>
-                                        <li>Thứ 6, 15:00-17:00, Giảng viên: Ngô Văn I, Phòng 302 Nhà B1</li>`;
-                    } else if(courseName.includes('bảo mật')) {
-                        scheduleData = `<li>Thứ 4, 9:00-11:00, Giảng viên: Mai Thị K, Phòng 301 Nhà A2</li>
-                                        <li>Thứ 6, 13:00-15:00, Giảng viên: Mai Thị K, Phòng 406 Nhà B3</li>`;
-                    } else {
-                        scheduleData = `<li>Chưa có lịch học cho môn này</li>`;
-                    }
-                    
-                    document.getElementById('scheduleList').innerHTML = scheduleData;
-                    
-                    // Show the modal
-                    const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
-                    scheduleModal.show();
-                });
-            });
-        });
     </script>
-    
-    <!-- Schedule Modal -->
-    <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;">
-                    <h5 class="modal-title" id="scheduleModalLabel">Thời Khóa Biểu</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <ul id="scheduleList" class="list-group list-group-flush">
-                        <!-- Schedule will be inserted here -->
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
