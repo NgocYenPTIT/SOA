@@ -1,0 +1,29 @@
+package com.example.subject_service.controller;
+
+import com.example.subject_service.security.JwtTokenProvider;
+import com.example.subject_service.service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+public class SubjectController {
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
+
+    public SubjectController(JwtTokenProvider jwtTokenProvider, UserService userService ) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userService = userService;
+    }
+
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(this.userService.getUserById(id));
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<?> getUserByUsername(@RequestParam("username") String username) {
+        return ResponseEntity.ok(this.userService.getUserByUsername(username));
+    }
+}
