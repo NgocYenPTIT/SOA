@@ -1,0 +1,58 @@
+package com.example.major_service.config;
+
+import com.example.major_service.model.Major;
+import com.example.major_service.repository.MajorRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class DataInitializer {
+
+    @Bean
+    public CommandLineRunner initData(MajorRepository majorRepository) {
+        return args -> {
+            // Khởi tạo ngành học (Majors)
+            if (majorRepository.count() == 0) {
+                System.out.println("Bắt đầu khởi tạo dữ liệu ngành học...");
+
+                // Major 1
+                Major major1 = new Major();
+                major1.setName("Công nghệ thông tin");
+                majorRepository.save(major1);
+
+                // Major 2
+                Major major2 = new Major();
+                major2.setName("Kỹ thuật phần mềm");
+                majorRepository.save(major2);
+
+                // Major 3
+                Major major3 = new Major();
+                major3.setName("Khoa học máy tính");
+                majorRepository.save(major3);
+
+                // Major 4
+                Major major4 = new Major();
+                major4.setName("Hệ thống thông tin");
+                majorRepository.save(major4);
+
+                // Major 5
+                Major major5 = new Major();
+                major5.setName("An toàn thông tin");
+                majorRepository.save(major5);
+
+                // Major 6
+                Major major6 = new Major();
+                major6.setName("Mạng máy tính và truyền thông");
+                majorRepository.save(major6);
+
+                // Major 7
+                Major major7 = new Major();
+                major7.setName("Trí tuệ nhân tạo");
+                majorRepository.save(major7);
+
+                System.out.println("Đã khởi tạo " + majorRepository.count() + " ngành học vào database");
+            }
+        };
+    }
+}

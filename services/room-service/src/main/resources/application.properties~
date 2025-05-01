@@ -1,8 +1,8 @@
-spring.application.name=subject-service
-server.port=8890
+spring.application.name=room-service
+server.port=8896
 
 # Database Configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/user_service_database?createDatabaseIfNotExist=true
+spring.datasource.url=jdbc:mysql://localhost:3306/subject_service_database?createDatabaseIfNotExist=true
 spring.datasource.username=root
 spring.datasource.password=Yenmysql153@
 

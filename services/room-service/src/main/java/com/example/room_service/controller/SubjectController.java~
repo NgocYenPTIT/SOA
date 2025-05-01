@@ -1,0 +1,17 @@
+package com.example.room_service.controller;
+
+import com.example.room_service.security.JwtTokenProvider;
+import com.example.room_service.service.SubjectService;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+public class SubjectController {
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final SubjectService subjectService;
+
+    public SubjectController(JwtTokenProvider jwtTokenProvider, SubjectService subjectService) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.subjectService = subjectService;
+    }
+}
