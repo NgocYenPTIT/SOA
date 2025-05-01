@@ -316,13 +316,13 @@
                                     <th style="width: 5%">Xóa</th>
                                     <th style="width: 8%">Mã MH</th>
                                     <th style="width: 10%">Mã học phần</th>
-                                    <th style="width: 20%">Tên môn học</th>
+                                    <th style="width: 25%">Tên môn học</th>
                                     <th style="width: 5%">Nhóm</th>
                                     <th style="width: 5%">Tổ</th>
                                     <th style="width: 5%">Số TC</th>
-                                    <th style="width: 7%">Ngày ĐK</th>
-                                    <th style="width: 7%">Trạng thái</th>
-                                    <th style="width: 28%">Thời khóa biểu</th>
+                                    <th style="width: 12%">Ngày ĐK</th>
+                                    <th style="width: 15%">Trạng thái</th>
+                                    <th style="width: 10%">Thời khóa biểu</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -335,12 +335,9 @@
                                     <td>04</td>
                                     <td>2</td>
                                     <td>3</td>
-                                    <td>17/12/24</td>
+                                    <td>17/12/24 12:58:15</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td class="schedule-cell">
-                                        <span class="schedule-item">Thứ 2, 7:00-9:00, P305-A2</span>
-                                        <span class="schedule-item">Thứ 4, 13:00-15:00, P207-B1</span>
-                                    </td>
+                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
@@ -350,12 +347,9 @@
                                     <td>03</td>
                                     <td>1</td>
                                     <td>2</td>
-                                    <td>17/12/24</td>
+                                    <td>17/12/24 12:58:32</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td class="schedule-cell">
-                                        <span class="schedule-item">Thứ 3, 9:00-11:00, P101-B2</span>
-                                        <span class="schedule-item">Thứ 5, 15:00-17:00, P405-A3</span>
-                                    </td>
+                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
@@ -365,11 +359,9 @@
                                     <td>05</td>
                                     <td>1</td>
                                     <td>3</td>
-                                    <td>17/12/24</td>
+                                    <td>17/12/24 12:58:46</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td class="schedule-cell">
-                                        <span class="schedule-item">Thứ 4, 7:00-10:00, P206-A2</span>
-                                    </td>
+                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
@@ -379,11 +371,9 @@
                                     <td>03</td>
                                     <td>1</td>
                                     <td>3</td>
-                                    <td>17/12/24</td>
+                                    <td>17/12/24 12:58:53</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td class="schedule-cell">
-                                        <span class="schedule-item">Thứ 6, 13:00-16:00, P303-B4</span>
-                                    </td>
+                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
@@ -393,12 +383,9 @@
                                     <td>04</td>
                                     <td>1</td>
                                     <td>3</td>
-                                    <td>17/12/24</td>
+                                    <td>17/12/24 12:59:45</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td class="schedule-cell">
-                                        <span class="schedule-item">Thứ 2, 15:00-17:00, P202-A1</span>
-                                        <span class="schedule-item">Thứ 5, 7:00-9:00, P308-B3</span>
-                                    </td>
+                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
                                 </tr>
                                 <tr>
                                     <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
@@ -408,12 +395,9 @@
                                     <td>03</td>
                                     <td>1</td>
                                     <td>2</td>
-                                    <td>17/12/24</td>
+                                    <td>17/12/24 13:06:00</td>
                                     <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td class="schedule-cell">
-                                        <span class="schedule-item">Thứ 3, 13:00-15:00, P105-A2</span>
-                                        <span class="schedule-item">Thứ 6, 9:00-11:00, P201-B1</span>
-                                    </td>
+                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -468,7 +452,73 @@
                     }
                 });
             });
+            
+            // Schedule modal functionality
+            const scheduleButtons = document.querySelectorAll('.schedule-btn');
+            scheduleButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Get the course name and code from the row
+                    const row = this.closest('tr');
+                    const courseName = row.querySelector('td:nth-child(4)').textContent;
+                    const courseCode = row.querySelector('td:nth-child(2)').textContent;
+                    
+                    // Set the course name in the modal
+                    document.getElementById('scheduleModalLabel').textContent = 'Thời Khóa Biểu: ' + courseName;
+                    
+                    // Generate schedule data based on the course
+                    let scheduleData = '';
+                    
+                    // Different schedule data for different courses
+                    if(courseName.includes('di động')) {
+                        scheduleData = `<li class="list-group-item">Thứ 2, 7:00-9:00, Giảng viên: Nguyễn Văn A, Phòng 305 Nhà A2</li>
+                                        <li class="list-group-item">Thứ 4, 13:00-15:00, Giảng viên: Nguyễn Văn A, Phòng 207 Nhà B1</li>`;
+                    } else if(courseName.includes('công nghệ')) {
+                        scheduleData = `<li class="list-group-item">Thứ 3, 9:00-11:00, Giảng viên: Trần Thị B, Phòng 101 Nhà B2</li>
+                                        <li class="list-group-item">Thứ 5, 15:00-17:00, Giảng viên: Trần Thị B, Phòng 405 Nhà A3</li>`;
+                    } else if(courseName.includes('kiến trúc')) {
+                        scheduleData = `<li class="list-group-item">Thứ 4, 7:00-10:00, Giảng viên: Lê Văn C, Phòng 206 Nhà A2</li>`;
+                    } else if(courseName.includes('chất lượng')) {
+                        scheduleData = `<li class="list-group-item">Thứ 6, 13:00-16:00, Giảng viên: Phạm Thị D, Phòng 303 Nhà B4</li>`;
+                    } else if(courseName.includes('dịch vụ')) {
+                        scheduleData = `<li class="list-group-item">Thứ 2, 15:00-17:00, Giảng viên: Hoàng Văn E, Phòng 202 Nhà A1</li>
+                                        <li class="list-group-item">Thứ 5, 7:00-9:00, Giảng viên: Hoàng Văn E, Phòng 308 Nhà B3</li>`;
+                    } else if(courseName.includes('hệ thống')) {
+                        scheduleData = `<li class="list-group-item">Thứ 3, 13:00-15:00, Giảng viên: Vũ Thị F, Phòng 105 Nhà A2</li>
+                                        <li class="list-group-item">Thứ 6, 9:00-11:00, Giảng viên: Vũ Thị F, Phòng 201 Nhà B1</li>`;
+                    } else {
+                        scheduleData = `<li class="list-group-item">Chưa có lịch học cho môn này</li>`;
+                    }
+                    
+                    document.getElementById('scheduleList').innerHTML = scheduleData;
+                    
+                    // Show the modal
+                    const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+                    scheduleModal.show();
+                });
+            });
         });
     </script>
+    
+    <!-- Schedule Modal -->
+    <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;">
+                    <h5 class="modal-title" id="scheduleModalLabel">Thời Khóa Biểu</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="scheduleList" class="list-group list-group-flush">
+                        <!-- Schedule will be inserted here -->
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
