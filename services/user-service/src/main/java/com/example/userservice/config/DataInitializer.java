@@ -20,48 +20,119 @@ public class DataInitializer {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date now = new Date();
 
-                // User 1 - Admin
-                User admin = new User();
-                admin.setUsername("admin");
-                admin.setPassword("password");
-                admin.setDateOfBirth(dateFormat.parse("1990-01-15"));
-                admin.setGender(true);
-                admin.setEmail("admin@example.com");
-                admin.setPhoneNumber("0987654321");
-                admin.setLastAccess(now);
-//                admin.setElo(2000);
+                // Initialize 5 students
+                // Student 1: specified user
+                User student1 = new User();
+                student1.setUsername("abc");
+                student1.setPassword("1");
+                student1.setFullName("Student ABC");
+                student1.setEmail("abc@example.com");
+                student1.setPhone("0123456789");
+                student1.setRole("STUDENT");
+                student1.setMajorId(1L); // Set default major ID, assuming it exists
+                userRepository.save(student1);
 
+                // Student 2
+                User student2 = new User();
+                student2.setUsername("student2");
+                student2.setPassword("pass2");
+                student2.setFullName("Student Two");
+                student2.setEmail("student2@example.com");
+                student2.setPhone("0987654321");
+                student2.setRole("STUDENT");
+                student2.setMajorId(1L);
+                userRepository.save(student2);
 
-                // User 2 - Người chơi cờ tích cực
-                User activePlayer = new User();
-                activePlayer.setUsername("player1");
-                activePlayer.setPassword("chess123");
-                activePlayer.setDateOfBirth(dateFormat.parse("1995-06-21"));
-                activePlayer.setGender(true);
-                activePlayer.setEmail("player1@example.com");
-                activePlayer.setPhoneNumber("0901234567");
-                activePlayer.setLastAccess(now);
-//                activePlayer.setElo(1750);
+                // Student 3
+                User student3 = new User();
+                student3.setUsername("student3");
+                student3.setPassword("pass3");
+                student3.setFullName("Student Three");
+                student3.setEmail("student3@example.com");
+                student3.setPhone("0123456798");
+                student3.setRole("STUDENT");
+                student3.setMajorId(1L);
+                userRepository.save(student3);
 
+                // Student 4
+                User student4 = new User();
+                student4.setUsername("student4");
+                student4.setPassword("pass4");
+                student4.setFullName("Student Four");
+                student4.setEmail("student4@example.com");
+                student4.setPhone("0987654312");
+                student4.setRole("STUDENT");
+                student4.setMajorId(1L);
+                userRepository.save(student4);
 
-                // User 3 - Người chơi nữ
-                User femalePlayer = new User();
-                femalePlayer.setUsername("player2");
-                femalePlayer.setPassword("chess456");
-                femalePlayer.setDateOfBirth(dateFormat.parse("1998-03-08"));
-                femalePlayer.setGender(false);
-                femalePlayer.setEmail("player2@example.com");
-                femalePlayer.setPhoneNumber("0912345678");
-                femalePlayer.setLastAccess(now);
-//                femalePlayer.setElo(1620);
+                // Student 5
+                User student5 = new User();
+                student5.setUsername("student5");
+                student5.setPassword("pass5");
+                student5.setFullName("Student Five");
+                student5.setEmail("student5@example.com");
+                student5.setPhone("0123456780");
+                student5.setRole("STUDENT");
+                student5.setMajorId(1L);
+                userRepository.save(student5);
 
+                // Initialize 5 teachers
+                // Teacher 1
+                User teacher1 = new User();
+                teacher1.setUsername("teacher1");
+                teacher1.setPassword("teachpass1");
+                teacher1.setFullName("Teacher One");
+                teacher1.setEmail("teacher1@example.com");
+                teacher1.setPhone("0987654322");
+                teacher1.setRole("TEACHER");
+                teacher1.setMajorId(1L); // Set default major ID for teachers as well, if applicable
+                userRepository.save(teacher1);
 
-                // Lưu cả 3 bản ghi vào database
-                userRepository.save(admin);
-                userRepository.save(activePlayer);
-                userRepository.save(femalePlayer);
+                // Teacher 2
+                User teacher2 = new User();
+                teacher2.setUsername("teacher2");
+                teacher2.setPassword("teachpass2");
+                teacher2.setFullName("Teacher Two");
+                teacher2.setEmail("teacher2@example.com");
+                teacher2.setPhone("0123456791");
+                teacher2.setRole("TEACHER");
+                teacher2.setMajorId(1L);
+                userRepository.save(teacher2);
 
-                System.out.println("Đã khởi tạo 3 bản ghi User vào database");
+                // Teacher 3
+                User teacher3 = new User();
+                teacher3.setUsername("teacher3");
+                teacher3.setPassword("teachpass3");
+                teacher3.setFullName("Teacher Three");
+                teacher3.setEmail("teacher3@example.com");
+                teacher3.setPhone("0987654333");
+                teacher3.setRole("TEACHER");
+                teacher3.setMajorId(1L);
+                userRepository.save(teacher3);
+
+                // Teacher 4
+                User teacher4 = new User();
+                teacher4.setUsername("teacher4");
+                teacher4.setPassword("teachpass4");
+                teacher4.setFullName("Teacher Four");
+                teacher4.setEmail("teacher4@example.com");
+                teacher4.setPhone("0123456804");
+                teacher4.setRole("TEACHER");
+                teacher4.setMajorId(1L);
+                userRepository.save(teacher4);
+
+                // Teacher 5
+                User teacher5 = new User();
+                teacher5.setUsername("teacher5");
+                teacher5.setPassword("teachpass5");
+                teacher5.setFullName("Teacher Five");
+                teacher5.setEmail("teacher5@example.com");
+                teacher5.setPhone("0987654445");
+                teacher5.setRole("TEACHER");
+                teacher5.setMajorId(1L);
+                userRepository.save(teacher5);
+
+                System.out.println("Đã khởi tạo 5 sinh viên và 5 giáo viên vào database");
             }
         };
     }

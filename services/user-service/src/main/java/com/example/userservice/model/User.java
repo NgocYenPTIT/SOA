@@ -43,8 +43,7 @@ public class User {
 
     private String phone;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private String role;
 
     @Column(unique = true)
     private String studentId;
