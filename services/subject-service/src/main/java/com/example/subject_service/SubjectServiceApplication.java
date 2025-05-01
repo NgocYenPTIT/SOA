@@ -8,7 +8,7 @@ public class SubjectServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SubjectServiceApplication.class, args);
-        System.out.println("hi from User Service");
+        System.out.println("hi from Subject Service");
     }
 
 }

@@ -1,7 +1,7 @@
 package com.example.subject_service.controller;
 
 import com.example.subject_service.security.JwtTokenProvider;
-import com.example.subject_service.service.UserService;
+import com.example.subject_service.service.SubjectService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,21 +9,10 @@ import org.springframework.web.bind.annotation.*;
 public class SubjectController {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
+    private final SubjectService subjectService;
 
-    public SubjectController(JwtTokenProvider jwtTokenProvider, UserService userService ) {
+    public SubjectController(JwtTokenProvider jwtTokenProvider, SubjectService subjectService) {
         this.jwtTokenProvider = jwtTokenProvider;
-        this.userService = userService;
-    }
-
-
-    @GetMapping("/user/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(this.userService.getUserById(id));
-    }
-
-    @GetMapping("/user")
-    public ResponseEntity<?> getUserByUsername(@RequestParam("username") String username) {
-        return ResponseEntity.ok(this.userService.getUserByUsername(username));
+        this.subjectService = subjectService;
     }
 }

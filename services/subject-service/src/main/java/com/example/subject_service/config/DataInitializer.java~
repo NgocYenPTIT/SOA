@@ -1,7 +1,7 @@
-package com.example.userservice.config;
+package com.example.subject_service.config;
 
-import com.example.userservice.model.User;
-import com.example.userservice.repository.UserRepository;
+import com.example.subject_service.model.User;
+import com.example.subject_service.repository.SubjectRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,7 @@ import java.util.Date;
 public class DataInitializer {
 
     @Bean
-    public CommandLineRunner initData(UserRepository userRepository) {
+    public CommandLineRunner initData(SubjectRepository userRepository) {
         return args -> {
             // Kiểm tra xem đã có dữ liệu chưa
             if (userRepository.count() == 0) {
