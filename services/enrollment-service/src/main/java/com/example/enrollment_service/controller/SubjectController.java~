@@ -1,8 +1,7 @@
-package com.example.subject_service.controller;
+package com.example.enrollment_service.controller;
 
-import com.example.subject_service.security.JwtTokenProvider;
-import com.example.subject_service.service.SubjectService;
-import org.springframework.http.ResponseEntity;
+import com.example.enrollment_service.security.JwtTokenProvider;
+import com.example.enrollment_service.service.SubjectService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +14,4 @@ public class SubjectController {
         this.jwtTokenProvider = jwtTokenProvider;
         this.subjectService = subjectService;
     }
-
-
-   
 }

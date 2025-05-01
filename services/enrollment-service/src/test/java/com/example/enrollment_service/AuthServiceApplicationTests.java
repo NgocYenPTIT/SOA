@@ -1,4 +1,4 @@
-package com.example.subject_service;
+package com.example.enrollment_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
