@@ -1,4 +1,4 @@
-package com.example.tournamentservice.util;
+package com.example.userservice.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -11,12 +11,12 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+
 @Service
 public class ServiceAPI {
     @Autowired
-    private RestTemplate restTemplate;
+    private  RestTemplate restTemplate;
 
-    // Phương thức hiện tại giữ nguyên
     public <T> T call(String urlService, HttpMethod method, Object requestBody, Class<T> responseType, String token) {
         System.out.println("call to " + urlService + " " + method + " " + requestBody);
         try {
@@ -40,7 +40,6 @@ public class ServiceAPI {
         }
     }
 
-    // Thêm phương thức mới đặc biệt cho List
     public <T> List<T> callForList(String urlService, HttpMethod method, Object requestBody, Class<T> elementType, String token) {
         System.out.println("callForList to " + urlService + " " + method + " " + requestBody);
         try {

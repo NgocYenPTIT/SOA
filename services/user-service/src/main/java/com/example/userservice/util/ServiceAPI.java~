@@ -1,4 +1,4 @@
-package com.example.tournamentPlayerService.util;
+package com.example..util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
