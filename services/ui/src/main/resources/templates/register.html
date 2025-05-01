@@ -13,6 +13,9 @@
             --accent: #1abc9c;
             --light: #ecf0f1;
             --dark: #2c3e50;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
         }
         
         body {
@@ -166,6 +169,34 @@
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
+        
+        #saveButton {
+            background: linear-gradient(135deg, var(--success), #219653);
+            color: white;
+            border: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        #saveButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #219653, #1e874b);
+        }
+        
+        .registration-status {
+            display: flex;
+            align-items: center;
+        }
+        
+        .toast {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: none;
+        }
 
         ::-webkit-scrollbar {
             width: 8px;
@@ -306,6 +337,10 @@
                         <i class="fas fa-clipboard-check me-2"></i>
                         Danh sách môn học đã đăng ký: 
                         <span class="badge bg-info ms-2">6 môn, 16 tín chỉ</span>
+                    </div>
+                    <div class="registration-status">
+                        <span class="badge bg-success me-2" id="registration-period-badge">Thời gian đăng ký còn: 2 ngày 15 giờ</span>
+                        <button id="saveButton" class="btn btn-success"><i class="fas fa-save me-2"></i>Lưu đăng ký</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -452,6 +487,103 @@
                     }
                 });
             });
+            
+            // Registration period check
+            function checkRegistrationPeriod() {
+                // Simulation: This would typically be a server-side check
+                // For demo purposes, we'll use a variable to toggle between states
+                
+                // Get the current date
+                const currentDate = new Date();
+                
+                // Set registration end date (example: May 5, 2025, 23:59:59)
+                const registrationEndDate = new Date(2025, 4, 5, 23, 59, 59);
+                
+                // Check if current date is past the registration end date
+                const isRegistrationPeriodOver = currentDate > registrationEndDate;
+                
+                // Get the save button and registration status elements
+                const saveButton = document.getElementById('saveButton');
+                const registrationBadge = document.getElementById('registration-period-badge');
+                
+                if (isRegistrationPeriodOver) {
+                    // If registration period is over, hide the save button and change status
+                    saveButton.style.display = 'none';
+                    registrationBadge.textContent = 'Thời gian đăng ký đã kết thúc';
+                    registrationBadge.classList.remove('bg-success');
+                    registrationBadge.classList.add('bg-danger');
+                } else {
+                    // If registration is still open, show button and update time left
+                    saveButton.style.display = 'inline-block';
+                    
+                    // Calculate time difference
+                    const timeDifference = registrationEndDate - currentDate;
+                    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    
+                    registrationBadge.textContent = `Thời gian đăng ký còn: ${days} ngày ${hours} giờ`;
+                    registrationBadge.classList.remove('bg-danger');
+                    registrationBadge.classList.add('bg-success');
+                }
+            }
+            
+            // Check registration period on page load
+            checkRegistrationPeriod();
+            
+            // Add event listener for save button
+            const saveButton = document.getElementById('saveButton');
+            saveButton.addEventListener('click', function() {
+                // Show a success message when saving
+                const toast = document.createElement('div');
+                toast.className = 'position-fixed bottom-0 end-0 p-3';
+                toast.style.zIndex = '11';
+                toast.innerHTML = `
+                    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header bg-success text-white">
+                            <strong class="me-auto"><i class="fas fa-check-circle me-2"></i>Thành công</strong>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            Đã lưu thông tin đăng ký môn học thành công.
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                
+                // Remove the toast after 3 seconds
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            });
+            
+            // For demo purposes: add a toggle button to simulate before/after registration period
+            const footer = document.querySelector('footer .container');
+            const toggleButton = document.createElement('button');
+            toggleButton.className = 'btn btn-sm btn-secondary mt-2';
+            toggleButton.textContent = 'Demo: Chuyển đổi trạng thái thời gian đăng ký';
+            toggleButton.addEventListener('click', function() {
+                // Get the current date
+                const currentDate = new Date();
+                
+                // Get registration end date reference
+                const registrationEndDate = new Date(2025, 4, 5, 23, 59, 59);
+                
+                // Toggle by setting current date to before or after the end date
+                if (currentDate > registrationEndDate) {
+                    // Set current date to before end date
+                    const newDate = new Date(registrationEndDate);
+                    newDate.setDate(newDate.getDate() - 3); // 3 days before end
+                    Date = function() { return newDate; };
+                } else {
+                    // Set current date to after end date
+                    const newDate = new Date(registrationEndDate);
+                    newDate.setDate(newDate.getDate() + 1); // 1 day after end
+                    Date = function() { return newDate; };
+                }
+                
+                checkRegistrationPeriod();
+            });
+            footer.appendChild(toggleButton);
             
             // Schedule modal functionality
             const scheduleButtons = document.querySelectorAll('.schedule-btn');
