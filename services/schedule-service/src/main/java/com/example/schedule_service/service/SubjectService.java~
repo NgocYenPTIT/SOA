@@ -1,0 +1,17 @@
+package com.example.schedule_service.service;
+
+import com.example.schedule_service.repository.SubjectRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class SubjectService {
+
+    private final SubjectRepository userRepository;
+
+    @Autowired
+    public SubjectService(SubjectRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+}
