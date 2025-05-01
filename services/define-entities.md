@@ -33,8 +33,9 @@
 
 ## 4. Course (Lớp học phần)
 - **id**: Long (PK)
-- **group**: String (NOT NULL, UNIQUE) - Nhóm lớp
-- **practiseGroup**: String (NOT NULL, UNIQUE) - Tổ thực hành
+- **code**: String (NOT NULL, UNIQUE)
+- **group**: String (NOT NULL) - Nhóm lớp
+- **practiseGroup**: String (NOT NULL) - Tổ thực hành
 - **subjectId**: Long (FK) - Tham chiếu đến Subject
 - **semesterId**: Long (FK) - Tham chiếu đến Semester
 - **instructorId**: Long (FK) - Tham chiếu đến User (giảng viên)
