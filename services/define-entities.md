@@ -24,11 +24,8 @@
 - **courseId**: Long (FK) - Tham chiếu đến Course
 - **roomId**: Long (FK) - Tham chiếu đến Room
 - **teacherId**: Long(FK) -Tham chiếu tới User
-- **dayOfWeek**: String : Ví dụ Thứ 2, Thứ 3,... ,Chủ nhật.
-- **startHour**: Time (NOT NULL) - Thời điểm bắt đầu: Ví dụ : 15:00
-- **endHour**: Time (NOT NULL) - Thời điểm kết thúc : Ví dụ : 16:00
-- **startDay**: Time (NOT NULL) - Ngày bắt đầu : 15/01/2023
-- **endDay**: Time (NOT NULL) - Ngày kết thúc : 15/01/2023
+- **startTime**: Date
+- **endTime**: Date
 - **type**: String - Loại lịch (LÝ THUYẾT, THỰC HÀNH)
 
 ## 4. Course (Lớp học phần)
