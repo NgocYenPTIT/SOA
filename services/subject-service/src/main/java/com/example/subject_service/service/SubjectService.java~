@@ -16,5 +16,11 @@ public class SubjectService {
     public SubjectService(SubjectRepository userRepository) {
         this.userRepository = userRepository;
     }
-    
+     public Subject getSubjectById(Long id) {
+        Optional<Subject> subject = userRepository.findById(id);
+        if (subject.isPresent()) {
+            return subject.get();
+        } else {
+            throw new RuntimeException("Subject not found");
+        }
 }
