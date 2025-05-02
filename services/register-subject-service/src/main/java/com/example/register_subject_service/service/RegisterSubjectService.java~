@@ -55,7 +55,6 @@ public class RegisterSubjectService {
 
     public ArrayList<RegisterResponse> validateConflictSchedule(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
         ArrayList<RegisterResponse> messages = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
         // get schedule list
         ArrayList<ArrayList<Schedule>> courseSchedules = new ArrayList<>();
 
@@ -71,7 +70,36 @@ public class RegisterSubjectService {
 
             courseSchedules.add(schedules);
         }
+
+        ObjectMapper mapper = new ObjectMapper();
         
+        for (int i = 0; i < courseSchedules.size(); i++) {
+            for (int j = i + 1; j < courseSchedules.size(); j++) {
+                for(int ii = 0 ; ii < courseSchedules.get(i).size(); ii++){
+                    for(int jj = 0 ; jj < courseSchedules.get(j).size(); jj++){
+                        Schedule scheduleI = mapper.convertValue(courseSchedules.get(i).get(ii), Schedule.class);
+                        Schedule scheduleJ = mapper.convertValue(courseSchedules.get(j).get(jj), Schedule.class);
+                        Long startTime1 = scheduleI.getStartTime().getTime();
+                        Long endTime1 = scheduleI.getEndTime().getTime();
+                        Long startTime2 = scheduleJ.getStartTime().getTime();
+                        Long endTime2 = scheduleJ.getEndTime().getTime();
+
+                        if(isConflictTime(startTime1,endTime1,startTime2,endTime2)){
+                            messages.add(RegisterResponse.builder()
+                                    .success(false)
+                                    .status(400L)
+                                    .message("Môn " + "//TODO" + "trùng lịch với môn " + "//TODO")
+                                    .build());
+                        }
+
+                    }
+                }
+            }
+        }
+        // have conflict
+        if(!messages.isEmpty()) return messages;
+
+        // else no conflict
         messages.add(RegisterResponse.builder()
                 .success(true)
                 .status(200L)
@@ -104,4 +132,8 @@ public class RegisterSubjectService {
 
         return messages;
     }
+    public boolean isConflictTime(Long startTime1,Long endTime1,Long startTime2,Long endTime2){
+        return  !(endTime1 <= startTime2 || startTime1 >= endTime2);
+    }
+
 }
