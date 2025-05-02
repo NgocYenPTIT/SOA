@@ -159,10 +159,6 @@
                     Danh sách môn học mở cho đăng ký
                 </div>
                 <div class="card-body">
-                    <div class="search-box">
-                        <input type="text" class="form-control" placeholder="Tìm kiếm môn học...">
-                        <i class="fas fa-search"></i>
-                    </div>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
@@ -278,22 +274,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
-            // Add search functionality
-            const searchInput = document.querySelector('.search-box input');
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const availableRows = document.querySelectorAll('.card:first-of-type tbody tr');
-                
-                availableRows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    if (text.includes(searchTerm)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            });
-            
             // Add event listener for save button
             const saveButton = document.getElementById('saveButton');
             saveButton.addEventListener('click', function() {
