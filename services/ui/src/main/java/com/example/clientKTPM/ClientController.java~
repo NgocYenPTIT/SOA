@@ -51,7 +51,7 @@ public class ClientController {
             session.setAttribute("token", token.getToken());
             session.setAttribute("user", token.getUser());
 
-            // Chuyển đến trang home
+            // Chuyển đến trang register
             return  "redirect:/register";
         } catch (Exception e) {
             model.addAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng!");
@@ -85,7 +85,7 @@ public class ClientController {
         return "redirect:/";
     }
 
-    // Hiển thị trang giải đấu
+    // Hiển thị trang đăng k
     @GetMapping("/register")
     public String showTournamentPage(Model model) {
         // Kiểm tra nếu đã đăng nhập thì chuyển đến trang hello

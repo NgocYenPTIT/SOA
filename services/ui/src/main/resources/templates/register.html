@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -226,7 +226,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="mb-0">
                         <i class="fas fa-graduation-cap me-2"></i>
-                        ĐĂNG KÝ MÔN HỌC HỌC KỲ 2 - NĂM HỌC 2024 - 2025
+                        ĐĂNG KÝ MÔN HỌC HỌC KỲ <span th:text="${view.semester.split('-')[2]}"></span> - NĂM HỌC <span th:text="${view.year}"></span> - <span th:text="${view.year + 1}"></span>
                     </h1>
                 </div>
             </div>
@@ -264,64 +264,24 @@
                             </thead>
                             <tbody>
                                 <!-- Available courses data -->
-                                <tr>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
-                                    <td>INT1501</td>
-                                    <td>CSE1055</td>
-                                    <td>Lập trình Java nâng cao</td>
-                                    <td>01</td>
-                                    <td>1</td>
-                                    <td>3</td>
-                                    <td>40</td>
-                                    <td>15</td>
-                                    <td class="schedule-cell">
-                                        <span class="schedule-item">Thứ 2, 13:00-15:00, P301-A1</span>
-                                        <span class="schedule-item">Thứ 4, 7:00-9:00, P209-B2</span>
+                                <tr th:each="subject : ${view.openSubject}">
+                                    <td>
+                                        <button class="btn btn-sm btn-actions" th:attr="data-subject-id=${subject.subjectId}">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </td>
-                                </tr>
-                                <tr>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
-                                    <td>INT1502</td>
-                                    <td>CSE2086</td>
-                                    <td>Phân tích dữ liệu lớn</td>
-                                    <td>02</td>
-                                    <td>1</td>
-                                    <td>4</td>
-                                    <td>30</td>
-                                    <td>8</td>
+                                    <td th:text="${subject.subjectCode}">INT1501</td>
+                                    <td th:text="${subject.courseCode}">CSE1055</td>
+                                    <td th:text="${subject.subjectName}">Lập trình Java nâng cao</td>
+                                    <td th:text="${subject.courseGroup}">01</td>
+                                    <td th:text="${subject.practiseGroup}">1</td>
+                                    <td th:text="${subject.amountOfCredit}">3</td>
+                                    <td th:text="${subject.maxStudent}">40</td>
+                                    <td th:text="${subject.remainSlot}">15</td>
                                     <td class="schedule-cell">
-                                        <span class="schedule-item">Thứ 3, 7:00-10:00, P205-A3</span>
-                                        <span class="schedule-item">Thứ 5, 13:00-16:00, P403-B4</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
-                                    <td>INT1503</td>
-                                    <td>CSE3027</td>
-                                    <td>Học máy</td>
-                                    <td>01</td>
-                                    <td>2</td>
-                                    <td>3</td>
-                                    <td>45</td>
-                                    <td>12</td>
-                                    <td class="schedule-cell">
-                                        <span class="schedule-item">Thứ 2, 9:00-11:00, P207-A4</span>
-                                        <span class="schedule-item">Thứ 6, 15:00-17:00, P302-B1</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><button class="btn btn-sm btn-actions"><i class="fas fa-plus"></i></button></td>
-                                    <td>INT1504</td>
-                                    <td>CSE4018</td>
-                                    <td>An toàn và bảo mật thông tin</td>
-                                    <td>02</td>
-                                    <td>1</td>
-                                    <td>3</td>
-                                    <td>35</td>
-                                    <td>5</td>
-                                    <td class="schedule-cell">
-                                        <span class="schedule-item">Thứ 4, 9:00-11:00, P301-A2</span>
-                                        <span class="schedule-item">Thứ 6, 13:00-15:00, P406-B3</span>
+                                        <span class="schedule-item" th:each="schedule : ${subject.schedules}" th:text="${schedule.content}">
+                                            Thời gian học
+                                        </span>
                                     </td>
                                 </tr>
                             </tbody>
@@ -336,11 +296,17 @@
                     <div>
                         <i class="fas fa-clipboard-check me-2"></i>
                         Danh sách môn học đã đăng ký: 
-                        <span class="badge bg-info ms-2">6 môn, 16 tín chỉ</span>
+                        <span class="badge bg-info ms-2" th:text="${view.numOfRegisteredSubject} + ' môn, ' + ${view.numOfRegisteredCredit} + ' tín chỉ'">
+                            6 môn, 16 tín chỉ
+                        </span>
                     </div>
                     <div class="registration-status">
-                        <span class="badge bg-success me-2" id="registration-period-badge">Thời gian đăng ký còn: 2 ngày 15 giờ</span>
-                        <button id="saveButton" class="btn btn-success"><i class="fas fa-save me-2"></i>Lưu đăng ký</button>
+                        <span class="badge bg-success me-2" id="registration-period-badge">
+                            Thời gian đăng ký còn: <span id="countdown-days">0</span> ngày <span id="countdown-hours">0</span> giờ
+                        </span>
+                        <button id="saveButton" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Lưu đăng ký
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -362,77 +328,25 @@
                             </thead>
                             <tbody>
                                 <!-- Registered courses data -->
-                                <tr>
-                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
-                                    <td>INT1449</td>
-                                    <td>CSE2031</td>
-                                    <td>Phát triển ứng dụng cho các thiết bị di động</td>
-                                    <td>04</td>
-                                    <td>2</td>
+                                <tr th:each="subject : ${view.registeredSubject}">
+                                    <td>
+                                        <button class="btn btn-sm btn-actions btn-remove" th:attr="data-subject-id=${subject.subjectId}">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </td>
+                                    <td th:text="${subject.subjectCode}">INT1449</td>
+                                    <td th:text="${subject.courseCode}">CSE2031</td>
+                                    <td th:text="${subject.subjectName}">Phát triển ứng dụng cho các thiết bị di động</td>
+                                    <td th:text="${subject.courseGroup}">04</td>
+                                    <td th:text="${subject.practiseGroup}">2</td>
                                     <td>3</td>
-                                    <td>17/12/24 12:58:15</td>
-                                    <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
-                                    <td>INT1408</td>
-                                    <td>CSE3042</td>
-                                    <td>Chuyên đề công nghệ phần mềm</td>
-                                    <td>03</td>
-                                    <td>1</td>
-                                    <td>2</td>
-                                    <td>17/12/24 12:58:32</td>
-                                    <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
-                                    <td>INT1427</td>
-                                    <td>CSE4063</td>
-                                    <td>Kiến trúc và thiết kế phần mềm</td>
-                                    <td>05</td>
-                                    <td>1</td>
-                                    <td>3</td>
-                                    <td>17/12/24 12:58:46</td>
-                                    <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
-                                    <td>INT1416</td>
-                                    <td>CSE3074</td>
-                                    <td>Đảm bảo chất lượng phần mềm</td>
-                                    <td>03</td>
-                                    <td>1</td>
-                                    <td>3</td>
-                                    <td>17/12/24 12:58:53</td>
-                                    <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
-                                    <td>INT1448</td>
-                                    <td>CSE4095</td>
-                                    <td>Phát triển phần mềm hướng dịch vụ</td>
-                                    <td>04</td>
-                                    <td>1</td>
-                                    <td>3</td>
-                                    <td>17/12/24 12:59:45</td>
-                                    <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td><button class="btn btn-sm btn-actions btn-remove"><i class="fas fa-times"></i></button></td>
-                                    <td>INT1461</td>
-                                    <td>CSE3086</td>
-                                    <td>Xây dựng các hệ thống nhúng</td>
-                                    <td>03</td>
-                                    <td>1</td>
-                                    <td>2</td>
-                                    <td>17/12/24 13:06:00</td>
-                                    <td><span class="badge badge-status">Đã khóa</span></td>
-                                    <td><button class="btn btn-sm btn-actions schedule-btn"><i class="fas fa-calendar"></i></button></td>
+                                    <td th:text="${#dates.format(#dates.parse(subject.enrollmentDate), 'dd/MM/yy HH:mm:ss')}">17/12/24 12:58:15</td>
+                                    <td><span class="badge badge-status" th:text="${subject.status}">Đã khóa</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-actions schedule-btn" th:attr="data-subject-id=${subject.subjectId}">
+                                            <i class="fas fa-calendar"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -450,7 +364,7 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script th:inline="javascript">
         // Add animations when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Stagger the animations of table rows
@@ -488,52 +402,41 @@
                 });
             });
             
-            // Registration period check
-            function checkRegistrationPeriod() {
-                // Simulation: This would typically be a server-side check
-                // For demo purposes, we'll use a variable to toggle between states
+            // Registration period check and countdown
+            function updateCountdown() {
+                // Get the end of enrollment time from Thymeleaf model
+                const endTimeStr = /*[[${view.endOfEnrollmentTime}]]*/ '2025-05-02T09:49:57.998Z';
+                const endTime = new Date(endTimeStr);
+                const now = new Date();
                 
-                // Get the current date
-                const currentDate = new Date();
+                // Calculate time difference
+                const timeDiff = endTime - now;
                 
-                // Set registration end date (example: May 5, 2025, 23:59:59)
-                const registrationEndDate = new Date(2025, 4, 5, 23, 59, 59);
-                
-                // Check if current date is past the registration end date
-                const isRegistrationPeriodOver = currentDate > registrationEndDate;
-                
-                // Get the save button and registration status elements
-                const saveButton = document.getElementById('saveButton');
-                const registrationBadge = document.getElementById('registration-period-badge');
-                
-                if (isRegistrationPeriodOver) {
-                    // If registration period is over, hide the save button and change status
-                    saveButton.style.display = 'none';
-                    registrationBadge.textContent = 'Thời gian đăng ký đã kết thúc';
-                    registrationBadge.classList.remove('bg-success');
-                    registrationBadge.classList.add('bg-danger');
+                if (timeDiff <= 0) {
+                    // Registration period is over
+                    document.getElementById('registration-period-badge').textContent = 'Thời gian đăng ký đã kết thúc';
+                    document.getElementById('registration-period-badge').classList.remove('bg-success');
+                    document.getElementById('registration-period-badge').classList.add('bg-danger');
+                    document.getElementById('saveButton').style.display = 'none';
                 } else {
-                    // If registration is still open, show button and update time left
-                    saveButton.style.display = 'inline-block';
+                    // Registration period is still active
+                    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     
-                    // Calculate time difference
-                    const timeDifference = registrationEndDate - currentDate;
-                    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    
-                    registrationBadge.textContent = `Thời gian đăng ký còn: ${days} ngày ${hours} giờ`;
-                    registrationBadge.classList.remove('bg-danger');
-                    registrationBadge.classList.add('bg-success');
+                    document.getElementById('countdown-days').textContent = days;
+                    document.getElementById('countdown-hours').textContent = hours;
                 }
             }
             
-            // Check registration period on page load
-            checkRegistrationPeriod();
+            // Update countdown immediately and then every minute
+            updateCountdown();
+            setInterval(updateCountdown, 60000);
             
             // Add event listener for save button
             const saveButton = document.getElementById('saveButton');
             saveButton.addEventListener('click', function() {
-                // Show a success message when saving
+                // Here you would typically make an AJAX call to save the registration
+                // For now, we'll just show a success message
                 const toast = document.createElement('div');
                 toast.className = 'position-fixed bottom-0 end-0 p-3';
                 toast.style.zIndex = '11';
@@ -556,34 +459,28 @@
                 }, 3000);
             });
             
-            // For demo purposes: add a toggle button to simulate before/after registration period
-            const footer = document.querySelector('footer .container');
-            const toggleButton = document.createElement('button');
-            toggleButton.className = 'btn btn-sm btn-secondary mt-2';
-            toggleButton.textContent = 'Demo: Chuyển đổi trạng thái thời gian đăng ký';
-            toggleButton.addEventListener('click', function() {
-                // Get the current date
-                const currentDate = new Date();
-                
-                // Get registration end date reference
-                const registrationEndDate = new Date(2025, 4, 5, 23, 59, 59);
-                
-                // Toggle by setting current date to before or after the end date
-                if (currentDate > registrationEndDate) {
-                    // Set current date to before end date
-                    const newDate = new Date(registrationEndDate);
-                    newDate.setDate(newDate.getDate() - 3); // 3 days before end
-                    Date = function() { return newDate; };
-                } else {
-                    // Set current date to after end date
-                    const newDate = new Date(registrationEndDate);
-                    newDate.setDate(newDate.getDate() + 1); // 1 day after end
-                    Date = function() { return newDate; };
-                }
-                
-                checkRegistrationPeriod();
+            // Event handlers for adding/removing subjects
+            const addButtons = document.querySelectorAll('.btn-actions:not(.btn-remove):not(.schedule-btn)');
+            addButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const subjectId = this.getAttribute('data-subject-id');
+                    // Here you would make an AJAX call to add the subject
+                    console.log('Adding subject with ID:', subjectId);
+                    // Show feedback to the user (temporary for demo)
+                    alert('Đã thêm môn học vào danh sách đăng ký. Chức năng đang được phát triển.');
+                });
             });
-            footer.appendChild(toggleButton);
+            
+            const removeButtons = document.querySelectorAll('.btn-remove');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const subjectId = this.getAttribute('data-subject-id');
+                    // Here you would make an AJAX call to remove the subject
+                    console.log('Removing subject with ID:', subjectId);
+                    // Show feedback to the user (temporary for demo)
+                    alert('Đã xóa môn học khỏi danh sách đăng ký. Chức năng đang được phát triển.');
+                });
+            });
             
             // Schedule modal functionality
             const scheduleButtons = document.querySelectorAll('.schedule-btn');
@@ -591,39 +488,26 @@
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     
-                    // Get the course name and code from the row
+                    const subjectId = this.getAttribute('data-subject-id');
                     const row = this.closest('tr');
                     const courseName = row.querySelector('td:nth-child(4)').textContent;
-                    const courseCode = row.querySelector('td:nth-child(2)').textContent;
                     
-                    // Set the course name in the modal
                     document.getElementById('scheduleModalLabel').textContent = 'Thời Khóa Biểu: ' + courseName;
                     
-                    // Generate schedule data based on the course
-                    let scheduleData = '';
+                    // Find the subject in the registered subjects array
+                    const registeredSubjects = /*[[${view.registeredSubject}]]*/ [];
+                    const subject = registeredSubjects.find(s => s.subjectId == subjectId);
                     
-                    // Different schedule data for different courses
-                    if(courseName.includes('di động')) {
-                        scheduleData = `<li class="list-group-item">Thứ 2, 7:00-9:00, Giảng viên: Nguyễn Văn A, Phòng 305 Nhà A2</li>
-                                        <li class="list-group-item">Thứ 4, 13:00-15:00, Giảng viên: Nguyễn Văn A, Phòng 207 Nhà B1</li>`;
-                    } else if(courseName.includes('công nghệ')) {
-                        scheduleData = `<li class="list-group-item">Thứ 3, 9:00-11:00, Giảng viên: Trần Thị B, Phòng 101 Nhà B2</li>
-                                        <li class="list-group-item">Thứ 5, 15:00-17:00, Giảng viên: Trần Thị B, Phòng 405 Nhà A3</li>`;
-                    } else if(courseName.includes('kiến trúc')) {
-                        scheduleData = `<li class="list-group-item">Thứ 4, 7:00-10:00, Giảng viên: Lê Văn C, Phòng 206 Nhà A2</li>`;
-                    } else if(courseName.includes('chất lượng')) {
-                        scheduleData = `<li class="list-group-item">Thứ 6, 13:00-16:00, Giảng viên: Phạm Thị D, Phòng 303 Nhà B4</li>`;
-                    } else if(courseName.includes('dịch vụ')) {
-                        scheduleData = `<li class="list-group-item">Thứ 2, 15:00-17:00, Giảng viên: Hoàng Văn E, Phòng 202 Nhà A1</li>
-                                        <li class="list-group-item">Thứ 5, 7:00-9:00, Giảng viên: Hoàng Văn E, Phòng 308 Nhà B3</li>`;
-                    } else if(courseName.includes('hệ thống')) {
-                        scheduleData = `<li class="list-group-item">Thứ 3, 13:00-15:00, Giảng viên: Vũ Thị F, Phòng 105 Nhà A2</li>
-                                        <li class="list-group-item">Thứ 6, 9:00-11:00, Giảng viên: Vũ Thị F, Phòng 201 Nhà B1</li>`;
+                    let scheduleHtml = '';
+                    if (subject && subject.schedules && subject.schedules.length > 0) {
+                        subject.schedules.forEach(schedule => {
+                            scheduleHtml += `<li class="list-group-item">${schedule.content}</li>`;
+                        });
                     } else {
-                        scheduleData = `<li class="list-group-item">Chưa có lịch học cho môn này</li>`;
+                        scheduleHtml = '<li class="list-group-item">Không có lịch học cho môn này</li>';
                     }
                     
-                    document.getElementById('scheduleList').innerHTML = scheduleData;
+                    document.getElementById('scheduleList').innerHTML = scheduleHtml;
                     
                     // Show the modal
                     const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));

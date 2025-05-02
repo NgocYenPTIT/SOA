@@ -85,7 +85,7 @@ public class ClientController {
         return "redirect:/";
     }
 
-    // Hiển thị trang giải đấu
+    // Hiển thị trang đăng ký
     @GetMapping("/register")
     public String showTournamentPage(Model model) {
         // Kiểm tra nếu đã đăng nhập thì chuyển đến trang hello
