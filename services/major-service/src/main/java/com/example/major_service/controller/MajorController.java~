@@ -1,17 +1,27 @@
 package com.example.major_service.controller;
 
+import com.example.major_service.repository.MajorRepository;
 import com.example.major_service.security.JwtTokenProvider;
-import com.example.major_service.service.MajorService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-public class SubjectController {
+public class MajorController {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final MajorService majorService;
+    private final MajorRepository majorRepository;
 
-    public SubjectController(JwtTokenProvider jwtTokenProvider, MajorService majorService) {
+    public CreditRuleController(JwtTokenProvider jwtTokenProvider,CreditRuleRepository creditRuleRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
-        this.majorService = majorService;
+        this.creditRuleRepository = creditRuleRepository;
+    }
+
+    @GetMapping("/credit-rule")
+    public ResponseEntity<List<CreditRule>> getCreditRulesBySemesterId(@RequestParam Long semesterId) {
+        List<CreditRule> creditRules = creditRuleRepository.findBySemesterId(semesterId);
+        System.out.println("xin chao");
+        return ResponseEntity.ok(creditRules);
     }
 }
