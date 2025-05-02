@@ -1,6 +1,7 @@
 package com.example.credit_rule_service.controller;
 
 import com.example.credit_rule_service.model.CreditRule;
+import com.example.credit_rule_service.repository.CreditRuleRepository;
 import com.example.credit_rule_service.security.JwtTokenProvider;
 import com.example.credit_rule_service.service.CreditRuleService;
 import org.springframework.http.ResponseEntity;
@@ -12,16 +13,17 @@ import java.util.List;
 public class CreditRuleController {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final CreditRuleService creditRuleService;
+    private final CreditRuleRepository creditRuleRepository;
 
-    public CreditRuleController(JwtTokenProvider jwtTokenProvider, CreditRuleService creditRuleService) {
+    public CreditRuleController(JwtTokenProvider jwtTokenProvider,CreditRuleRepository creditRuleRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
-        this.creditRuleService = creditRuleService;
+        this.creditRuleRepository = creditRuleRepository;
     }
     
     @GetMapping("/credit-rule")
     public ResponseEntity<List<CreditRule>> getCreditRulesBySemesterId(@RequestParam Long semesterId) {
-        List<CreditRule> creditRules = creditRuleService.getCreditRulesBySemesterId(semesterId);
+        List<CreditRule> creditRules = creditRuleRepository.findBySemesterId(semesterId);
+        System.out.println("xin chao");
         return ResponseEntity.ok(creditRules);
     }
 }
