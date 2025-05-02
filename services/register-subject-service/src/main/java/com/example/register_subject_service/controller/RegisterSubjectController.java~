@@ -1,0 +1,27 @@
+package com.example.register_subject_service.controller;
+
+import com.example.register_subject_service.model.RegisterResponse;
+import com.example.register_subject_service.model.RegisterSubjectDto;
+import com.example.register_subject_service.service.RegisterSubjectService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+
+@RestController
+public class RegisterSubjectController {
+    private final RegisterSubjectService registerSubjectService;
+
+    public RegisterSubjectController(RegisterSubjectService registerSubjectService) {
+        this.registerSubjectService = registerSubjectService;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
+        Long userId = (Long)request.getAttribute("id");
+        System.out.println(userId);
+        System.out.println(form);
+        return  ResponseEntity.ok(this.registerSubjectService.registerSubject(form));
+    }
+
+}

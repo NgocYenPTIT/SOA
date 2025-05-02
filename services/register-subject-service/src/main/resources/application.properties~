@@ -1,4 +1,4 @@
-spring.application.name=register-subject-service
+spring.application.name=register-service
 server.port=8899
 
 # Database Configuration

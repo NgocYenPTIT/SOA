@@ -1,0 +1,42 @@
+package com.example.register_subject_service.service;
+
+import com.example.register_subject_service.model.OpeningSubject;
+import com.example.register_subject_service.model.RegisterResponse;
+import com.example.register_subject_service.model.RegisterSubjectDto;
+import com.example.register_subject_service.model.Schedule;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+
+@Service
+public class RegisterSubjectService {
+
+    public RegisterResponse registerSubject(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
+
+        this.validate(request,form);
+
+        return  RegisterResponse.builder()
+                .success(true)
+                .status(200L)
+                .message("Success")
+                .build();
+    }
+
+    public RegisterResponse validate(HttpServletRequest request, @RequestBody RegisterSubjectDto form){
+        Long userId = (Long)request.getAttribute("id");
+        System.out.println(userId);
+        System.out.println(form);
+        return  RegisterResponse.builder()
+                .success(true)
+                .status(200L)
+                .message("Success")
+                .build();
+    }
+}
