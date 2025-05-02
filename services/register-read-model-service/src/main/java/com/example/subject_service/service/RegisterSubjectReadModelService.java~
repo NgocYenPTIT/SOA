@@ -1,0 +1,117 @@
+package com.example.subject_service.service;
+
+import com.example.subject_service.model.OpeningSubject;
+import com.example.subject_service.model.RegisterSubjectView;
+import com.example.subject_service.model.RegisteredSubject;
+import com.example.subject_service.repository.RegisterSubjectRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+
+@Service
+public class RegisterSubjectReadModelService {
+
+    private final RegisterSubjectRepository registerSubjectRepository;
+
+    @Autowired
+    public RegisterSubjectReadModelService(RegisterSubjectRepository registerSubjectRepository) {
+        this.registerSubjectRepository = registerSubjectRepository;
+    }
+
+    public List<RegisterSubjectView> getRegisteredSubjects(Long id){
+        return this.registerSubjectRepository.findByStudentId((id));
+    }
+
+    public RegisterSubjectView create() {
+        // Tạo danh sách lịch học
+        List<Schedule> schedules1 = new ArrayList<>();
+        schedules1.add(Schedule.builder()
+                .id(1L)
+                .content("Thứ 2, tiết 1-3, phòng A1.01")
+                .build());
+        schedules1.add(Schedule.builder()
+                .id(2L)
+                .content("Thứ 5, tiết 7-9, phòng A2.03")
+                .build());
+
+        List<Schedule> schedules2 = new ArrayList<>();
+        schedules2.add(Schedule.builder()
+                .id(3L)
+                .content("Thứ 3, tiết 4-6, phòng B1.02")
+                .build());
+        schedules2.add(Schedule.builder()
+                .id(4L)
+                .content("Thứ 6, tiết 1-3, phòng B2.05")
+                .build());
+
+        // Tạo danh sách môn học mở
+        List<OpeningSubject> openingSubjects = new ArrayList<>();
+        openingSubjects.add(OpeningSubject.builder()
+                .subjectId(1L)
+                .subjectName("Lập trình Java")
+                .subjectCode("IT1110")
+                .courseCode("IT1110.1")
+                .courseGroup("L01")
+                .practiseGroup("P01")
+                .amountOfCredit(3)
+                .remainSlot(25)
+                .maxStudent(40)
+                .schedules(schedules1)
+                .build());
+        openingSubjects.add(OpeningSubject.builder()
+                .subjectId(2L)
+                .subjectName("Cơ sở dữ liệu")
+                .subjectCode("IT1120")
+                .courseCode("IT1120.1")
+                .courseGroup("L02")
+                .practiseGroup("P02")
+                .amountOfCredit(3)
+                .remainSlot(18)
+                .maxStudent(35)
+                .schedules(schedules2)
+                .build());
+
+        // Tạo danh sách môn học đã đăng ký
+        List<RegisteredSubject> registeredSubjects = new ArrayList<>();
+        registeredSubjects.add(RegisteredSubject.builder()
+                .subjectId(3L)
+                .subjectName("Mạng máy tính")
+                .subjectCode("IT1130")
+                .courseCode("IT1130.1")
+                .courseGroup("L03")
+                .practiseGroup("P03")
+                .enrollmentDate("2022-08-15")
+                .Status("Registered")
+                .schedules(schedules1)
+                .build());
+        registeredSubjects.add(RegisteredSubject.builder()
+                .subjectId(4L)
+                .subjectName("An toàn thông tin")
+                .subjectCode("IT1140")
+                .courseCode("IT1140.1")
+                .courseGroup("L04")
+                .practiseGroup("P04")
+                .enrollmentDate("2022-08-16")
+                .Status("Registered")
+                .schedules(schedules2)
+                .build());
+
+        // Tạo và lưu RegisterSubjectView
+        RegisterSubjectView registerSubjectView = RegisterSubjectView.builder()
+                .studentId(1L)
+                .semester("2022-2023-1")
+                .year("2022")
+                .endOfEnrollmentTime(new Date())
+                .openSubject(openingSubjects)
+                .numOfRegisteredSubject(2)
+                .numOfRegisteredCredit(6)
+                .registeredSubject(registeredSubjects)
+                .build();
+
+        return this.registerSubjectRepository.save(registerSubjectView);
+    }
+}
