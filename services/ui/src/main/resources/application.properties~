@@ -13,4 +13,4 @@ app.global.url.user-service=http://localhost:8889/
 app.global.url.auth-service=http://localhost:8888/
 
 #URL of tournament-service
-app.global.url.register-subject-read-model-service=http://localhost:8898/
+app.global.url.register-read-model-service=http://localhost:8898/

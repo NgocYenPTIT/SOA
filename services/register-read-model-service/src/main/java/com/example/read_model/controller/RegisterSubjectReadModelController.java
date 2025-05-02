@@ -1,6 +1,6 @@
-package com.example.subject_service.controller;
+package com.example.read_model.controller;
 
-import com.example.subject_service.service.RegisterSubjectReadModelService;
+import com.example.read_model.service.RegisterSubjectReadModelService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

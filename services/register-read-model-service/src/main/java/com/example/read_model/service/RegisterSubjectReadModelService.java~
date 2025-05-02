@@ -1,0 +1,29 @@
+package com.example.read_model.service;
+
+import com.example.read_model.model.OpeningSubject;
+import com.example.read_model.model.RegisterSubjectView;
+import com.example.read_model.model.RegisteredSubject;
+import com.example.read_model.model.Schedule;
+import com.example.read_model.repository.RegisterSubjectRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+
+@Service
+public class RegisterSubjectReadModelService {
+
+    private final RegisterSubjectRepository registerSubjectRepository;
+
+    @Autowired
+    public RegisterSubjectReadModelService(RegisterSubjectRepository registerSubjectRepository) {
+        this.registerSubjectRepository = registerSubjectRepository;
+    }
+
+    public RegisterSubjectView getRegisteredSubjects(Long id){
+        return this.registerSubjectRepository.findByStudentId((1L));
+    }
+}

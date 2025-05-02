@@ -1,6 +1,6 @@
-package com.example.subject_service.repository;
+package com.example.read_model.repository;
 
-import com.example.subject_service.model.RegisterSubjectView;
+import com.example.read_model.model.RegisterSubjectView;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

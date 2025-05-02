@@ -26,8 +26,8 @@ public class ClientController {
     @Value("${app.global.url.auth-service}")
     private String authServiceUrl;
 
-    @Value("${app.global.url.tournament-service}")
-    private String urlTournamentService;
+    @Value("${app.global.url.register-subject-read-model-service}")
+    private String urlRegisterReadModelService;
 
     // Hiển thị trang đăng nhập
     @GetMapping("/")
@@ -51,8 +51,8 @@ public class ClientController {
             session.setAttribute("token", token.getToken());
             session.setAttribute("user", token.getUser());
 
-            // Chuyển đến trang home
-            return "register";
+            // Chuyển đến trang register
+            return  "redirect:/register";
         } catch (Exception e) {
             model.addAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng!");
             return "login";
@@ -85,49 +85,23 @@ public class ClientController {
         return "redirect:/";
     }
 
-//    // Hiển thị trang giải đấu
-//    @GetMapping("/tournaments")
-//    public String showTournamentPage(Model model) {
-//        // Kiểm tra nếu đã đăng nhập thì chuyển đến trang hello
-//        if (session.getAttribute("user") != null) {
-////            System.out.println(session.getAttribute("user"));
-////            TournamentPageableDto flag_all = this.serviceAPI.call(
-////                    this.urlTournamentService + "tournament?name=&currentPage=1&pageSize=10&flag=all",
-////                    HttpMethod.GET,
-////                    null,
-////                    TournamentPageableDto.class,
-////                    (String) session.getAttribute("token")
-////            );
-////
-////            TournamentPageableDto flag_create_and_join = this.serviceAPI.call(
-////                    this.urlTournamentService + "tournament?name=&currentPage=1&pageSize=10&flag=create-and-join",
-////                    HttpMethod.GET,
-////                    null,
-////                    TournamentPageableDto.class,
-////                    (String) session.getAttribute("token")
-////            );
-////
-////            TournamentPageableDto flag_only_create = this.serviceAPI.call(
-////                    this.urlTournamentService + "tournament?name=&currentPage=1&pageSize=10&flag=only-create",
-////                    HttpMethod.GET,
-////                    null,
-////                    TournamentPageableDto.class,
-////                    (String) session.getAttribute("token")
-////            );
-////
-////            TournamentPageableDto flag_only_join = this.serviceAPI.call(
-////                    this.urlTournamentService + "tournament?name=&currentPage=1&pageSize=10&flag=only-join",
-////                    HttpMethod.GET,
-////                    null,
-////                    TournamentPageableDto.class,
-////                    (String) session.getAttribute("token")
-////            );
-////            model.addAttribute("flag_all", flag_all.getTotalItems());
-////            model.addAttribute("flag_create_and_join", flag_create_and_join.getTotalItems());
-////            model.addAttribute("flag_only_create", flag_only_create.getTotalItems());
-////            model.addAttribute("flag_only_join", flag_only_join.getTotalItems());
-////            return "tournament-management";
-////        }
-//        return "redirect:/";
-//    }
+    // Hiển thị trang giải đấu
+    @GetMapping("/register")
+    public String showTournamentPage(Model model) {
+        // Kiểm tra nếu đã đăng nhập thì chuyển đến trang hello
+        if (session.getAttribute("user") != null) {
+            System.out.println(session.getAttribute("user"));
+            RegisterSubjectView view = this.serviceAPI.call(
+                    this.urlRegisterReadModelService + "register-subject-read-model",
+                    HttpMethod.GET,
+                    null,
+                    RegisterSubjectView.class,
+                    (String) session.getAttribute("token")
+            );
+            System.out.println(view);
+            model.addAttribute("view", view);
+            return "register" ;
+        }
+        return "redirect:/";
+    }
 }
