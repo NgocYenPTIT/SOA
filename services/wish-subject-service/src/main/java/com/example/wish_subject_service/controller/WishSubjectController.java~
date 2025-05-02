@@ -1,0 +1,17 @@
+package com.example.wish_subject_service.controller;
+
+import com.example.wish_subject_service.security.JwtTokenProvider;
+import com.example.wish_subject_service.service.WishSubjectService;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+public class SubjectController {
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final WishSubjectService wishSubjectService;
+
+    public SubjectController(JwtTokenProvider jwtTokenProvider, WishSubjectService wishSubjectService) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.wishSubjectService = wishSubjectService;
+    }
+}
