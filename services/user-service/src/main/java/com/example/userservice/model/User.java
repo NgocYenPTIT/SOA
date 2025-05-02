@@ -48,6 +48,8 @@ public class User {
     @Column(unique = true)
     private String studentId;
 
+    private Long semesterId;
+
     @Column(nullable = false)
     private Long majorId;
 

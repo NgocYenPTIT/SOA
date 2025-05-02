@@ -148,8 +148,8 @@ public class DataInitializer {
                 teacher5.setPhone("0987654445");
                 teacher5.setRole("TEACHER");
                 teacher5.setMajorId(1L);
-                teacher5.setStudentId("B21DCCN1)");
-                teacher5.setSemesterId(1L);
+                student1.setStudentId("B21DCCN1)");
+                student1.setSemesterId(1L);
                 userRepository.save(teacher5);
 
                 System.out.println("Đã khởi tạo 5 sinh viên và 5 giáo viên vào database");
