@@ -19,6 +19,6 @@ public class ScheduleService {
         this.scheduleRepository = scheduleRepository;
     }
     public List<Schedule> getList(HttpServletRequest request, GetScheduleDto form){
-        return  this.scheduleRepository.findAllByCourseId(form.getCourseId());
+        return  this.scheduleRepository.findAllByCourseId()
     }
 }

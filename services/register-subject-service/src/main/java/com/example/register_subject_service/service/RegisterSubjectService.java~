@@ -1,42 +1,83 @@
 package com.example.register_subject_service.service;
 
-import com.example.register_subject_service.model.OpeningSubject;
 import com.example.register_subject_service.model.RegisterResponse;
 import com.example.register_subject_service.model.RegisterSubjectDto;
-import com.example.register_subject_service.model.Schedule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
 @Service
 public class RegisterSubjectService {
 
-    public RegisterResponse registerSubject(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
-        
-        this.validate(request,form);
+    public List<RegisterResponse> registerSubject(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
 
-        return  RegisterResponse.builder()
+        List<RegisterResponse> messages = new ArrayList<>();
+
+        messages.addAll(this.validateConflictSchedule(request, form));
+        messages.addAll(this.validateEnoughCredit(request, form));
+        messages.addAll(this.validateEnoughSlot(request, form));
+
+        //fail
+        if(!messages.isEmpty()) return  messages ;
+
+        //success
+        messages.add(RegisterResponse.builder()
                 .success(true)
                 .status(200L)
                 .message("Success")
-                .build();
+                .build());
+
+        return messages;
     }
 
-    public RegisterResponse validate(HttpServletRequest request, @RequestBody RegisterSubjectDto form){
-        Long userId = (Long)request.getAttribute("id");
-        System.out.println(userId);
-        System.out.println(form);
-        return  RegisterResponse.builder()
+    public void save(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
+        // TODO:emit event
+    }
+
+    public ArrayList<RegisterResponse> validateConflictSchedule(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
+        ArrayList<RegisterResponse> messages = new ArrayList<>();
+        RegisterSubjectView view = this.serviceAPI.call(
+                this.urlRegisterReadModelService + "register-subject-read-model",
+                HttpMethod.GET,
+                null,
+                RegisterSubjectView.class,
+                (String) session.getAttribute("token")
+        );
+
+        messages.add(RegisterResponse.builder()
                 .success(true)
                 .status(200L)
                 .message("Success")
-                .build();
+                .build());
+
+        return messages;
+    }
+
+    public ArrayList<RegisterResponse> validateEnoughCredit(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
+        ArrayList<RegisterResponse> messages = new ArrayList<>();
+
+        messages.add(RegisterResponse.builder()
+                .success(true)
+                .status(200L)
+                .message("Success")
+                .build());
+
+        return messages;
+    }
+
+    public ArrayList<RegisterResponse> validateEnoughSlot(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
+        ArrayList<RegisterResponse> messages = new ArrayList<>();
+
+        messages.add(RegisterResponse.builder()
+                .success(true)
+                .status(200L)
+                .message("Success")
+                .build());
+
+        return messages;
     }
 }

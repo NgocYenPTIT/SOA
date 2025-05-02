@@ -73,3 +73,11 @@
 - **minCredits**: Integer (NOT NULL) - Số tín chỉ tối thiểu
 - **maxCredits**: Integer (NOT NULL) - Số tín chỉ tối đa
 - **semesterId**: Long (FK) - Tham chiếu đến Semester
+
+## 10. WishSubject (Môn nguyện vọng)
+- **id**: Long (PK)
+- **studentId**: Long (FK) - Tham chiếu đến User (sinh viên)
+- **SubjectId**: Long (FK) - Tham chiếu đến Subject
+- **semesterId**: Long (FK) - Tham chiếu đến Semester
+- **registerDate**: DateTime (NOT NULL) - Ngày đăng ký
+- **status**: Enum (PENDING, APPROVED, REJECTED) - Trạng thái đăng ký
