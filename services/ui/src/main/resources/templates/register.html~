@@ -228,7 +228,7 @@
                             <td th:text="${subject.subjectName}">Mạng máy tính</td>
                             <td th:text="${subject.courseGroup}">L03</td>
                             <td th:text="${subject.practiseGroup}">P03</td>
-                            <td>3</td> <!-- Số tín chỉ cứng vì không có trường amountOfCredit trong RegisteredSubject -->
+                            <td th:text="${subject.amountOfCredit}">3</td>
                             <td th:text="${subject.enrollmentDate}">2022-08-15</td>
                             <td th:text="${subject.status}">Registered</td>
                             <td>
