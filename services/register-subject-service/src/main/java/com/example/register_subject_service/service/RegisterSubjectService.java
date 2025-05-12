@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -29,27 +30,31 @@ public class RegisterSubjectService {
 
 
     public List<RegisterResponse> registerSubject(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
-
-        List<RegisterResponse> messages = new ArrayList<>();
-
-        messages.addAll(this.validateConflictSchedule(request, form));
-        messages.addAll(this.validateEnoughCredit(request, form));
-        messages.addAll(this.validateEnoughSlot(request, form));
-
-        //fail
-        if (!messages.isEmpty()) return messages;
-
-        //success
-        messages.add(RegisterResponse.builder()
-                .success(true)
-                .status(200L)
-                .message("Success")
-                .build());
-
-        return messages;
+        // emit event and send data attach to processing
+        //        List<RegisterResponse> messages = new ArrayList<>();
+//
+//        messages.addAll(this.validateConflictSchedule(request, form));
+//        messages.addAll(this.validateEnoughCredit(request, form));
+//
+//        //fail validate
+//        if (!messages.isEmpty()) return messages;
+//
+//        //success
+//        this.save(request, form);
+//
+//        messages.add(RegisterResponse.builder()
+//                .success(true)
+//                .status(200L)
+//                .message("Success")
+//                .build());
+//
+//        return messages;
+        //return status PROCESSING...
+        return Collections.singletonList(RegisterResponse.builder().success(true).status(202L).message("Processing...").build());
     }
 
     public void save(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
+        // squash validateEnoughSlot();
         // TODO:emit event
     }
 
@@ -121,17 +126,6 @@ public class RegisterSubjectService {
         return messages;
     }
 
-    public ArrayList<RegisterResponse> validateEnoughSlot(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
-        ArrayList<RegisterResponse> messages = new ArrayList<>();
-
-        messages.add(RegisterResponse.builder()
-                .success(true)
-                .status(200L)
-                .message("Success")
-                .build());
-
-        return messages;
-    }
     public boolean isConflictTime(Long startTime1,Long endTime1,Long startTime2,Long endTime2){
         return  !(endTime1 <= startTime2 || startTime1 >= endTime2);
     }
