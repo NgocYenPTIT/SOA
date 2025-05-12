@@ -1,5 +1,5 @@
 spring.application.name=wish-subject-service
-server.port=8897
+server.port=8900
 
 spring.application.name=user-service
 server.port=8889
@@ -17,7 +17,7 @@ spring.application.name=schedule-service
 server.port=8896
 
 spring.application.name=room-service
-server.port=8896
+server.port=8887
 
 spring.application.name=register-subject-service
 server.port=8899

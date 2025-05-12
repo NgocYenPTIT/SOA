@@ -1,7 +1,7 @@
 package com.example.register_subject_service.service;
 
 import com.example.register_subject_service.model.RegisterResponse;
-import com.example.register_subject_service.model.RegisterSubjectDto;
+import com.example.register_subject_service.model.RegisterSubjectRequest;
 import com.example.register_subject_service.model.Schedule;
 import com.example.register_subject_service.util.ServiceAPI;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +29,7 @@ public class RegisterSubjectService {
     }
 
 
-    public List<RegisterResponse> registerSubject(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
+    public List<RegisterResponse> registerSubject(HttpServletRequest request, @RequestBody RegisterSubjectRequest form) {
         // emit event and send data attach to processing
         //        List<RegisterResponse> messages = new ArrayList<>();
 //
@@ -53,12 +53,12 @@ public class RegisterSubjectService {
         return Collections.singletonList(RegisterResponse.builder().success(true).status(202L).message("Processing...").build());
     }
 
-    public void save(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
+    public void save(HttpServletRequest request, @RequestBody RegisterSubjectRequest form) {
         // squash validateEnoughSlot();
         // TODO:emit event
     }
 
-    public ArrayList<RegisterResponse> validateConflictSchedule(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
+    public ArrayList<RegisterResponse> validateConflictSchedule(HttpServletRequest request, @RequestBody RegisterSubjectRequest form) {
         ArrayList<RegisterResponse> messages = new ArrayList<>();
         // get schedule list
         ArrayList<ArrayList<Schedule>> courseSchedules = new ArrayList<>();
@@ -114,7 +114,7 @@ public class RegisterSubjectService {
         return messages;
     }
 
-    public ArrayList<RegisterResponse> validateEnoughCredit(HttpServletRequest request, @RequestBody RegisterSubjectDto form) {
+    public ArrayList<RegisterResponse> validateEnoughCredit(HttpServletRequest request, @RequestBody RegisterSubjectRequest form) {
         ArrayList<RegisterResponse> messages = new ArrayList<>();
 
         messages.add(RegisterResponse.builder()

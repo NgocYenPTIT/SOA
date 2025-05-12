@@ -11,6 +11,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterSubjectDto {
+public class RegisterSubjectRequest {
     private List<Long> courseIds;
 }
