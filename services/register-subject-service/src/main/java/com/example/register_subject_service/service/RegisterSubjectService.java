@@ -1,12 +1,15 @@
 package com.example.register_subject_service.service;
 
+import com.example.register_subject_service.model.CourseRegistrationEvent;
 import com.example.register_subject_service.model.RegisterResponse;
 import com.example.register_subject_service.model.RegisterSubjectRequest;
 import com.example.register_subject_service.model.Schedule;
+import com.example.register_subject_service.service.event.EventStoreService;
 import com.example.register_subject_service.util.ServiceAPI;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -24,13 +27,34 @@ public class RegisterSubjectService {
 
     private final ServiceAPI serviceAPI;
 
-    public RegisterSubjectService(ServiceAPI serviceAPI) {
+    private final EventStoreService eventStoreService;
+
+    public RegisterSubjectService(ServiceAPI serviceAPI, EventStoreService eventStoreService) {
+        this.eventStoreService = eventStoreService;
         this.serviceAPI = serviceAPI;
     }
 
 
     public List<RegisterResponse> registerSubject(HttpServletRequest request, @RequestBody RegisterSubjectRequest form) {
-        // emit event and send data attach to processing
+
+        try {
+            CourseRegistrationEvent event = CourseRegistrationEvent.builder()
+                    .eventId(java.util.UUID.randomUUID())
+                    .correlationId(java.util.UUID.randomUUID().toString())
+                    .studentId((Long) request.getAttribute("id"))
+                    .courseIds(form.getCourseIds())
+                    .build();
+
+            // emit event and send data attach to processing
+            this.eventStoreService.saveEvent(event);
+            //success
+            return Collections.singletonList(RegisterResponse.builder().success(true).status(202L).message("Processing...").build());
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return  new ArrayList<>()   ;
+        }
         //        List<RegisterResponse> messages = new ArrayList<>();
 //
 //        messages.addAll(this.validateConflictSchedule(request, form));
@@ -49,8 +73,6 @@ public class RegisterSubjectService {
 //                .build());
 //
 //        return messages;
-        //return status PROCESSING...
-        return Collections.singletonList(RegisterResponse.builder().success(true).status(202L).message("Processing...").build());
     }
 
     public void save(HttpServletRequest request, @RequestBody RegisterSubjectRequest form) {
@@ -80,8 +102,8 @@ public class RegisterSubjectService {
 
         for (int i = 0; i < courseSchedules.size(); i++) {
             for (int j = i + 1; j < courseSchedules.size(); j++) {
-                for(int ii = 0 ; ii < courseSchedules.get(i).size(); ii++){
-                    for(int jj = 0 ; jj < courseSchedules.get(j).size(); jj++){
+                for (int ii = 0; ii < courseSchedules.get(i).size(); ii++) {
+                    for (int jj = 0; jj < courseSchedules.get(j).size(); jj++) {
                         Schedule scheduleI = mapper.convertValue(courseSchedules.get(i).get(ii), Schedule.class);
                         Schedule scheduleJ = mapper.convertValue(courseSchedules.get(j).get(jj), Schedule.class);
                         Long startTime1 = scheduleI.getStartTime().getTime();
@@ -89,7 +111,7 @@ public class RegisterSubjectService {
                         Long startTime2 = scheduleJ.getStartTime().getTime();
                         Long endTime2 = scheduleJ.getEndTime().getTime();
 
-                        if(isConflictTime(startTime1,endTime1,startTime2,endTime2)){
+                        if (isConflictTime(startTime1, endTime1, startTime2, endTime2)) {
                             messages.add(RegisterResponse.builder()
                                     .success(false)
                                     .status(400L)
@@ -102,7 +124,7 @@ public class RegisterSubjectService {
             }
         }
         // have conflict
-        if(!messages.isEmpty()) return messages;
+        if (!messages.isEmpty()) return messages;
 
         // else no conflict
         messages.add(RegisterResponse.builder()
@@ -126,8 +148,8 @@ public class RegisterSubjectService {
         return messages;
     }
 
-    public boolean isConflictTime(Long startTime1,Long endTime1,Long startTime2,Long endTime2){
-        return  !(endTime1 <= startTime2 || startTime1 >= endTime2);
+    public boolean isConflictTime(Long startTime1, Long endTime1, Long startTime2, Long endTime2) {
+        return !(endTime1 <= startTime2 || startTime1 >= endTime2);
     }
 
 }
