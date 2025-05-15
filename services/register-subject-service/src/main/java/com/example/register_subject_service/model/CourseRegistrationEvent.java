@@ -19,4 +19,5 @@ public class CourseRegistrationEvent {
     private Long studentId;
     private ArrayList<Long> courseIds;
     private long timestamp;
+    private String token ;
 }

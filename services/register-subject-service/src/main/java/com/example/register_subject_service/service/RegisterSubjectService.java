@@ -1,9 +1,6 @@
 package com.example.register_subject_service.service;
 
-import com.example.register_subject_service.model.CourseRegistrationEvent;
-import com.example.register_subject_service.model.RegisterResponse;
-import com.example.register_subject_service.model.RegisterSubjectRequest;
-import com.example.register_subject_service.model.Schedule;
+import com.example.register_subject_service.model.*;
 import com.example.register_subject_service.service.event.EventStoreService;
 import com.example.register_subject_service.util.ServiceAPI;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +26,9 @@ public class RegisterSubjectService {
 
     private final EventStoreService eventStoreService;
 
+    static ArrayList<Slot> slots;
+    static Long lock;
+
     public RegisterSubjectService(ServiceAPI serviceAPI, EventStoreService eventStoreService) {
         this.eventStoreService = eventStoreService;
         this.serviceAPI = serviceAPI;
@@ -43,6 +43,7 @@ public class RegisterSubjectService {
                     .correlationId(java.util.UUID.randomUUID().toString())
                     .studentId((Long) request.getAttribute("id"))
                     .courseIds(form.getCourseIds())
+                    .token((String)request.getAttribute("token"))
                     .build();
 
             // emit event and send data attach to processing
@@ -53,103 +54,9 @@ public class RegisterSubjectService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return  new ArrayList<>()   ;
+            return new ArrayList<>();
         }
-        //        List<RegisterResponse> messages = new ArrayList<>();
-//
-//        messages.addAll(this.validateConflictSchedule(request, form));
-//        messages.addAll(this.validateEnoughCredit(request, form));
-//
-//        //fail validate
-//        if (!messages.isEmpty()) return messages;
-//
-//        //success
-//        this.save(request, form);
-//
-//        messages.add(RegisterResponse.builder()
-//                .success(true)
-//                .status(200L)
-//                .message("Success")
-//                .build());
-//
-//        return messages;
     }
 
-    public void save(HttpServletRequest request, @RequestBody RegisterSubjectRequest form) {
-        // squash validateEnoughSlot();
-        // TODO:emit event
-    }
-
-    public ArrayList<RegisterResponse> validateConflictSchedule(HttpServletRequest request, @RequestBody RegisterSubjectRequest form) {
-        ArrayList<RegisterResponse> messages = new ArrayList<>();
-        // get schedule list
-        ArrayList<ArrayList<Schedule>> courseSchedules = new ArrayList<>();
-
-        for (int i = 0; i < form.getCourseIds().size(); i++) {
-            Long courseId = form.getCourseIds().get(i);
-            ArrayList<Schedule> schedules = (ArrayList<Schedule>) this.serviceAPI.callForList(
-                    this.scheduleURL + "/schedule?courseId=" + courseId,
-                    HttpMethod.GET,
-                    null,
-                    Schedule.class,
-                    (String) request.getAttribute("token")
-            );
-
-            courseSchedules.add(schedules);
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        for (int i = 0; i < courseSchedules.size(); i++) {
-            for (int j = i + 1; j < courseSchedules.size(); j++) {
-                for (int ii = 0; ii < courseSchedules.get(i).size(); ii++) {
-                    for (int jj = 0; jj < courseSchedules.get(j).size(); jj++) {
-                        Schedule scheduleI = mapper.convertValue(courseSchedules.get(i).get(ii), Schedule.class);
-                        Schedule scheduleJ = mapper.convertValue(courseSchedules.get(j).get(jj), Schedule.class);
-                        Long startTime1 = scheduleI.getStartTime().getTime();
-                        Long endTime1 = scheduleI.getEndTime().getTime();
-                        Long startTime2 = scheduleJ.getStartTime().getTime();
-                        Long endTime2 = scheduleJ.getEndTime().getTime();
-
-                        if (isConflictTime(startTime1, endTime1, startTime2, endTime2)) {
-                            messages.add(RegisterResponse.builder()
-                                    .success(false)
-                                    .status(400L)
-                                    .message("Môn " + "//TODO" + "trùng lịch với môn " + "//TODO")
-                                    .build());
-                        }
-
-                    }
-                }
-            }
-        }
-        // have conflict
-        if (!messages.isEmpty()) return messages;
-
-        // else no conflict
-        messages.add(RegisterResponse.builder()
-                .success(true)
-                .status(200L)
-                .message("Success")
-                .build());
-
-        return messages;
-    }
-
-    public ArrayList<RegisterResponse> validateEnoughCredit(HttpServletRequest request, @RequestBody RegisterSubjectRequest form) {
-        ArrayList<RegisterResponse> messages = new ArrayList<>();
-
-        messages.add(RegisterResponse.builder()
-                .success(true)
-                .status(200L)
-                .message("Success")
-                .build());
-
-        return messages;
-    }
-
-    public boolean isConflictTime(Long startTime1, Long endTime1, Long startTime2, Long endTime2) {
-        return !(endTime1 <= startTime2 || startTime1 >= endTime2);
-    }
 
 }

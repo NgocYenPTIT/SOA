@@ -6,7 +6,7 @@ BASE_DIR=$(pwd)/services
 # Khởi động từng service trên terminal riêng biệt với title
 
 # # UI
-# gnome-terminal --title="UI" -- bash -c "cd $BASE_DIR/ui && ./gradlew bootRun; exec bash" 
+gnome-terminal --title="UI" -- bash -c "cd $BASE_DIR/ui && ./gradlew bootRun; exec bash" 
 
 # # Auth Service
 gnome-terminal --title="Auth Service" -- bash -c "cd $BASE_DIR/auth-service && ./gradlew bootRun; exec bash" 

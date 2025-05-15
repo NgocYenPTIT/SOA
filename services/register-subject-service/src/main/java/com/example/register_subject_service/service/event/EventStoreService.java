@@ -19,7 +19,7 @@ public class EventStoreService {
     private final EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient;
     private final CreatePersistentSubscription createPersistentSubscription;
     private final SaveEvent saveEvent;
-    private final SubscribePersistentSubscription subscribePersistentSubscription;
+    private final SubscribeRegistration subscribeRegistration;
 
     @Value("${app.global.stream}")
     private String stream ;
@@ -33,13 +33,13 @@ public class EventStoreService {
             EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient,
             CreatePersistentSubscription createPersistentSubscription,
             SaveEvent saveEvent,
-            SubscribePersistentSubscription subscribePersistentSubscription
+            SubscribeRegistration subscribeRegistration
     ) {
         this.eventStoreDBClient = eventStoreDBClient;
         this.persistentSubscriptionsClient = persistentSubscriptionsClient;
         this.createPersistentSubscription = createPersistentSubscription;
         this.saveEvent = saveEvent;
-        this.subscribePersistentSubscription = subscribePersistentSubscription;
+        this.subscribeRegistration = subscribeRegistration;
     }
 
 
@@ -50,7 +50,7 @@ public class EventStoreService {
         this.createPersistentSubscription.call(stream, group);
 
         // 2. Đăng ký lắng nghe
-        this.subscribePersistentSubscription.call(stream, group);
+        this.subscribeRegistration.call(stream, group);
 
         System.out.println("EventStore service initialized with persistent subscription");
     }

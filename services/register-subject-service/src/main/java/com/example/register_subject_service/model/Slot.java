@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-
-public class CourseRegistrationRequest {
-    private String studentId;
-    private String courseId;
+public class Slot {
+    private Long id ;
+    private String name;
+    private Integer quantity;
 }
