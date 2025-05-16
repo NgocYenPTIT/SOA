@@ -37,7 +37,7 @@ public class DataInitializer {
                 course2.setCode("COURSE002");
                 course2.setCourseGroup("Nhóm 02");
                 course2.setPractiseGroup("Tổ TH02");
-                course2.setSubjectId(1L);
+                course2.setSubjectId(2L);
                 course2.setSemesterId(1L);
                 course2.setInstructorId(7L); // Teacher với ID 7 (teacher2)
                 course2.setMaxStudents(35);

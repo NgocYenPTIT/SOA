@@ -117,8 +117,8 @@ public class DataInitializer {
                 schedule3.setCourseId(2L);
                 schedule3.setRoomId(2L);
                 schedule3.setTeacherId(7L);
-                schedule3.setStartTime(startTime3);
-                schedule3.setEndTime(endTime3);
+                schedule3.setStartTime(startTime1);//conflict
+                schedule3.setEndTime(endTime1);//conflict
                 schedule3.setType("LÝ THUYẾT");
                 scheduleRepository.save(schedule3);
 

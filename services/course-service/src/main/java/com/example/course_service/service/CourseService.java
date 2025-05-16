@@ -18,4 +18,8 @@ public class CourseService {
     public List<Course> getListCourse(Long semesterId) {
         return this.courseRepository.findAllBySemesterIdAndDeletedAtIsNull(semesterId);
     }
+
+    public Course getDetail(Long id) {
+        return this.courseRepository.findById(id).get();
+    }
 }

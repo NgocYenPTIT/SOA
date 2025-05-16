@@ -43,7 +43,7 @@ gnome-terminal --title="Schedule Service" -- bash -c "cd $BASE_DIR/schedule-serv
 # gnome-terminal --title="Semester Service" -- bash -c "cd $BASE_DIR/semester-service && ./gradlew bootRun; exec bash"
 
 # # Subject Service
-# gnome-terminal --title="Subject Service" -- bash -c "cd $BASE_DIR/subject-service && ./gradlew bootRun; exec bash"
+gnome-terminal --title="Subject Service" -- bash -c "cd $BASE_DIR/subject-service && ./gradlew bootRun; exec bash"
 
 # # User Service
 gnome-terminal --title="User Service" -- bash -c "cd $BASE_DIR/user-service && ./gradlew bootRun; exec bash"
