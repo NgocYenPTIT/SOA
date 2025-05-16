@@ -78,6 +78,7 @@ public class SubscribeRegistration {
                 @Override
                 public void onEvent(PersistentSubscription subscription, int retryCount, ResolvedEvent event) {
                     try {
+                        System.out.println("start onEvent");
                         String eventType = event.getOriginalEvent().getEventType();
                         byte[] eventData = event.getOriginalEvent().getEventData();
                         String baseText64 = new String(eventData, StandardCharsets.UTF_8);
@@ -91,13 +92,15 @@ public class SubscribeRegistration {
                             CourseRegistrationEvent registrationEvent = objectMapper.readValue(
                                     jsonData, CourseRegistrationEvent.class);
 
-                            List<RegisterResponse> success = processRegistrationEvent(registrationEvent);
+//                            List<RegisterResponse> success = processtrueRegistrationEvent(registrationEvent);
 
-                            if (success.size() == 1  ) {
+                            if (2  > 1) {
                                 // Báo xử lý thành công
+                                System.out.println("send ACK");
                                 subscription.ack(event);
                             } else {
                                 // Báo xử lý thất bại, cần thử lại
+                                System.out.println("send NACK");
                                 subscription.nack(NackAction.Retry, "Failed to process", event);
                             }
                         } else {
@@ -161,7 +164,7 @@ public class SubscribeRegistration {
 
             courseSchedules.add(schedules);
         }
-
+        System.out.println("Call for schedule: " + courseSchedules);
         ObjectMapper mapper = new ObjectMapper();
 
         for (int i = 0; i < courseSchedules.size(); i++) {

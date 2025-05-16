@@ -19,11 +19,7 @@ public class RegisterSubjectController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(HttpServletRequest request, @RequestBody RegisterSubjectRequest form) {
-        List<RegisterResponse> result = this.registerSubjectService.registerSubject(request, form);
-
-        if(result.size() == 1) return ResponseEntity.ok(result);
-
-        return ResponseEntity.internalServerError().body("Error");
+        return  ResponseEntity.ok( this.registerSubjectService.registerSubject(request, form));
     }
 
 }

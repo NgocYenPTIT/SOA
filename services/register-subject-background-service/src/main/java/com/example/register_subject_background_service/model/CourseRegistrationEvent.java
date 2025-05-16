@@ -1,4 +1,4 @@
-package com.example.register_subject_service.model;
+package com.example.register_subject_background_service.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,4 +21,5 @@ public class CourseRegistrationEvent {
     private long timestamp;
     private String token ;
     private String eventType;
+
 }

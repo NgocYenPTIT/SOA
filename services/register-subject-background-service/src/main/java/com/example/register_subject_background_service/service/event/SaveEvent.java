@@ -1,7 +1,7 @@
-package com.example.register_subject_service.service.event;
+package com.example.register_subject_background_service.service.event;
 
 import com.eventstore.dbclient.*;
-import com.example.register_subject_service.model.CourseRegistrationEvent;
+import com.example.register_subject_background_service.model.CourseRegistrationEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

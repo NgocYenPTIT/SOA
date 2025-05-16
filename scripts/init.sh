@@ -6,13 +6,13 @@ BASE_DIR=$(pwd)/services
 # Khởi động từng service trên terminal riêng biệt với title
 
 # # UI
-gnome-terminal --title="UI" -- bash -c "cd $BASE_DIR/ui && ./gradlew bootRun; exec bash" 
+# gnome-terminal --title="UI" -- bash -c "cd $BASE_DIR/ui && ./gradlew bootRun; exec bash" 
 
 # # Auth Service
 gnome-terminal --title="Auth Service" -- bash -c "cd $BASE_DIR/auth-service && ./gradlew bootRun; exec bash" 
 
 # # Course Service
-# gnome-terminal --title="Course Service" -- bash -c "cd $BASE_DIR/course-service && ./gradlew bootRun; exec bash"
+gnome-terminal --title="Course Service" -- bash -c "cd $BASE_DIR/course-service && ./gradlew bootRun; exec bash"
 
 # # Credit Rule Service
 # gnome-terminal --title="Credit Rule Service" -- bash -c "cd $BASE_DIR/credit-rule-service && ./gradlew bootRun; exec bash"
@@ -27,13 +27,17 @@ gnome-terminal --title="Auth Service" -- bash -c "cd $BASE_DIR/auth-service && .
 # gnome-terminal --title="Register Read Model Service" -- bash -c "cd $BASE_DIR/register-read-model-service && ./gradlew bootRun; exec bash"
 
 # Register Subject Service
-gnome-terminal --title="Register Subject Service" -- bash -c "cd $BASE_DIR/register-subject-service && ./gradlew bootRun; exec bash"
+# gnome-terminal --title="Register Subject Service" -- bash -c "cd $BASE_DIR/register-subject-service && ./gradlew bootRun; exec bash"
+
+
+# Register Subject Background Service
+gnome-terminal --title="Register Subject Background Service" -- bash -c "cd $BASE_DIR/register-subject-background-service && ./gradlew bootRun; exec bash"
 
 # # Room Service
 # gnome-terminal --title="Room Service" -- bash -c "cd $BASE_DIR/room-service && ./gradlew bootRun; exec bash"
 
 # # Schedule Service
-# gnome-terminal --title="Schedule Service" -- bash -c "cd $BASE_DIR/schedule-service && ./gradlew bootRun; exec bash"
+gnome-terminal --title="Schedule Service" -- bash -c "cd $BASE_DIR/schedule-service && ./gradlew bootRun; exec bash"
 
 # # Semester Service
 # gnome-terminal --title="Semester Service" -- bash -c "cd $BASE_DIR/semester-service && ./gradlew bootRun; exec bash"
