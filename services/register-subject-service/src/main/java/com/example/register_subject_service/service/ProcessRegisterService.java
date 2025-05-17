@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -27,11 +24,24 @@ public class ProcessRegisterService {
     @Value("${app.global.schedule-service-url}")
     private String scheduleURL;
 
+    @Value("${app.global.credit-rule-service-url}")
+    private String creditRuleURL;
+
     @Value("${app.global.subject-service-url}")
     private String subjectURL;
 
+    @Value("${app.global.wish-subject-service-url}")
+    private String wishSubjectURL;
+
+
+    @Value("${app.global.user-service-url}")
+    private String userURL;
+
     @Value("${app.global.course-service-url}")
     private String courseURL;
+
+    @Value("${app.global.enrollment-service-url}")
+    private String enrollmentURL;
 
     @Autowired
     private  ServiceAPI serviceAPI;
@@ -44,17 +54,13 @@ public class ProcessRegisterService {
         System.out.println("Processing registration event: " + event);
 
         List<RegisterResponse> messages = new ArrayList<>();
-        List<RegisterResponse> messageOfValidateConflictSchedule = this.validateConflictSchedule(event);
-        List<RegisterResponse> messageOfValidateEnoughCredit = this.validateEnoughCredit(event);
 
-        if(!messageOfValidateConflictSchedule.get(0).getSuccess().equals("Success")){
-            messages.addAll(messageOfValidateConflictSchedule);
-        }
-        if(!messageOfValidateEnoughCredit.get(0).getSuccess().equals("Success")){
-            messages.addAll(messageOfValidateEnoughCredit);
-        }
-        //fail validate
-        if (!messages.isEmpty()) return messages;
+        //validate
+//        messages.addAll(this.validate(event));
+//        if (!messages.isEmpty()) return messages;
+
+        // save
+        this.save(event);
 
         messages.add(RegisterResponse.builder()
                 .success(true)
@@ -63,6 +69,58 @@ public class ProcessRegisterService {
                 .build());
 
         return messages;
+    }
+
+    public void save(CourseRegistrationEvent event){
+        List<Long> courseIdsUnregistered = this.findCourseUnregistered(event);
+        //serve slot
+        //outbox to emit to queue
+    }
+
+    public List<RegisterResponse> validate(CourseRegistrationEvent event) {
+        List<RegisterResponse> messages = new ArrayList<>();
+
+        boolean canRegister = this.canRegister(event);
+        if (!canRegister) {
+            messages.add(RegisterResponse.builder()
+                    .success(false)
+                    .status(400L)
+                    .message("Can not register because not enough credit in semester yeah year")
+                    .build());
+            return messages;
+        }
+
+        messages.addAll(this.validateConflictSchedule(event));
+        messages.addAll(this.validateEnoughCredit(event));
+
+        return messages;
+    }
+
+    public List<Long> findCourseUnregistered(CourseRegistrationEvent event) {
+        List<Enrollment> enrollments = (List<Enrollment>) this.serviceAPI.callForList(
+                this.enrollmentURL + "/enrollment",
+                HttpMethod.GET,
+                null,
+                Enrollment.class,
+                event.getToken()
+        );
+
+        HashSet<Long> courseIdsRegistered = new HashSet<>();
+        List<Long> courseIdsUnregistered = new ArrayList<>();
+
+        for(int i = 0 ; i < enrollments.size(); i++){
+            LinkedHashMap<String, Integer> hashmap = new LinkedHashMap<>((Map) enrollments.get(i));
+            courseIdsRegistered.add((long) hashmap.get("courseId"));
+        }
+        System.out.println("courseIdsRegistered: " + courseIdsRegistered);
+
+        event.getCourseIds().forEach(courseId -> {
+            if(!courseIdsRegistered.contains(courseId)){
+                courseIdsUnregistered.add(courseId);
+            }
+        });
+        System.out.println("courseIdsUnregistered: " + courseIdsUnregistered);
+        return courseIdsUnregistered;
     }
 
     public ArrayList<RegisterResponse> validateConflictSchedule(CourseRegistrationEvent event) {
@@ -156,23 +214,63 @@ public class ProcessRegisterService {
         }
 
         // else no conflict
-        messages.add(RegisterResponse.builder()
-                .success(true)
-                .status(200L)
-                .message("Success")
-                .build());
-
         return messages;
     }
 
     public ArrayList<RegisterResponse> validateEnoughCredit(CourseRegistrationEvent event) {
         ArrayList<RegisterResponse> messages = new ArrayList<>();
 
-        messages.add(RegisterResponse.builder()
-                .success(true)
-                .status(200L)
-                .message("Success")
-                .build());
+        User student = (User)this.serviceAPI.call(
+                this.userURL + "/user/" + event.getStudentId(),
+                HttpMethod.GET,
+                null,
+                User.class,
+                event.getToken()
+        );
+
+        Long semesterId = student.getSemesterId();
+
+        CreditRule creditRule = this.serviceAPI.call(
+                this.creditRuleURL + "/credit-rule/semester/" + semesterId,
+                HttpMethod.GET,
+                null,
+                CreditRule.class,
+                event.getToken()
+        );
+        System.out.println(creditRule);
+        Integer minCredits = creditRule.getMinCredits();
+        Integer maxCredits = creditRule.getMaxCredits();
+        Integer totalCredits = 0;
+
+        for (int i = 0; i < event.getCourseIds().size(); i++) {
+            Course course = (Course)this.serviceAPI.call(
+                    this.courseURL + "/course/" + event.getCourseIds().get(i),
+                    HttpMethod.GET,
+                    null,
+                    Course.class,
+                    event.getToken()
+            );
+            Subject subject = (Subject)this.serviceAPI.call(
+                    this.subjectURL + "/subject/" + course.getSubjectId(),
+                    HttpMethod.GET,
+                    null,
+                    Subject.class,
+                    event.getToken()
+            );
+            totalCredits += subject.getCredit();
+        }
+
+        System.out.println("minCredits: " + minCredits);
+        System.out.println("maxCredits: " + maxCredits);
+        System.out.println("totalCredits: " + totalCredits);
+
+        if(!(minCredits <= totalCredits && totalCredits <= maxCredits)) {
+            messages.add(RegisterResponse.builder()
+                    .success(false)
+                    .status(400L)
+                    .message("Credit not enough in semester")
+                    .build());
+        }
 
         return messages;
     }
@@ -180,5 +278,58 @@ public class ProcessRegisterService {
     public boolean isConflictTime(Long startTime1, Long endTime1, Long startTime2, Long endTime2) {
         System.out.println("is validating conflict time");
         return !(endTime1 <= startTime2 || startTime1 >= endTime2);
+    }
+
+    public boolean canRegister(CourseRegistrationEvent event){
+        // Lay ra cac mon nguyen vong cua sinh vien
+        // Kiem tra tong so tin chi
+        // Neu tong < minCredits thi return false
+        List<WishSubject> wishSubjects = (List<WishSubject>) this.serviceAPI.callForList(
+                this.wishSubjectURL + "/wish-subject",
+                HttpMethod.GET,
+                null,
+                WishSubject.class,
+                event.getToken()
+        );
+
+        Integer sumCredits = 0;
+        for(int i = 0 ; i < wishSubjects.size(); i++){
+            LinkedHashMap<String, Integer> hashmap = new LinkedHashMap<>((Map) wishSubjects.get(i));
+            Subject subject = this.serviceAPI.call(
+                    this.subjectURL + "/subject/" + hashmap.get("subjectId"),
+                    HttpMethod.GET,
+                    null,
+                    Subject.class,
+                    event.getToken()
+            );
+            sumCredits += subject.getCredit();
+        }
+        System.out.println("sumCredits: " + sumCredits);
+
+        User student = (User)this.serviceAPI.call(
+                this.userURL + "/user/" + event.getStudentId(),
+                HttpMethod.GET,
+                null,
+                User.class,
+                event.getToken()
+        );
+
+        Long semesterId = student.getSemesterId();
+
+        CreditRule creditRule = this.serviceAPI.call(
+                this.creditRuleURL + "/credit-rule/semester/" + semesterId,
+                HttpMethod.GET,
+                null,
+                CreditRule.class,
+                event.getToken()
+        );
+        System.out.println(creditRule);
+
+        Integer minCredits = creditRule.getMinCredits();
+
+        if (sumCredits < minCredits) {
+            return false;
+        }
+        return true;
     }
 }

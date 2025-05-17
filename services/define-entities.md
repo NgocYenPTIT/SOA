@@ -10,6 +10,8 @@
 - **role**: Enum (STUDENT, INSTRUCTOR, ADMIN)
 - **studentId**: String (UNIQUE) - Mã sinh viên
 - **majorId**: Long (FK) NOT NULL
+- **semesterId**: Long (FK) NOT NULL
+
 
 ## 2. Subject (Môn học)
 - **id**: Long (PK)

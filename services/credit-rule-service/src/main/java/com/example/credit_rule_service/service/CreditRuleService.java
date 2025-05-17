@@ -17,7 +17,7 @@ public class CreditRuleService {
         this.userRepository = userRepository;
     }
 
-    public List<CreditRule> getCreditRulesBySemesterId(Long semesterId) {
+    public CreditRule getCreditRulesBySemesterId(Long semesterId) {
         return userRepository.findBySemesterId(semesterId);
     }
 }

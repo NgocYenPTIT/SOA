@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface CreditRuleRepository extends JpaRepository<CreditRule, Long> {
-    List<CreditRule> findBySemesterId(Long semesterId);
+    CreditRule findBySemesterId(Long semesterId);
 }

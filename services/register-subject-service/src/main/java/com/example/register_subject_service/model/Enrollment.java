@@ -1,4 +1,4 @@
-package com.example.enrollmentservice.model;
+package com.example.register_subject_service.model;
 
 import java.util.Date;
 import javax.persistence.Column;
@@ -17,43 +17,27 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "enrollments")
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Enrollment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
 
-    @Column(name = "student_id", nullable = false)
     private Long studentId;
 
-    @Column(name = "course_id", nullable = false)
     private Long courseId;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "enrollment_date", nullable = false)
     private Date enrollmentDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EnrollmentStatus status;
+    private String status;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at")
     private Date updatedAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "deleted_at")
     private Date deletedAt;
 
-    @Column(columnDefinition = "boolean default true")
     private boolean isActive = true;
 
     @PrePersist
@@ -80,7 +64,4 @@ public class Enrollment {
         return this.deletedAt != null;
     }
 
-    public enum EnrollmentStatus {
-        PENDING, APPROVED, REJECTED
-    }
 }

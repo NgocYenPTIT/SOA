@@ -79,18 +79,10 @@ public class SubscribeRegistration {
                             System.out.println("test list listMessageForError");
                             System.out.println(listMessageForError);
 
-                            if (2  > 1) {
-                                // Báo xử lý thành công
-                                System.out.println("send ACK");
-                                subscription.ack(event);
-                            } else {
-                                // Báo xử lý thất bại, cần thử lại
-                                System.out.println("send NACK");
-                                subscription.nack(NackAction.Retry, "Failed to process", event);
-                            }
-                        } else {
-                            // Process other
+                            System.out.println("send ACK");
+                            subscription.ack(event);
                         }
+
                     } catch (Exception e) {
                         System.err.println("Error processing event: " + e.getMessage());
                         e.printStackTrace();

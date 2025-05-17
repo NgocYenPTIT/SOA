@@ -37,9 +37,8 @@ public class Enrollment {
     @Column(name = "enrollment_date", nullable = false)
     private Date enrollmentDate;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EnrollmentStatus status;
+    private String status;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -80,7 +79,4 @@ public class Enrollment {
         return this.deletedAt != null;
     }
 
-    public enum EnrollmentStatus {
-        PENDING, APPROVED, REJECTED
-    }
 }
