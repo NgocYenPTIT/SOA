@@ -11,11 +11,7 @@ import java.util.Optional;
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<Enrollment> findByStudentIdAndDeletedAtIsNullAndStatus(Long id, String status);
 
-    List<Enrollment> findByCourseIdAndStatus(Long courseId, String status);
+    Enrollment findOneByStudentIdAndCourseId(Long studentId, Long courseId);
 
-    Optional<Enrollment> findOneByCourseIdAndStatus(Long courseId, String pending);
-
-    Optional<Enrollment> findOneByCourseIdAndStatusAndStudentId(Long courseId, String registered, Long studentId);
-
-    Enrollment findByStudentIdAndCourseId(Long studentId, Long courseId);
+    Optional<Enrollment> findFirstByCourseIdAndStatus(Long courseId, String status);
 }

@@ -1,31 +1,37 @@
 package com.example.enrollment_service.model;
 
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.util.Date;
-
 @Entity
-@Table(name = "transaction_log",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"correlation_id", "status"},
-                        name = "duplicate")
-        })
-@Builder
-@AllArgsConstructor
+@Table(name = "outbox_messages")
+@Data
 @NoArgsConstructor
-public class TransactionLog {
+@AllArgsConstructor
+@Builder
+public class OutBoxMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, name = "correlation_id")
-    private String correlationId;
+    @Column( nullable = false, length = 1000)
+    private  String payload;
 
-    @Column(nullable = false)
-    private String status;
+    @Column( nullable = false)
+    private  String eventType;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -39,8 +45,6 @@ public class TransactionLog {
     @Column(name = "deleted_at")
     private Date deletedAt;
 
-    @Column(columnDefinition = "boolean default true")
-    private boolean isActive = true;
 
     @PrePersist
     protected void onCreate() {
@@ -59,10 +63,6 @@ public class TransactionLog {
 
     public void delete() {
         this.deletedAt = new Date();
-        this.isActive = false;
     }
 
-    public boolean isDeleted() {
-        return this.deletedAt != null;
-    }
 }
