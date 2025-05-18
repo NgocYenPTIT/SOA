@@ -2,8 +2,10 @@ package com.example.register_subject_background_service.service.BackgroundJob;
 
 import com.example.register_subject_background_service.model.CourseRegistrationEvent;
 import com.example.register_subject_background_service.model.OutBoxMessage;
+import com.example.register_subject_background_service.model.ReserveSlotEvent;
 import com.example.register_subject_background_service.repository.OutBoxMessageRepository;
-import com.example.register_subject_background_service.service.event.SaveEvent;
+import com.example.register_subject_background_service.service.event.SaveRegistrationEvent;
+import com.example.register_subject_background_service.service.event.SaveReserveSlotEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +24,8 @@ import java.util.List;
 @Service  // Changed from @Component to @Service
 public class OutboxProcessor {
     @Autowired
-    private  final SaveEvent saveEvent;
+    private  final SaveRegistrationEvent saveRegistrationEvent;
+    private  final SaveReserveSlotEvent saveReserveSlotEvent;
     private  final OutBoxMessageRepository outBoxMessageRepository;
     private static final int BATCH_SIZE = 100; // Process 100 records at a time
 
@@ -41,9 +44,18 @@ public class OutboxProcessor {
 
             for (OutBoxMessage outboxMessage : outboxMessages) {
                 try {
-                    this.saveEvent.call(new ObjectMapper().readValue(outboxMessage.getPayload(), CourseRegistrationEvent.class)); // Process each record();
+                    if(outboxMessage.getEventType().equals("CourseRegistrationEvent")) {
+                        CourseRegistrationEvent event = new ObjectMapper().readValue(outboxMessage.getPayload(), CourseRegistrationEvent.class);
+                        this.saveRegistrationEvent.call(event,"registration"); // Process each record();
+                    }
+                    else if(outboxMessage.getEventType().equals("ReserveSlotEvent")) {
+                        ReserveSlotEvent event = new ObjectMapper().readValue(outboxMessage.getPayload(), ReserveSlotEvent.class);
+                        this.saveReserveSlotEvent.call(event,"reserve-slot"); // Process each record();
+                    }
                     outboxMessage.setDeletedAt(new java.util.Date());
-                    outBoxMessageRepository.save(outboxMessage);                }
+                    outBoxMessageRepository.save(outboxMessage);
+
+                }
                 catch (Exception e) {
                     e.printStackTrace();
                     return;

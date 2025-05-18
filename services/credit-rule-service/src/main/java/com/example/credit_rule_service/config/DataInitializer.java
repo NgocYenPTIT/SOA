@@ -22,37 +22,10 @@ public class DataInitializer {
                 // Quy định cho học kỳ 1
                 CreditRule rule1 = new CreditRule();
                 rule1.setSemesterId(1L); // Học kỳ 1
-                rule1.setMinCredits(14);
-                rule1.setMaxCredits(24);
+                rule1.setMinCredits(3);
+                rule1.setMaxCredits(10);
                 creditRuleRepository.save(rule1);
 
-                // Quy định cho học kỳ 2
-                CreditRule rule2 = new CreditRule();
-                rule2.setSemesterId(2L); // Học kỳ 2
-                rule2.setMinCredits(14);
-                rule2.setMaxCredits(22);
-                creditRuleRepository.save(rule2);
-
-                // Quy định cho học kỳ hè
-                CreditRule rule3 = new CreditRule();
-                rule3.setSemesterId(3L); // Học kỳ hè
-                rule3.setMinCredits(8);
-                rule3.setMaxCredits(12);
-                creditRuleRepository.save(rule3);
-
-                // Quy định cho sinh viên năm cuối - học kỳ 1
-                CreditRule rule4 = new CreditRule();
-                rule4.setSemesterId(4L); // Học kỳ 1 - năm cuối
-                rule4.setMinCredits(10);
-                rule4.setMaxCredits(24);
-                creditRuleRepository.save(rule4);
-
-                // Quy định cho sinh viên năm cuối - học kỳ 2
-                CreditRule rule5 = new CreditRule();
-                rule5.setSemesterId(5L); // Học kỳ 2 - năm cuối
-                rule5.setMinCredits(10);
-                rule5.setMaxCredits(24);
-                creditRuleRepository.save(rule5);
 
                 System.out.println("Đã khởi tạo " + creditRuleRepository.count() + " quy định tín chỉ vào database");
             }

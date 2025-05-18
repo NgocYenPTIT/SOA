@@ -1,6 +1,7 @@
 package com.example.register_subject_service.service;
 
 import com.example.register_subject_service.model.*;
+import com.example.register_subject_service.repository.OutBoxMessageRepository;
 import com.example.register_subject_service.util.ServiceAPI;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -12,12 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Service
 public class ProcessRegisterService {
 
@@ -46,35 +44,48 @@ public class ProcessRegisterService {
     @Autowired
     private  ServiceAPI serviceAPI;
 
-    public ProcessRegisterService(ServiceAPI serviceAPI) {
+    private final OutBoxMessageRepository outBoxMessageRepository;
+
+
+    public ProcessRegisterService(ServiceAPI serviceAPI, OutBoxMessageRepository outBoxMessageRepository) {
+        this.outBoxMessageRepository = outBoxMessageRepository;
         this.serviceAPI = serviceAPI;
+
     }
 
-    public List<RegisterResponse> call(CourseRegistrationEvent event) {
+    @Transactional
+    public void call(CourseRegistrationEvent event)throws Exception {
         System.out.println("Processing registration event: " + event);
 
         List<RegisterResponse> messages = new ArrayList<>();
 
         //validate
 //        messages.addAll(this.validate(event));
-//        if (!messages.isEmpty()) return messages;
+//        if (!messages.isEmpty()){
+//            //emit fail validate
+//        }
 
         // save
         this.save(event);
-
-        messages.add(RegisterResponse.builder()
-                .success(true)
-                .status(200L)
-                .message("Success")
-                .build());
-
-        return messages;
     }
 
-    public void save(CourseRegistrationEvent event){
-        List<Long> courseIdsUnregistered = this.findCourseUnregistered(event);
+    public void save(CourseRegistrationEvent event) throws Exception {
+       List<List<Long>> addAndDeleteCourse = this.findAddAndDeleteCourse(event);
         //serve slot
-        //outbox to emit to queue
+        String eventType = "ReserveSlotEvent";
+
+        ReserveSlotEvent serveSlotEvent = ReserveSlotEvent.builder()
+                .eventId(java.util.UUID.randomUUID())
+                .eventType(eventType)
+                .correlationId(java.util.UUID.randomUUID().toString())
+                .studentId(event.getStudentId())
+                .addAndDeleteCourses(addAndDeleteCourse)
+                .token(event.getToken())
+                .timestamp(System.currentTimeMillis())
+                .build();
+
+        // Save outbox
+        this.outBoxMessageRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(serveSlotEvent)).build());
     }
 
     public List<RegisterResponse> validate(CourseRegistrationEvent event) {
@@ -96,7 +107,7 @@ public class ProcessRegisterService {
         return messages;
     }
 
-    public List<Long> findCourseUnregistered(CourseRegistrationEvent event) {
+    public List<List<Long> > findAddAndDeleteCourse(CourseRegistrationEvent event) {
         List<Enrollment> enrollments = (List<Enrollment>) this.serviceAPI.callForList(
                 this.enrollmentURL + "/enrollment",
                 HttpMethod.GET,
@@ -106,7 +117,9 @@ public class ProcessRegisterService {
         );
 
         HashSet<Long> courseIdsRegistered = new HashSet<>();
-        List<Long> courseIdsUnregistered = new ArrayList<>();
+        List<Long> courseIdsAdd = new ArrayList<>();
+        List<Long> courseIdsDelete = new ArrayList<>();
+
 
         for(int i = 0 ; i < enrollments.size(); i++){
             LinkedHashMap<String, Integer> hashmap = new LinkedHashMap<>((Map) enrollments.get(i));
@@ -116,11 +129,18 @@ public class ProcessRegisterService {
 
         event.getCourseIds().forEach(courseId -> {
             if(!courseIdsRegistered.contains(courseId)){
-                courseIdsUnregistered.add(courseId);
+                courseIdsAdd.add(courseId);
             }
         });
-        System.out.println("courseIdsUnregistered: " + courseIdsUnregistered);
-        return courseIdsUnregistered;
+        courseIdsRegistered.forEach(courseId -> {
+            if(!event.getCourseIds().contains(courseId)){
+                courseIdsDelete.add(courseId);
+            }
+        });
+
+        System.out.println("courseIdsAdd: " + courseIdsAdd);
+        System.out.println("courseIdsDelete: " + courseIdsDelete);
+        return new ArrayList<>(Arrays.asList(courseIdsAdd,courseIdsDelete));
     }
 
     public ArrayList<RegisterResponse> validateConflictSchedule(CourseRegistrationEvent event) {

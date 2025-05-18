@@ -1,7 +1,11 @@
-package com.example.register_subject_service.service.event;
+package com.example.register_subject_background_service.service.event;
 
-import com.eventstore.dbclient.*;
-import com.example.register_subject_service.model.CourseRegistrationEvent;
+import com.eventstore.dbclient.AppendToStreamOptions;
+import com.eventstore.dbclient.EventData;
+import com.eventstore.dbclient.EventStoreDBClient;
+import com.eventstore.dbclient.EventStoreDBPersistentSubscriptionsClient;
+import com.example.register_subject_background_service.model.CourseRegistrationEvent;
+import com.example.register_subject_background_service.model.ReserveSlotEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +15,7 @@ import java.util.UUID;
 
 
 @Service
-public class SaveEvent {
+public class SaveReserveSlotEvent {
 
     // Dùng để ghi sự kiện
     private final EventStoreDBClient eventStoreDBClient;
@@ -21,8 +25,9 @@ public class SaveEvent {
 
     private final ObjectMapper objectMapper;
 
+
     @Autowired
-    public SaveEvent(
+    public SaveReserveSlotEvent(
             EventStoreDBClient eventStoreDBClient,
             EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient,
             ObjectMapper objectMapper) {
@@ -32,9 +37,10 @@ public class SaveEvent {
     }
 
 
-    public void call(CourseRegistrationEvent event,String stream) throws Exception {
 
-        System.out.println("Saving event..." + event);
+    public void call(ReserveSlotEvent event, String stream) throws Exception {
+
+        System.out.println("Saving event..." + event + " to stream: " + stream);
 
         EventData eventData = EventData.builderAsJson(
                 UUID.randomUUID(),

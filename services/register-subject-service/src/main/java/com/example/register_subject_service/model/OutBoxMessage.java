@@ -30,6 +30,9 @@ public class OutBoxMessage {
     @Column( nullable = false, length = 1000)
     private  String payload;
 
+    @Column( nullable = false)
+    private  String eventType;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;

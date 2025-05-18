@@ -11,7 +11,7 @@ import java.util.UUID;
 
 
 @Service
-public class SaveEvent {
+public class SaveRegistrationEvent {
 
     // Dùng để ghi sự kiện
     private final EventStoreDBClient eventStoreDBClient;
@@ -22,12 +22,8 @@ public class SaveEvent {
     private final ObjectMapper objectMapper;
 
 
-    @Value("${app.global.stream}")
-    private String stream ;
-
-
     @Autowired
-    public SaveEvent(
+    public SaveRegistrationEvent(
             EventStoreDBClient eventStoreDBClient,
             EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient,
             ObjectMapper objectMapper) {
@@ -37,7 +33,16 @@ public class SaveEvent {
     }
 
 
-    public void call(CourseRegistrationEvent event) throws Exception {
+/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
+    /**
+     * Saves the provided CourseRegistrationEvent to the configured EventStoreDB stream.
+     *
+     * @param event the CourseRegistrationEvent to be saved
+     * @throws Exception if there is an error during the event serialization or appending to the stream
+     */
+
+/* <<<<<<<<<<  1f2e19da-ca6d-48bf-b742-2fb9eb9729ad  >>>>>>>>>>> */
+    public void call(CourseRegistrationEvent event,String stream) throws Exception {
 
         System.out.println("Saving event..." + event);
 

@@ -1,25 +1,19 @@
-package com.example.register_subject_service.service.event;
+package com.example.enrollment_service.service.event;
 
 import com.eventstore.dbclient.*;
-import com.example.register_subject_service.model.CourseRegistrationEvent;
-import com.example.register_subject_service.model.RegisterResponse;
-import com.example.register_subject_service.model.Schedule;
-import com.example.register_subject_service.service.ProcessRegisterService;
-import com.example.register_subject_service.util.ServiceAPI;
+import com.example.enrollment_service.model.ReserveSlotEvent;
+import com.example.enrollment_service.service.EnrollmentService;
+import com.example.enrollment_service.util.ServiceAPI;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.Base64;
 
 
 @Service
-public class SubscribeRegistration {
+public class SubscribeReserveSlot {
 
     // Dùng để ghi sự kiện
     private final EventStoreDBClient eventStoreDBClient;
@@ -29,31 +23,23 @@ public class SubscribeRegistration {
 
     private final ObjectMapper objectMapper;
 
-    private  ServiceAPI serviceAPI;
+    private ServiceAPI serviceAPI;
 
-    private ProcessRegisterService processRegisterService;
-
-
-
-    @Value("${app.global.schedule-service-url}")
-    private String scheduleURL;
+    private EnrollmentService enrollmentService;
 
     @Autowired
-    public SubscribeRegistration(
+    public SubscribeReserveSlot(
             EventStoreDBClient eventStoreDBClient,
             EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient,
             ServiceAPI serviceAPI,
-            ProcessRegisterService processRegisterService,
+            EnrollmentService enrollmentService,
             ObjectMapper objectMapper) {
         this.eventStoreDBClient = eventStoreDBClient;
         this.persistentSubscriptionsClient = persistentSubscriptionsClient;
         this.objectMapper = objectMapper;
         this.serviceAPI = serviceAPI;
-        this.processRegisterService = processRegisterService;
+        this.enrollmentService = enrollmentService;
     }
-
-
-
 
     public void call(String streamName, String groupName) {
         try {
@@ -72,13 +58,11 @@ public class SubscribeRegistration {
                         System.out.println("Retry count: " + retryCount);
 
 //                         Nếu là CourseRegistrationEvent, xử lý
-                        if ("CourseRegistrationEvent".equals(eventType)) {
-                            CourseRegistrationEvent registrationEvent = objectMapper.readValue(jsonData, CourseRegistrationEvent.class);
-
-                            processRegisterService.call(registrationEvent);
-                        }
-                        else if("ReserveSlotEvent".equals(eventType)){
-                            System.out.println("current event is ServeSlotEvent");
+                        if ("ReserveSlotEvent".equals(eventType)) {
+                            ReserveSlotEvent reserveSlotEvent = objectMapper.readValue(jsonData, ReserveSlotEvent.class);
+                            System.out.println("this is ReserveSlotEvent");
+                            System.out.println(reserveSlotEvent);
+                            enrollmentService.reserve(reserveSlotEvent);
                         }
                         System.out.println("send ACK");
                         subscription.ack(event);

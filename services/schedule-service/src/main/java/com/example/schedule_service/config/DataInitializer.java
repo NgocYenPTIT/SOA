@@ -6,6 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.Date;
 public class DataInitializer {
 
     @Bean
+    @Transactional
     public CommandLineRunner initData(ScheduleRepository scheduleRepository) {
         return args -> {
             // Khởi tạo lịch học (Schedules)
@@ -96,7 +98,7 @@ public class DataInitializer {
                 Schedule schedule1 = new Schedule();
                 schedule1.setCourseId(1L);
                 schedule1.setRoomId(1L);
-                schedule1.setTeacherId(6L);
+                schedule1.setTeacherId(3L);
                 schedule1.setStartTime(startTime1);
                 schedule1.setEndTime(endTime1);
                 schedule1.setType("LÝ THUYẾT");
@@ -105,18 +107,18 @@ public class DataInitializer {
                 // Schedule 2 - Thứ 2 chiều - Môn 1
                 Schedule schedule2 = new Schedule();
                 schedule2.setCourseId(1L);
-                schedule2.setRoomId(9L); // Phòng lab
-                schedule2.setTeacherId(6L);
+                schedule2.setRoomId(1L); // Phòng lab
+                schedule2.setTeacherId(3L);
                 schedule2.setStartTime(startTime2);
                 schedule2.setEndTime(endTime2);
-                schedule2.setType("THỰC HÀNH");
+                schedule2.setType("LÝ THUYẾT");
                 scheduleRepository.save(schedule2);
 
                 // Schedule 3 - Thứ 3 sáng - Môn 2
                 Schedule schedule3 = new Schedule();
                 schedule3.setCourseId(2L);
                 schedule3.setRoomId(2L);
-                schedule3.setTeacherId(7L);
+                schedule3.setTeacherId(4L);
                 schedule3.setStartTime(startTime1);//conflict
                 schedule3.setEndTime(endTime1);//conflict
                 schedule3.setType("LÝ THUYẾT");
@@ -125,18 +127,18 @@ public class DataInitializer {
                 // Schedule 4 - Thứ 3 chiều - Môn 2
                 Schedule schedule4 = new Schedule();
                 schedule4.setCourseId(2L);
-                schedule4.setRoomId(10L); // Phòng lab
-                schedule4.setTeacherId(7L);
+                schedule4.setRoomId(2L); // Phòng lab
+                schedule4.setTeacherId(4L);
                 schedule4.setStartTime(startTime4);
                 schedule4.setEndTime(endTime4);
-                schedule4.setType("THỰC HÀNH");
+                schedule4.setType("LÝ THUYẾT");
                 scheduleRepository.save(schedule4);
 
                 // Schedule 5 - Thứ 4 sáng - Môn 3
                 Schedule schedule5 = new Schedule();
                 schedule5.setCourseId(3L);
                 schedule5.setRoomId(3L);
-                schedule5.setTeacherId(8L);
+                schedule5.setTeacherId(4L);
                 schedule5.setStartTime(startTime5);
                 schedule5.setEndTime(endTime5);
                 schedule5.setType("LÝ THUYẾT");
@@ -145,18 +147,18 @@ public class DataInitializer {
                 // Schedule 6 - Thứ 4 chiều - Môn 3
                 Schedule schedule6 = new Schedule();
                 schedule6.setCourseId(3L);
-                schedule6.setRoomId(9L); // Phòng lab
-                schedule6.setTeacherId(8L);
+                schedule6.setRoomId(3L); // Phòng lab
+                schedule6.setTeacherId(4L);
                 schedule6.setStartTime(startTime6);
                 schedule6.setEndTime(endTime6);
-                schedule6.setType("THỰC HÀNH");
+                schedule6.setType("LÝ THUYẾT");
                 scheduleRepository.save(schedule6);
 
                 // Schedule 7 - Thứ 5 sáng - Môn 4
                 Schedule schedule7 = new Schedule();
                 schedule7.setCourseId(4L);
                 schedule7.setRoomId(4L);
-                schedule7.setTeacherId(9L);
+                schedule7.setTeacherId(4L);
                 schedule7.setStartTime(startTime7);
                 schedule7.setEndTime(endTime7);
                 schedule7.setType("LÝ THUYẾT");
@@ -165,32 +167,13 @@ public class DataInitializer {
                 // Schedule 8 - Thứ 5 chiều - Môn 4
                 Schedule schedule8 = new Schedule();
                 schedule8.setCourseId(4L);
-                schedule8.setRoomId(10L); // Phòng lab
-                schedule8.setTeacherId(9L);
+                schedule8.setRoomId(4L); // Phòng lab
+                schedule8.setTeacherId(4L);
                 schedule8.setStartTime(startTime8);
                 schedule8.setEndTime(endTime8);
-                schedule8.setType("THỰC HÀNH");
+                schedule8.setType("LÝ THUYẾT");
                 scheduleRepository.save(schedule8);
 
-                // Schedule 9 - Thứ 6 sáng - Môn 5
-                Schedule schedule9 = new Schedule();
-                schedule9.setCourseId(5L);
-                schedule9.setRoomId(5L);
-                schedule9.setTeacherId(10L);
-                schedule9.setStartTime(startTime9);
-                schedule9.setEndTime(endTime9);
-                schedule9.setType("LÝ THUYẾT");
-                scheduleRepository.save(schedule9);
-
-                // Schedule 10 - Thứ 6 chiều - Môn 5
-                Schedule schedule10 = new Schedule();
-                schedule10.setCourseId(5L);
-                schedule10.setRoomId(9L); // Phòng lab
-                schedule10.setTeacherId(10L);
-                schedule10.setStartTime(startTime10);
-                schedule10.setEndTime(endTime10);
-                schedule10.setType("THỰC HÀNH");
-                scheduleRepository.save(schedule10);
 
                 System.out.println("Đã khởi tạo " + scheduleRepository.count() + " lịch học vào database");
             }

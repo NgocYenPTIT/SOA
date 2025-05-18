@@ -1,44 +1,42 @@
 package com.example.enrollment_service.model;
 
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "enrollments")
+@Table(name = "enrollments",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"student_id", "course_id"},
+                        name = "duplicate"),
+                @UniqueConstraint(columnNames = {"course_id", "order_number", "status"},
+                        name = "tranh_chap_slot")
+        }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Enrollment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "student_id", nullable = false)
+    @Column(name = "student_id", nullable = true)
     private Long studentId;
 
     @Column(name = "course_id", nullable = false)
     private Long courseId;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "enrollment_date", nullable = false)
-    private Date enrollmentDate;
-
     @Column(nullable = false)
     private String status;
+
+    @Column(nullable = false,name = "order_number")
+    private Integer orderNumber;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -6,10 +6,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.transaction.Transactional;
+
 @Configuration
 public class DataInitializer {
 
     @Bean
+    @Transactional
     public CommandLineRunner initData(RoomRepository roomRepository) {
         return args -> {
             // Khởi tạo phòng học (Rooms)

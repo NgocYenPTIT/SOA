@@ -1,17 +1,14 @@
-package com.example.register_subject_service.service.event;
+package com.example.enrollment_service.service.event;
 
 import com.eventstore.dbclient.*;
-import com.example.register_subject_service.model.CourseRegistrationEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
 
 
 @Service
-public class SaveEvent {
+public class CreatePersistentSubscription {
 
     // Dùng để ghi sự kiện
     private final EventStoreDBClient eventStoreDBClient;
@@ -22,7 +19,7 @@ public class SaveEvent {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public SaveEvent(
+    public CreatePersistentSubscription(
             EventStoreDBClient eventStoreDBClient,
             EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient,
             ObjectMapper objectMapper) {
@@ -31,20 +28,14 @@ public class SaveEvent {
         this.objectMapper = objectMapper;
     }
 
+    public void call(String streamName, String groupName) {
+        try {
 
-    public void call(CourseRegistrationEvent event,String stream) throws Exception {
-
-        System.out.println("Saving event..." + event);
-
-        EventData eventData = EventData.builderAsJson(
-                UUID.randomUUID(),
-                event.getEventType(),
-                objectMapper.writeValueAsBytes(event)).build();
-
-        AppendToStreamOptions options = AppendToStreamOptions.get();
-        eventStoreDBClient.appendToStream(stream, options, eventData).get();
-
-        System.out.println("Event successfully saved to stream: " + stream);
+            // Tạo persistent subscription thông qua client chuyên biệt
+            persistentSubscriptionsClient.createToStream(streamName, groupName);
+            System.out.println("Created persistent subscription for stream: " + streamName + ", group: " + groupName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
 }

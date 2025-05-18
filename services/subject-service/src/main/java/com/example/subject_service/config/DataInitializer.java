@@ -15,46 +15,37 @@ public class DataInitializer {
             if (subjectRepository.count() == 0) {
                 // Seed sample subjects
                 Subject subject1 = new Subject();
-                subject1.setSubjectCode("MATH101");
-                subject1.setSubjectName("Calculus I");
-                subject1.setCredit(3);
-                subject1.setDescription("Introduction to calculus concepts");
+                subject1.setSubjectCode("C Programing");
+                subject1.setSubjectName("C Programing");
+                subject1.setCredit(1);
+                subject1.setDescription("Introduction to C");
                 subject1.setPrerequisiteSubjects("None");
                 subjectRepository.save(subject1);
 
                 Subject subject2 = new Subject();
-                subject2.setSubjectCode("PHYS101");
-                subject2.setSubjectName("Physics I");
-                subject2.setCredit(4);
-                subject2.setDescription("Fundamental physics principles");
+                subject2.setSubjectCode("Java Programing");
+                subject2.setSubjectName("Java Programing");
+                subject2.setCredit(2);
+                subject2.setDescription("Introduction to Java");
                 subject2.setPrerequisiteSubjects("MATH101");
                 subjectRepository.save(subject2);
 
                 Subject subject3 = new Subject();
-                subject3.setSubjectCode("CHEM101");
-                subject3.setSubjectName("Chemistry I");
+                subject3.setSubjectCode("Python Programing");
+                subject3.setSubjectName("Python Programing");
                 subject3.setCredit(3);
-                subject3.setDescription("Basic chemical reactions and concepts");
+                subject3.setDescription("Introduction to Python");
                 subject3.setPrerequisiteSubjects("None");
                 subjectRepository.save(subject3);
 
                 Subject subject4 = new Subject();
-                subject4.setSubjectCode("CS101");
+                subject4.setSubjectCode("Introduction to Computer Science");
                 subject4.setSubjectName("Introduction to Computer Science");
-                subject4.setCredit(3);
+                subject4.setCredit(4);
                 subject4.setDescription("Basics of programming and algorithms");
                 subject4.setPrerequisiteSubjects("MATH101");
                 subjectRepository.save(subject4);
 
-                Subject subject5 = new Subject();
-                subject5.setSubjectCode("BIO101");
-                subject5.setSubjectName("Biology I");
-                subject5.setCredit(4);
-                subject5.setDescription("Fundamental biological processes");
-                subject5.setPrerequisiteSubjects("CHEM101");
-                subjectRepository.save(subject5);
-
-                System.out.println("Đã khởi tạo dữ liệu mẫu cho các môn học");
             }
         };
     }

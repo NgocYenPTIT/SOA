@@ -46,7 +46,7 @@ public class RegisterSubjectService {
                     .build();
 
             // Save outbox
-            this.outBoxMessageRepository.save(OutBoxMessage.builder().payload(new ObjectMapper().writeValueAsString(event)).build());
+            this.outBoxMessageRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(event)).build());
             //success
             return Collections.singletonList(RegisterResponse.builder().success(true).status(202L).message("Processing...").build());
         } catch (Exception e) {

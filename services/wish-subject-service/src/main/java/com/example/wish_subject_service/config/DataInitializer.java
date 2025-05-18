@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.Date;
 public class DataInitializer {
 
     @Bean
+    @Transactional
     public CommandLineRunner initData(WishSubjectRepository wishSubjectRepository) {
         return args -> {
             // Khởi tạo môn nguyện vọng (WishSubjects)
@@ -49,7 +51,7 @@ public class DataInitializer {
                 WishSubject wishSubject1 = new WishSubject();
                 wishSubject1.setStudentId(1L);
                 wishSubject1.setSubjectId(1L);
-                wishSubject1.setSemesterId(2L); // Học kỳ 2
+                wishSubject1.setSemesterId(1L); // Học kỳ 2
                 wishSubject1.setRegisterDate(tenDaysAgo);
                 wishSubject1.setStatus(WishSubjectStatus.APPROVED);
                 wishSubjectRepository.save(wishSubject1);
@@ -58,7 +60,7 @@ public class DataInitializer {
                 WishSubject wishSubject2 = new WishSubject();
                 wishSubject2.setStudentId(1L);
                 wishSubject2.setSubjectId(2L);
-                wishSubject2.setSemesterId(2L); // Học kỳ 2
+                wishSubject2.setSemesterId(1L); // Học kỳ 2
                 wishSubject2.setRegisterDate(tenDaysAgo);
                 wishSubject2.setStatus(WishSubjectStatus.APPROVED);
                 wishSubjectRepository.save(wishSubject2);
@@ -67,16 +69,16 @@ public class DataInitializer {
                 WishSubject wishSubject3 = new WishSubject();
                 wishSubject3.setStudentId(1L);
                 wishSubject3.setSubjectId(3L);
-                wishSubject3.setSemesterId(2L); // Học kỳ 2
+                wishSubject3.setSemesterId(1L); // Học kỳ 2
                 wishSubject3.setRegisterDate(eightDaysAgo);
-                wishSubject3.setStatus(WishSubjectStatus.PENDING);
+                wishSubject3.setStatus(WishSubjectStatus.APPROVED);
                 wishSubjectRepository.save(wishSubject3);
 
                 // WishSubject 4: Student 2 đăng ký WishSubject 1 - Approved
                 WishSubject wishSubject4 = new WishSubject();
-                wishSubject4.setStudentId(2L);
-                wishSubject4.setSubjectId(1L);
-                wishSubject4.setSemesterId(2L); // Học kỳ 2
+                wishSubject4.setStudentId(1L);
+                wishSubject4.setSubjectId(4L);
+                wishSubject4.setSemesterId(1L); // Học kỳ 2
                 wishSubject4.setRegisterDate(eightDaysAgo);
                 wishSubject4.setStatus(WishSubjectStatus.APPROVED);
                 wishSubjectRepository.save(wishSubject4);
@@ -84,56 +86,39 @@ public class DataInitializer {
                 // WishSubject 5: Student 2 đăng ký WishSubject 4 - Rejected
                 WishSubject wishSubject5 = new WishSubject();
                 wishSubject5.setStudentId(2L);
-                wishSubject5.setSubjectId(4L);
-                wishSubject5.setSemesterId(2L); // Học kỳ 2
+                wishSubject5.setSubjectId(1L);
+                wishSubject5.setSemesterId(1L); // Học kỳ 2
                 wishSubject5.setRegisterDate(sixDaysAgo);
-                wishSubject5.setStatus(WishSubjectStatus.REJECTED);
+                wishSubject5.setStatus(WishSubjectStatus.APPROVED);
                 wishSubjectRepository.save(wishSubject5);
 
                 // WishSubject 6: Student 3 đăng ký WishSubject 2 - Approved
                 WishSubject wishSubject6 = new WishSubject();
-                wishSubject6.setStudentId(3L);
+                wishSubject6.setStudentId(2L);
                 wishSubject6.setSubjectId(2L);
-                wishSubject6.setSemesterId(2L); // Học kỳ 2
+                wishSubject6.setSemesterId(1L); // Học kỳ 2
                 wishSubject6.setRegisterDate(sixDaysAgo);
                 wishSubject6.setStatus(WishSubjectStatus.APPROVED);
                 wishSubjectRepository.save(wishSubject6);
 
                 // WishSubject 7: Student 3 đăng ký WishSubject 5 - Pending
                 WishSubject wishSubject7 = new WishSubject();
-                wishSubject7.setStudentId(3L);
-                wishSubject7.setSubjectId(5L);
-                wishSubject7.setSemesterId(2L); // Học kỳ 2
+                wishSubject7.setStudentId(2L);
+                wishSubject7.setSubjectId(3L);
+                wishSubject7.setSemesterId(1L); // Học kỳ 2
                 wishSubject7.setRegisterDate(fourDaysAgo);
-                wishSubject7.setStatus(WishSubjectStatus.PENDING);
+                wishSubject7.setStatus(WishSubjectStatus.APPROVED);
                 wishSubjectRepository.save(wishSubject7);
 
                 // WishSubject 8: Student 4 đăng ký WishSubject 3 - Approved
                 WishSubject wishSubject8 = new WishSubject();
-                wishSubject8.setStudentId(4L);
-                wishSubject8.setSubjectId(3L);
-                wishSubject8.setSemesterId(2L); // Học kỳ 2
+                wishSubject8.setStudentId(2L);
+                wishSubject8.setSubjectId(4L);
+                wishSubject8.setSemesterId(1L); // Học kỳ 2
                 wishSubject8.setRegisterDate(fourDaysAgo);
                 wishSubject8.setStatus(WishSubjectStatus.APPROVED);
                 wishSubjectRepository.save(wishSubject8);
 
-                // WishSubject 9: Student 5 đăng ký WishSubject 4 - Rejected
-                WishSubject wishSubject9 = new WishSubject();
-                wishSubject9.setStudentId(5L);
-                wishSubject9.setSubjectId(4L);
-                wishSubject9.setSemesterId(2L); // Học kỳ 2
-                wishSubject9.setRegisterDate(twoDaysAgo);
-                wishSubject9.setStatus(WishSubjectStatus.REJECTED);
-                wishSubjectRepository.save(wishSubject9);
-
-                // WishSubject 10: Student 5 đăng ký WishSubject 5 - Pending
-                WishSubject wishSubject10 = new WishSubject();
-                wishSubject10.setStudentId(5L);
-                wishSubject10.setSubjectId(5L);
-                wishSubject10.setSemesterId(2L); // Học kỳ 2
-                wishSubject10.setRegisterDate(twoDaysAgo);
-                wishSubject10.setStatus(WishSubjectStatus.PENDING);
-                wishSubjectRepository.save(wishSubject10);
 
                 System.out.println("Đã khởi tạo " + wishSubjectRepository.count() + " môn nguyện vọng vào database");
             }

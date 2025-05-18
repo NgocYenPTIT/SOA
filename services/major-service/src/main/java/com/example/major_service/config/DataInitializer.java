@@ -1,3 +1,4 @@
+
 package com.example.major_service.config;
 
 import com.example.major_service.model.Major;
@@ -23,33 +24,9 @@ public class DataInitializer {
 
                 // Major 2
                 Major major2 = new Major();
-                major2.setName("Kỹ thuật phần mềm");
+                major2.setName("Khoa học máy tính");
                 majorRepository.save(major2);
 
-                // Major 3
-                Major major3 = new Major();
-                major3.setName("Khoa học máy tính");
-                majorRepository.save(major3);
-
-                // Major 4
-                Major major4 = new Major();
-                major4.setName("Hệ thống thông tin");
-                majorRepository.save(major4);
-
-                // Major 5
-                Major major5 = new Major();
-                major5.setName("An toàn thông tin");
-                majorRepository.save(major5);
-
-                // Major 6
-                Major major6 = new Major();
-                major6.setName("Mạng máy tính và truyền thông");
-                majorRepository.save(major6);
-
-                // Major 7
-                Major major7 = new Major();
-                major7.setName("Trí tuệ nhân tạo");
-                majorRepository.save(major7);
 
                 System.out.println("Đã khởi tạo " + majorRepository.count() + " ngành học vào database");
             }
