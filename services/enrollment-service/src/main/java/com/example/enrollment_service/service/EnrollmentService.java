@@ -53,7 +53,7 @@ public class EnrollmentService {
                //emit SUCCESS
                System.out.println("RESERVE SUCCESS");
 
-               String eventType = "ReduceSlotEvent";
+               String eventType = "ChangeQuantitySlotEvent";
 
                ReduceSlotEvent reduceSlotEvent = ReduceSlotEvent.builder()
                        .eventId(java.util.UUID.randomUUID())
