@@ -8,21 +8,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Schedule {
-
+public class Room {
     private Long id;
 
-    private Long courseId;
-
-    private Long roomId;
-
-    private Long teacherId;
-
-    private Date startTime;
-
-    private Date endTime;
-
-    private String type;
+    private String roomCode;
 
     private Date createdAt;
 

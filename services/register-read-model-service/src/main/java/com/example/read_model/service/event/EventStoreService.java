@@ -1,7 +1,6 @@
-package com.example.register_subject_service.service.event;
+package com.example.read_model.service.event;
 
 import com.eventstore.dbclient.*;
-import com.example.register_subject_service.model.CourseRegistrationEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,22 +17,26 @@ public class EventStoreService {
     // Dùng để quản lý persistent subscriptions
     private final EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient;
     private final CreatePersistentSubscription createPersistentSubscription;
-    private final SaveEvent saveEvent;
-    private final SubscribeRegistration subscribeRegistration;
+
+    private  final SubscribeUpdateReadModel subscribeUpdateReadModel;
+
+    @Value("${app.global.stream}")
+    private String stream ;
+
+    @Value("${app.global.group}")
+    private String group;
 
     @Autowired
     public EventStoreService(
             EventStoreDBClient eventStoreDBClient,
             EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient,
             CreatePersistentSubscription createPersistentSubscription,
-            SaveEvent saveEvent,
-            SubscribeRegistration subscribeRegistration
+            SubscribeUpdateReadModel subscribeUpdateReadModel
     ) {
         this.eventStoreDBClient = eventStoreDBClient;
         this.persistentSubscriptionsClient = persistentSubscriptionsClient;
         this.createPersistentSubscription = createPersistentSubscription;
-        this.saveEvent = saveEvent;
-        this.subscribeRegistration = subscribeRegistration;
+        this.subscribeUpdateReadModel = subscribeUpdateReadModel;
     }
 
 
@@ -41,18 +44,13 @@ public class EventStoreService {
     public void init() throws Exception {
 
         // 1. Tạo persistent subscription
-        this.createPersistentSubscription.call("registration", "registration");
-        this.createPersistentSubscription.call("reserve-slot", "reserve-slot");
-        this.createPersistentSubscription.call("update-read-model", "update-read-model");
+        this.createPersistentSubscription.call(stream, group);
+
 
         // 2. Đăng ký lắng nghe
-        this.subscribeRegistration.call("registration", "registration");
+        this.subscribeUpdateReadModel.call(stream, group);
 
         System.out.println("EventStore service initialized with persistent subscription");
-    }
-
-    public  void  saveEvent(CourseRegistrationEvent event, String stream) throws Exception {
-        this.saveEvent.call(event, stream);
     }
 
 }

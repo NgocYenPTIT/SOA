@@ -119,6 +119,46 @@ public class DataInitializer {
                 wishSubject8.setStatus(WishSubjectStatus.APPROVED);
                 wishSubjectRepository.save(wishSubject8);
 
+//////////////////////////////////////////////////////
+//
+///  // WishSubject 5: Student 2 đăng ký WishSubject 4 - Rejected
+/// 
+                WishSubject wishSubject55 = new WishSubject();
+                wishSubject55.setStudentId(5L);
+                wishSubject55.setSubjectId(1L);
+                wishSubject55.setSemesterId(1L); // Học kỳ 2
+                wishSubject55.setRegisterDate(sixDaysAgo);
+                wishSubject55.setStatus(WishSubjectStatus.APPROVED);
+                wishSubjectRepository.save(wishSubject55);
+
+                // WishSubject 6: Student 3 đăng ký WishSubject 2 - Approved
+                WishSubject wishSubject66 = new WishSubject();
+                wishSubject66.setStudentId(5L);
+                wishSubject66.setSubjectId(2L);
+                wishSubject66.setSemesterId(1L); // Học kỳ 2
+                wishSubject66.setRegisterDate(sixDaysAgo);
+                wishSubject66.setStatus(WishSubjectStatus.APPROVED);
+                wishSubjectRepository.save(wishSubject66);
+
+                // WishSubject 7: Student 3 đăng ký WishSubject 5 - Pending
+                WishSubject wishSubject77 = new WishSubject();
+                wishSubject77.setStudentId(5L);
+                wishSubject77.setSubjectId(3L);
+                wishSubject77.setSemesterId(1L); // Học kỳ 2
+                wishSubject77.setRegisterDate(fourDaysAgo);
+                wishSubject77.setStatus(WishSubjectStatus.APPROVED);
+                wishSubjectRepository.save(wishSubject77);
+
+                // WishSubject 8: Student 4 đăng ký WishSubject 3 - Approved
+                WishSubject wishSubject88 = new WishSubject();
+                wishSubject88.setStudentId(5L);
+                wishSubject88.setSubjectId(4L);
+                wishSubject88.setSemesterId(1L); // Học kỳ 2
+                wishSubject88.setRegisterDate(fourDaysAgo);
+                wishSubject88.setStatus(WishSubjectStatus.APPROVED);
+                wishSubjectRepository.save(wishSubject88);
+                
+
 
                 System.out.println("Đã khởi tạo " + wishSubjectRepository.count() + " môn nguyện vọng vào database");
             }

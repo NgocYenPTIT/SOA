@@ -48,6 +48,8 @@ public class EventStoreService {
 
         // 1. Tạo persistent subscription
         this.createPersistentSubscription.call(stream, group);
+        this.createPersistentSubscription.call("update-read-model", "update-read-model");
+
 
         // 2. Đăng ký lắng nghe
         this.subscribeReserveSlot.call(stream, group);
@@ -57,6 +59,3 @@ public class EventStoreService {
     }
 
 }
-
-
-//}

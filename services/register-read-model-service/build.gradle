@@ -43,6 +43,9 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
+    implementation 'com.eventstore:db-client-java:4.2.0'
+
+
 }
 
 tasks.named('test') {

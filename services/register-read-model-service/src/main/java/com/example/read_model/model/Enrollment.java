@@ -1,28 +1,27 @@
 package com.example.read_model.model;
 
 import java.util.Date;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Schedule {
+@Builder
+public class Enrollment {
 
     private Long id;
 
+    private Long studentId;
+
     private Long courseId;
 
-    private Long roomId;
+    private String status;
 
-    private Long teacherId;
-
-    private Date startTime;
-
-    private Date endTime;
-
-    private String type;
+    private Integer orderNumber;
 
     private Date createdAt;
 
@@ -30,6 +29,7 @@ public class Schedule {
 
     private Date deletedAt;
 
-    private boolean isActive = true;
+    private boolean isActive;
+
 
 }

@@ -15,13 +15,10 @@ public class RegisteredSubject {
     private Long subjectId;
     private String subjectName;
     private String subjectCode;
-
     private String courseCode;
     private String courseGroup;
     private String practiseGroup;
-
     private String enrollmentDate;
     private String Status;
-
-    private List<Schedule> schedules;
+    private List<ScheduleResponse> scheduleResponses;
 }

@@ -5,56 +5,56 @@ BASE_DIR=$(pwd)/services
 
 # Khởi động từng service trên terminal riêng biệt với title
 
-# # UI
+# UI
 # gnome-terminal --title="UI" -- bash -c "cd $BASE_DIR/ui && ./gradlew bootRun; exec bash" 
 
-# # Auth Service
+# Auth Service
 gnome-terminal --title="Auth Service" -- bash -c "cd $BASE_DIR/auth-service && ./gradlew bootRun; exec bash" 
 
-# # Course Service
+# Course Service
 gnome-terminal --title="Course Service" -- bash -c "cd $BASE_DIR/course-service && ./gradlew bootRun; exec bash"
 
-# Course Background Service
+Course Background Service
 gnome-terminal --title="Course Background Service" -- bash -c "cd $BASE_DIR/course-background-service && ./gradlew bootRun; exec bash"
 
-# # Credit Rule Service
+# Credit Rule Service
 gnome-terminal --title="Credit Rule Service" -- bash -c "cd $BASE_DIR/credit-rule-service && ./gradlew bootRun; exec bash"
 
-# # Enrollment Service
+# Enrollment Service
 gnome-terminal --title="Enrollment Service" -- bash -c "cd $BASE_DIR/enrollment-service && ./gradlew bootRun; exec bash"
 
-# Enrollment Background Service
+Enrollment Background Service
 gnome-terminal --title="Enrollment Background Service" -- bash -c "cd $BASE_DIR/enrollment-background-service && ./gradlew bootRun; exec bash"
 
-# # Major Service
+# Major Service
 # gnome-terminal --title="Major Service" -- bash -c "cd $BASE_DIR/major-service && ./gradlew bootRun; exec bash"
 
-# # Register Read Model Service
+# Register Read Model Service
 # gnome-terminal --title="Register Read Model Service" -- bash -c "cd $BASE_DIR/register-read-model-service && ./gradlew bootRun; exec bash"
 
-# Register Subject Service
-# gnome-terminal --title="Register Subject Service" -- bash -c "cd $BASE_DIR/register-subject-service && ./gradlew bootRun; exec bash"
+Register Subject Service
+gnome-terminal --title="Register Subject Service" -- bash -c "cd $BASE_DIR/register-subject-service && ./gradlew bootRun; exec bash"
 
 
-# Register Subject Background Service
+Register Subject Background Service
 gnome-terminal --title="Register Subject Background Service" -- bash -c "cd $BASE_DIR/register-subject-background-service && ./gradlew bootRun; exec bash"
 
-# # Room Service
+# Room Service
 # gnome-terminal --title="Room Service" -- bash -c "cd $BASE_DIR/room-service && ./gradlew bootRun; exec bash"
 
-# # Schedule Service
+# Schedule Service
 gnome-terminal --title="Schedule Service" -- bash -c "cd $BASE_DIR/schedule-service && ./gradlew bootRun; exec bash"
 
-# # Semester Service
-# gnome-terminal --title="Semester Service" -- bash -c "cd $BASE_DIR/semester-service && ./gradlew bootRun; exec bash"
+# Semester Service
+gnome-terminal --title="Semester Service" -- bash -c "cd $BASE_DIR/semester-service && ./gradlew bootRun; exec bash"
 
-# # Subject Service
+# Subject Service
 gnome-terminal --title="Subject Service" -- bash -c "cd $BASE_DIR/subject-service && ./gradlew bootRun; exec bash"
 
-# # User Service
+# User Service
 gnome-terminal --title="User Service" -- bash -c "cd $BASE_DIR/user-service && ./gradlew bootRun; exec bash"
 
-# # Wish Subject Service
+# Wish Subject Service
 gnome-terminal --title="Wish Subject Service" -- bash -c "cd $BASE_DIR/wish-subject-service && ./gradlew bootRun; exec bash"
 
 echo "Tất cả các service đã được khởi động trong các terminal riêng biệt!"

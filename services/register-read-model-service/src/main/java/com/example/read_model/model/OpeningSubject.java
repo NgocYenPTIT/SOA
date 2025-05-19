@@ -14,14 +14,11 @@ public class OpeningSubject {
     private Long subjectId;
     private String subjectName;
     private String subjectCode;
-
     private String courseCode;
     private String courseGroup;
     private String practiseGroup;
-
     private Integer amountOfCredit;
     private Integer remainSlot;
     private Integer maxStudent;
-
-    private List<Schedule> schedules;
+    private List<ScheduleResponse> scheduleResponses;
 }
