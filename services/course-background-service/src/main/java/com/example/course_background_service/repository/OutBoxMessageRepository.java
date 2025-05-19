@@ -1,6 +1,6 @@
-package com.example.enrollment_background_service.repository;
+package com.example.course_background_service.repository;
 
-import com.example.enrollment_background_service.model.OutBoxMessage;
+import com.example.course_background_service.model.OutBoxMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

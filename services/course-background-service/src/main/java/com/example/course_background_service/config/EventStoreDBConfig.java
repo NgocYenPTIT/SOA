@@ -1,4 +1,4 @@
-package com.example.enrollment_background_service.config;
+package com.example.course_background_service.config;
 
 import com.eventstore.dbclient.ConnectionStringParsingException;
 import com.eventstore.dbclient.EventStoreDBClient;

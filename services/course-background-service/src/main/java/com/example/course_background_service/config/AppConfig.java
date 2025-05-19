@@ -1,4 +1,4 @@
-package com.example.enrollment_background_service.config;
+package com.example.course_background_service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

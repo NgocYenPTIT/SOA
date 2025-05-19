@@ -1,7 +1,11 @@
-package com.example.enrollment_background_service.service.event;
+package com.example.course_background_service.service.event;
 
-import com.eventstore.dbclient.*;
-import com.example.enrollment_background_service.model.CourseRegistrationEvent;
+import com.eventstore.dbclient.AppendToStreamOptions;
+import com.eventstore.dbclient.EventData;
+import com.eventstore.dbclient.EventStoreDBClient;
+import com.eventstore.dbclient.EventStoreDBPersistentSubscriptionsClient;
+import com.example.course_background_service.model.CommitEvent;
+import com.example.course_background_service.model.RollBackEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +14,7 @@ import java.util.UUID;
 
 
 @Service
-public class SaveRegistrationEvent {
+public class SaveRollbackEvent {
 
     // Dùng để ghi sự kiện
     private final EventStoreDBClient eventStoreDBClient;
@@ -22,7 +26,7 @@ public class SaveRegistrationEvent {
 
 
     @Autowired
-    public SaveRegistrationEvent(
+    public SaveRollbackEvent(
             EventStoreDBClient eventStoreDBClient,
             EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient,
             ObjectMapper objectMapper) {
@@ -32,18 +36,10 @@ public class SaveRegistrationEvent {
     }
 
 
-/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
-    /**
-     * Saves the provided CourseRegistrationEvent to the configured EventStoreDB stream.
-     *
-     * @param event the CourseRegistrationEvent to be saved
-     * @throws Exception if there is an error during the event serialization or appending to the stream
-     */
 
-/* <<<<<<<<<<  1f2e19da-ca6d-48bf-b742-2fb9eb9729ad  >>>>>>>>>>> */
-    public void call(CourseRegistrationEvent event,String stream) throws Exception {
+    public void call(RollBackEvent event, String stream) throws Exception {
 
-        System.out.println("Saving event..." + event);
+        System.out.println("Saving event..." + event + " to stream: " + stream);
 
         EventData eventData = EventData.builderAsJson(
                 UUID.randomUUID(),

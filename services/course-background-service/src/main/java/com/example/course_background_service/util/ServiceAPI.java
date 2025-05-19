@@ -1,4 +1,4 @@
-package com.example.enrollment_background_service.util;
+package com.example.course_background_service.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;

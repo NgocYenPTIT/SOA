@@ -1,4 +1,4 @@
-package com.example.enrollment_background_service.model;
+package com.example.course_background_service.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

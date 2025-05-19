@@ -1,10 +1,7 @@
-package com.example.enrollment_background_service.service.event;
+package com.example.course_background_service.service.event;
 
-import com.eventstore.dbclient.AppendToStreamOptions;
-import com.eventstore.dbclient.EventData;
-import com.eventstore.dbclient.EventStoreDBClient;
-import com.eventstore.dbclient.EventStoreDBPersistentSubscriptionsClient;
-import com.example.enrollment_background_service.model.ReserveSlotEvent;
+import com.eventstore.dbclient.*;
+import com.example.course_background_service.model.CourseRegistrationEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +10,7 @@ import java.util.UUID;
 
 
 @Service
-public class SaveReserveSlotEvent {
+public class SaveRegistrationEvent {
 
     // Dùng để ghi sự kiện
     private final EventStoreDBClient eventStoreDBClient;
@@ -25,7 +22,7 @@ public class SaveReserveSlotEvent {
 
 
     @Autowired
-    public SaveReserveSlotEvent(
+    public SaveRegistrationEvent(
             EventStoreDBClient eventStoreDBClient,
             EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient,
             ObjectMapper objectMapper) {
@@ -35,10 +32,18 @@ public class SaveReserveSlotEvent {
     }
 
 
+/* <<<<<<<<<<<<<<  ✨ Windsurf Command ⭐ >>>>>>>>>>>>>>>> */
+    /**
+     * Saves the provided CourseRegistrationEvent to the configured EventStoreDB stream.
+     *
+     * @param event the CourseRegistrationEvent to be saved
+     * @throws Exception if there is an error during the event serialization or appending to the stream
+     */
 
-    public void call(ReserveSlotEvent event, String stream) throws Exception {
+/* <<<<<<<<<<  1f2e19da-ca6d-48bf-b742-2fb9eb9729ad  >>>>>>>>>>> */
+    public void call(CourseRegistrationEvent event,String stream) throws Exception {
 
-        System.out.println("Saving event..." + event + " to stream: " + stream);
+        System.out.println("Saving event..." + event);
 
         EventData eventData = EventData.builderAsJson(
                 UUID.randomUUID(),

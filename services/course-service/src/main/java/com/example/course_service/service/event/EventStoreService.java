@@ -44,6 +44,7 @@ public class EventStoreService {
 
         // 1. Tạo persistent subscription
         this.createPersistentSubscription.call(stream, group);
+        this.createPersistentSubscription.call("course-transaction", "course-transaction");
 
         // 2. Đăng ký lắng nghe
         this.subscribeChangeQuantitySlot.call(stream, group);

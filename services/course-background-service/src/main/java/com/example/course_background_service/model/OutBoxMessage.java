@@ -1,4 +1,4 @@
-package com.example.enrollment_background_service.model;
+package com.example.course_background_service.model;
 
 import java.util.Date;
 import javax.persistence.Column;

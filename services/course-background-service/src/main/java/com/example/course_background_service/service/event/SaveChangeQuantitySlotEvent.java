@@ -1,11 +1,10 @@
-package com.example.enrollment_background_service.service.event;
+package com.example.course_background_service.service.event;
 
 import com.eventstore.dbclient.AppendToStreamOptions;
 import com.eventstore.dbclient.EventData;
 import com.eventstore.dbclient.EventStoreDBClient;
 import com.eventstore.dbclient.EventStoreDBPersistentSubscriptionsClient;
-import com.example.enrollment_background_service.model.ChangeQuantitySlotEvent;
-import com.example.enrollment_background_service.model.CourseRegistrationEvent;
+import com.example.course_background_service.model.ChangeQuantitySlotEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

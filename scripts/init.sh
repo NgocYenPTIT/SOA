@@ -12,15 +12,18 @@ BASE_DIR=$(pwd)/services
 gnome-terminal --title="Auth Service" -- bash -c "cd $BASE_DIR/auth-service && ./gradlew bootRun; exec bash" 
 
 # # Course Service
-# gnome-terminal --title="Course Service" -- bash -c "cd $BASE_DIR/course-service && ./gradlew bootRun; exec bash"
+gnome-terminal --title="Course Service" -- bash -c "cd $BASE_DIR/course-service && ./gradlew bootRun; exec bash"
+
+# Course Background Service
+gnome-terminal --title="Course Background Service" -- bash -c "cd $BASE_DIR/course-background-service && ./gradlew bootRun; exec bash"
 
 # # Credit Rule Service
 gnome-terminal --title="Credit Rule Service" -- bash -c "cd $BASE_DIR/credit-rule-service && ./gradlew bootRun; exec bash"
 
 # # Enrollment Service
-gnome-terminal --title="Enrollment Service" -- bash -c "cd $BASE_DIR/enrollment-service && ./gradlew bootRun; exec bash"
+# gnome-terminal --title="Enrollment Service" -- bash -c "cd $BASE_DIR/enrollment-service && ./gradlew bootRun; exec bash"
 
-# Register Subject Background Service
+# Enrollment Background Service
 gnome-terminal --title="Enrollment Background Service" -- bash -c "cd $BASE_DIR/enrollment-background-service && ./gradlew bootRun; exec bash"
 
 # # Major Service

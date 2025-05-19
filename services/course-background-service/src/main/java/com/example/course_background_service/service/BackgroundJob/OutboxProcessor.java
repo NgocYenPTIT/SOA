@@ -1,13 +1,11 @@
-package com.example.enrollment_background_service.service.BackgroundJob;
+package com.example.course_background_service.service.BackgroundJob;
 
-import com.example.enrollment_background_service.model.ChangeQuantitySlotEvent;
-import com.example.enrollment_background_service.model.CourseRegistrationEvent;
-import com.example.enrollment_background_service.model.OutBoxMessage;
-import com.example.enrollment_background_service.model.ReserveSlotEvent;
-import com.example.enrollment_background_service.repository.OutBoxMessageRepository;
-import com.example.enrollment_background_service.service.event.SaveChangeQuantitySlotEvent;
-import com.example.enrollment_background_service.service.event.SaveRegistrationEvent;
-import com.example.enrollment_background_service.service.event.SaveReserveSlotEvent;
+import com.example.course_background_service.model.ChangeQuantitySlotEvent;
+import com.example.course_background_service.model.CommitEvent;
+import com.example.course_background_service.model.OutBoxMessage;
+import com.example.course_background_service.model.RollBackEvent;
+import com.example.course_background_service.repository.OutBoxMessageRepository;
+import com.example.course_background_service.service.event.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @AllArgsConstructor
@@ -29,6 +28,8 @@ public class OutboxProcessor {
     private  final SaveRegistrationEvent saveRegistrationEvent;
     private  final SaveReserveSlotEvent saveReserveSlotEvent;
     private final SaveChangeQuantitySlotEvent saveChangeQuantitySlotEvent;
+    private SaveCommitEvent saveCommitEvent;
+    private SaveRollbackEvent saveRollbackEvent;
     private  final OutBoxMessageRepository outBoxMessageRepository;
     private static final int BATCH_SIZE = 100; // Process 100 records at a time
 
@@ -47,13 +48,16 @@ public class OutboxProcessor {
 
             for (OutBoxMessage outboxMessage : outboxMessages) {
                 try {
-                    if(outboxMessage.getEventType().equals("ChangeQuantitySlotEvent")) {
-                        ChangeQuantitySlotEvent event = new ObjectMapper().readValue(outboxMessage.getPayload(), ChangeQuantitySlotEvent.class);
-                        this.saveChangeQuantitySlotEvent.call(event,"change-quantity-slot"); // Process each record();
+                    if(outboxMessage.getEventType().equals("CommitChangeQuantitySlotEvent")) {
+                        CommitEvent event = new ObjectMapper().readValue(outboxMessage.getPayload(), CommitEvent.class);
+                        this.saveCommitEvent.call(event,"course-transaction"); // Process each record();
                     }
-                    outboxMessage.setDeletedAt(new java.util.Date());
+                    else if(outboxMessage.getEventType().equals("RollBackChangeQuantitySlotEvent")) {
+                        RollBackEvent event = new ObjectMapper().readValue(outboxMessage.getPayload(), RollBackEvent.class);
+                        this.saveRollbackEvent.call(event,"course-transaction"); // Process each record();
+                    }
+                    outboxMessage.setDeletedAt(new Date());
                     outBoxMessageRepository.save(outboxMessage);
-
                 }
                 catch (Exception e) {
                     e.printStackTrace();

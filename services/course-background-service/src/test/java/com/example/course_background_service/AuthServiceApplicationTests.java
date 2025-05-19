@@ -1,4 +1,4 @@
-package com.example.enrollment_background_service;
+package com.example.course_background_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

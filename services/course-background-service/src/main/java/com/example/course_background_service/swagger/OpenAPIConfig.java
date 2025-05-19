@@ -1,4 +1,4 @@
-package  com.example.enrollment_background_service.swagger ;
+package  com.example.course_background_service.swagger ;
 
 
 import io.swagger.v3.oas.models.Components;

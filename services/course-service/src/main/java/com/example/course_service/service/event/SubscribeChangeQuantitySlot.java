@@ -86,7 +86,7 @@ public class SubscribeChangeQuantitySlot {
                         } else {
                             // DEAD LETTER QUEUE
                             try {
-                                String rollbackEventType = "CommitChangeQuantitySlotEvent";
+                                String rollbackEventType = "RollbackChangeQuantitySlotEvent";
                                 ChangeQuantitySlotEvent changeQuantitySlotEvent = objectMapper.readValue(jsonData, ChangeQuantitySlotEvent.class);
 
                                 RollBackEvent rollBackEvent = RollBackEvent.builder()

@@ -1,4 +1,4 @@
-package com.example.enrollment_background_service.model;
+package com.example.course_background_service.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @Data
 @Builder
 
-public class ReserveSlotEvent {
+public class ChangeQuantitySlotEvent {
     private UUID eventId;
     private String correlationId ;
     private Long studentId;
@@ -21,4 +21,5 @@ public class ReserveSlotEvent {
     private long timestamp;
     private String token ;
     private String eventType;
+
 }
