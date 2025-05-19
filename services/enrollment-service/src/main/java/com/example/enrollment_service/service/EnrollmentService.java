@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class EnrollmentService {
@@ -45,10 +43,8 @@ public class EnrollmentService {
                List<List<Long>> addAndDeleteCourses = event.getAddAndDeleteCourses();
 
                List<Long> addCourses = addAndDeleteCourses.get(0);
-               List<Long> deleteCourses = addAndDeleteCourses.get(1);
 
                add(addCourses, studentId);
-               delete(deleteCourses, studentId);
 
                //emit SUCCESS
                System.out.println("RESERVE SUCCESS");
@@ -69,12 +65,125 @@ public class EnrollmentService {
                this.outBoxRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(reduceSlotEvent)).build());
 
            } catch (Exception e) {
-               //emit FULL
                e.printStackTrace();
+               //emit FULL
+               String eventType = "UpdateReadModelEvent";
+
+               UpdateReadModelEvent updateReadModelEvent = UpdateReadModelEvent.builder()
+                       .eventId(java.util.UUID.randomUUID())
+                       .eventType(eventType)
+                       .correlationId(event.getCorrelationId())
+                       .studentId(event.getStudentId())
+                       .success(false)
+                       .status(e.getMessage())
+                       .messages(new ArrayList<>(Collections.singleton(e.getMessage())))
+                       .token(event.getToken())
+                       .timestamp(System.currentTimeMillis())
+                       .build();
+               System.out.println("updateReadModelEvent: " + updateReadModelEvent);
+               // Save outbox
+               this.outBoxRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(updateReadModelEvent)).build());
                System.out.println("RESERVE FULL");
                throw e;
            }
     }
+    @Transactional
+    public void rollback(RollBackEvent event) throws Exception {
+        if(this.validateDuplicateRollbackEvent(event)){
+            System.out.println("ROLLBACK IS DUPLICATE");
+            return;
+        }
+
+            Long studentId = event.getStudentId();
+
+            List<List<Long>> addAndDeleteCourses = event.getAddAndDeleteCourses();
+
+            List<Long> addCourses = addAndDeleteCourses.get(0);
+
+            delete(addCourses, studentId);
+
+            //emit ROLLBACK SUCCESS
+            System.out.println("ROLLBACK SUCCESS");
+
+            String eventType = "UpdateReadModelEvent";
+
+            UpdateReadModelEvent updateReadModelEvent = UpdateReadModelEvent.builder()
+                    .eventId(java.util.UUID.randomUUID())
+                    .eventType(eventType)
+                    .correlationId(event.getCorrelationId())
+                    .studentId(event.getStudentId())
+                    .success(false)
+                    .status("ROLLBACK")
+                    .messages(new ArrayList<>(Collections.singleton("ROLLBACK")))
+                    .token(event.getToken())
+                    .timestamp(System.currentTimeMillis())
+                    .build();
+            System.out.println("updateReadModelEvent: " + updateReadModelEvent);
+            // Save outbox
+            this.outBoxRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(updateReadModelEvent)).build());
+            System.out.println("ROLLBACK BECAUSE SYSTEM ERROR");
+
+    }
+
+    @Transactional
+    public void commit(CommitEvent event) throws Exception {
+        if(this.validateDuplicateCommitEvent(event)){
+            System.out.println("COMMIT IS DUPLICATE");
+            return;
+        }
+
+            Long studentId = event.getStudentId();
+
+            List<List<Long>> addAndDeleteCourses = event.getAddAndDeleteCourses();
+
+            List<Long> deleteCourses = addAndDeleteCourses.get(1);
+
+            this.delete(deleteCourses, studentId);
+
+            //emit COMMIT SUCCESS
+            System.out.println("COMMIT SUCCESS");
+
+            String eventType = "UpdateReadModelEvent";
+
+            UpdateReadModelEvent updateReadModelEvent = UpdateReadModelEvent.builder()
+                    .eventId(java.util.UUID.randomUUID())
+                    .eventType(eventType)
+                    .correlationId(event.getCorrelationId())
+                    .studentId(event.getStudentId())
+                    .success(true)
+                    .status("COMMIT")
+                    .messages(new ArrayList<>(Collections.singleton("COMMIT")))
+                    .token(event.getToken())
+                    .timestamp(System.currentTimeMillis())
+                    .build();
+            System.out.println("updateReadModelEvent: " + updateReadModelEvent);
+            // Save outbox
+            this.outBoxRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(updateReadModelEvent)).build());
+            System.out.println("COMMIT FOR REGISTER THREAD");
+    }
+
+    private boolean validateDuplicateCommitEvent(CommitEvent event){
+        try {
+            this.transactionLogRepository.save(TransactionLog.builder().correlationId(event.getCorrelationId()).status("COMMIT").build());
+            return false;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return  true;
+        }
+    }
+
+    private boolean validateDuplicateRollbackEvent(RollBackEvent event){
+        try {
+            this.transactionLogRepository.save(TransactionLog.builder().correlationId(event.getCorrelationId()).status("ROLLBACK").build());
+            return false;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return  true;
+        }
+    }
+
 
     private boolean validateDuplicateEvent(ReserveSlotEvent event){
         try {
@@ -94,7 +203,7 @@ public class EnrollmentService {
                 try {
                     Optional<Enrollment> freeSlot = this.enrollmentRepository.findFirstByCourseIdAndStatus(courseId, "PENDING");
                     if(!freeSlot.isPresent()){
-                        throw new Exception("FULL");
+                        throw new Exception(courseId  + " IS FULL");
                     }
                     //save
                     Enrollment freeEnrollment = freeSlot.get();
@@ -111,12 +220,11 @@ public class EnrollmentService {
                 } catch (Exception e) {
                     // exception occur when two threads try to reserve the same slot
                     // ->> continue find slot, no worry
-                    if(e.getMessage().equals("FULL")){
+                    if(e.getMessage().contains("FULL")){
                         System.out.println("FULL");
                         throw e;
                     }
-//                    e.printStackTrace();
-                    System.out.println("continue find slot");
+                    else System.out.println("continue find slot");
                 }
             }
         }

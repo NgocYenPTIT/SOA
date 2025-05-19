@@ -65,13 +65,13 @@ public class SubscribeCourse {
                             CommitEvent commitEvent = objectMapper.readValue(jsonData, CommitEvent.class);
                             System.out.println("this is commitEvent");
                             System.out.println(commitEvent);
-//                            enrollmentService.reserve(reserveSlotEvent);
+                            enrollmentService.commit(commitEvent);
                         }
                         else if ("RollbackChangeQuantitySlotEvent".equals(eventType)) {
                             RollBackEvent rollBackEvent = objectMapper.readValue(jsonData, RollBackEvent.class);
                             System.out.println("this is rollBackEvent");
                             System.out.println(rollBackEvent);
-//                            enrollmentService.reserve(reserveSlotEvent);
+                            enrollmentService.rollback(rollBackEvent);
                         }
 
                         System.out.println("send ACK");

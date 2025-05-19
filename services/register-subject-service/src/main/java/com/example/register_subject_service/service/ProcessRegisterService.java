@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProcessRegisterService {
@@ -60,13 +61,36 @@ public class ProcessRegisterService {
         List<RegisterResponse> messages = new ArrayList<>();
 
         //validate
-//        messages.addAll(this.validate(event));
-//        if (!messages.isEmpty()){
-//            //emit fail validate
-//        }
-
+        messages.addAll(this.validate(event));
+        if (!messages.isEmpty()) {
+            System.out.println(messages);
+            this.emitFailValidate(event,messages);
+            return;
+        }
         // save
         this.save(event);
+    }
+
+    private void emitFailValidate(CourseRegistrationEvent event, List<RegisterResponse> messages) throws Exception {
+        String eventType = "UpdateReadModelEvent";
+
+        UpdateReadModelEvent updateReadModelEvent = UpdateReadModelEvent.builder()
+                .eventId(java.util.UUID.randomUUID())
+                .eventType(eventType)
+                .correlationId(event.getCorrelationId())
+                .studentId(event.getStudentId())
+                .success(false)
+                .status("FAIL VALIDATE")
+                .messages(messages.stream()
+                        .map(RegisterResponse::getMessage)
+                        .collect(Collectors.toList()))
+                .token(event.getToken())
+                .timestamp(System.currentTimeMillis())
+                .build();
+        System.out.println("updateReadModelEvent: " + updateReadModelEvent);
+        // Save outbox
+        this.outBoxMessageRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(updateReadModelEvent)).build());
+        System.out.println("FAIL VALIDATE");
     }
 
     public void save(CourseRegistrationEvent event) throws Exception {
@@ -96,7 +120,7 @@ public class ProcessRegisterService {
             messages.add(RegisterResponse.builder()
                     .success(false)
                     .status(400L)
-                    .message("Can not register because not enough credit in semester yeah year")
+                    .message("You are not allowed to register this course")
                     .build());
             return messages;
         }

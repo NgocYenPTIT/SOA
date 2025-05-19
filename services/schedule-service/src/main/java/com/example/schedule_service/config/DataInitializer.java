@@ -119,8 +119,8 @@ public class DataInitializer {
                 schedule3.setCourseId(2L);
                 schedule3.setRoomId(2L);
                 schedule3.setTeacherId(4L);
-                schedule3.setStartTime(startTime1);//conflict
-                schedule3.setEndTime(endTime1);//conflict
+                schedule3.setStartTime(startTime3);//conflict
+                schedule3.setEndTime(startTime3);//conflict
                 schedule3.setType("LÝ THUYẾT");
                 scheduleRepository.save(schedule3);
 
@@ -129,8 +129,8 @@ public class DataInitializer {
                 schedule4.setCourseId(2L);
                 schedule4.setRoomId(2L); // Phòng lab
                 schedule4.setTeacherId(4L);
-                schedule4.setStartTime(startTime4);
-                schedule4.setEndTime(endTime4);
+                schedule4.setStartTime(startTime5);
+                schedule4.setEndTime(endTime5);
                 schedule4.setType("LÝ THUYẾT");
                 scheduleRepository.save(schedule4);
 

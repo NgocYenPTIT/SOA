@@ -94,7 +94,7 @@ public class SubscribeChangeQuantitySlot {
                                         .eventType(rollbackEventType)
                                         .correlationId(changeQuantitySlotEvent.getCorrelationId())
                                         .studentId(changeQuantitySlotEvent.getStudentId())
-                                        .message("ROLLBACK")
+                                        .addAndDeleteCourses(changeQuantitySlotEvent.getAddAndDeleteCourses())
                                         .token(changeQuantitySlotEvent.getToken())
                                         .timestamp(System.currentTimeMillis())
                                         .build();

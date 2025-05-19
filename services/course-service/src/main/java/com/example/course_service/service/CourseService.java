@@ -58,7 +58,7 @@ public class CourseService {
                     .eventType(eventType)
                     .correlationId(event.getCorrelationId())
                     .studentId(event.getStudentId())
-                    .message("COMMIT")
+                    .addAndDeleteCourses(addAndDeleteCourses)
                     .token(event.getToken())
                     .timestamp(System.currentTimeMillis())
                     .build();

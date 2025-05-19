@@ -21,7 +21,7 @@ gnome-terminal --title="Course Background Service" -- bash -c "cd $BASE_DIR/cour
 gnome-terminal --title="Credit Rule Service" -- bash -c "cd $BASE_DIR/credit-rule-service && ./gradlew bootRun; exec bash"
 
 # # Enrollment Service
-# gnome-terminal --title="Enrollment Service" -- bash -c "cd $BASE_DIR/enrollment-service && ./gradlew bootRun; exec bash"
+gnome-terminal --title="Enrollment Service" -- bash -c "cd $BASE_DIR/enrollment-service && ./gradlew bootRun; exec bash"
 
 # Enrollment Background Service
 gnome-terminal --title="Enrollment Background Service" -- bash -c "cd $BASE_DIR/enrollment-background-service && ./gradlew bootRun; exec bash"
@@ -33,7 +33,7 @@ gnome-terminal --title="Enrollment Background Service" -- bash -c "cd $BASE_DIR/
 # gnome-terminal --title="Register Read Model Service" -- bash -c "cd $BASE_DIR/register-read-model-service && ./gradlew bootRun; exec bash"
 
 # Register Subject Service
-gnome-terminal --title="Register Subject Service" -- bash -c "cd $BASE_DIR/register-subject-service && ./gradlew bootRun; exec bash"
+# gnome-terminal --title="Register Subject Service" -- bash -c "cd $BASE_DIR/register-subject-service && ./gradlew bootRun; exec bash"
 
 
 # Register Subject Background Service

@@ -1,4 +1,4 @@
-package com.example.course_background_service.model;
+package com.example.enrollment_service.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,15 +8,18 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
-@Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RollBackEvent {
+@Data
+@Builder
+
+public class UpdateReadModelEvent {
     private UUID eventId;
     private String correlationId ;
     private Long studentId;
-    private List<List<Long>> addAndDeleteCourses;
+    private boolean success;
+    private String status;
+    private  List<String> messages;
     private long timestamp;
     private String token ;
     private String eventType;
