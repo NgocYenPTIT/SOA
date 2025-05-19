@@ -1,7 +1,9 @@
 package com.example.course_service.service.event;
 
 import com.eventstore.dbclient.*;
-import com.example.course_service.model.ChangeQuantitySlotEvent;
+import com.example.course_service.model.*;
+import com.example.course_service.repository.OutboxRepository;
+import com.example.course_service.repository.TransactionLogRepository;
 import com.example.course_service.service.CourseService;
 import com.example.course_service.util.ServiceAPI;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,17 +29,25 @@ public class SubscribeChangeQuantitySlot {
 
     private CourseService courseService;
 
+    private OutboxRepository outboxRepository;
+
+    private  TransactionLogRepository transactionLogRepository;
+
     @Autowired
     public SubscribeChangeQuantitySlot(
             EventStoreDBClient eventStoreDBClient,
             EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient,
             ServiceAPI serviceAPI,
             CourseService courseService,
+            OutboxRepository outboxRepository,
+            TransactionLogRepository transactionLogRepository,
             ObjectMapper objectMapper) {
         this.eventStoreDBClient = eventStoreDBClient;
         this.persistentSubscriptionsClient = persistentSubscriptionsClient;
         this.objectMapper = objectMapper;
+        this.transactionLogRepository = transactionLogRepository;
         this.serviceAPI = serviceAPI;
+        this.outboxRepository = outboxRepository;
         this.courseService = courseService;
     }
 
@@ -46,24 +56,22 @@ public class SubscribeChangeQuantitySlot {
             // Tạo listener cho persistent subscription
             PersistentSubscriptionListener listener = new PersistentSubscriptionListener() {
                 @Override
-                public void onEvent(PersistentSubscription subscription, int retryCount, ResolvedEvent event) {
-                    try {
-                        System.out.println("start onEvent");
-                        String eventType = event.getOriginalEvent().getEventType();
-                        byte[] eventData = event.getOriginalEvent().getEventData();
-                        String baseText64 = new String(eventData, StandardCharsets.UTF_8);
-                        String jsonData = new String(Base64.getDecoder().decode(baseText64.substring(1, baseText64.length() - 1)), StandardCharsets.UTF_8);
-                        System.out.println(jsonData);
-                        System.out.println("Received event: " + eventType + " from stream: " + streamName);
-                        System.out.println("Retry count: " + retryCount);
+                public void onEvent(PersistentSubscription subscription, int retryCount, ResolvedEvent event)  {
+                    System.out.println("start onEvent");
+                    String eventType = event.getOriginalEvent().getEventType();
+                    byte[] eventData = event.getOriginalEvent().getEventData();
+                    String baseText64 = new String(eventData, StandardCharsets.UTF_8);
+                    String jsonData = new String(Base64.getDecoder().decode(baseText64.substring(1, baseText64.length() - 1)), StandardCharsets.UTF_8);
+                    System.out.println(jsonData);
+                    System.out.println("Received event: " + eventType + " from stream: " + streamName);
+                    System.out.println("Retry count: " + retryCount);
 
+                    try {
 //                         Nếu là CourseRegistrationEvent, xử lý
-                        if ("ChangeQuantitySlotEvent".equals(eventType)) {
-                            ChangeQuantitySlotEvent changeQuantitySlotEvent = objectMapper.readValue(jsonData, ChangeQuantitySlotEvent.class);
-                            System.out.println("this is ChangeQuantitySlotEvent");
-                            System.out.println(changeQuantitySlotEvent);
-                            courseService.changeQuantitySlot(changeQuantitySlotEvent);
-                        }
+                        ChangeQuantitySlotEvent changeQuantitySlotEvent = objectMapper.readValue(jsonData, ChangeQuantitySlotEvent.class);
+                        System.out.println("this is ChangeQuantitySlotEvent");
+                        System.out.println(changeQuantitySlotEvent);
+                        courseService.changeQuantitySlot(changeQuantitySlotEvent);
                         System.out.println("send ACK");
                         subscription.ack(event);
 
@@ -76,7 +84,29 @@ public class SubscribeChangeQuantitySlot {
                             System.err.println("Too many retries (" + retryCount + "), moving to park");
                             subscription.nack(NackAction.Park, "Too many retries: " + e.getMessage(), event);
                         } else {
-                            // Yêu cầu thử lại
+                            // DEAD LETTER QUEUE
+                            try {
+                                String rollbackEventType = "CommitChangeQuantitySlotEvent";
+                                ChangeQuantitySlotEvent changeQuantitySlotEvent = objectMapper.readValue(jsonData, ChangeQuantitySlotEvent.class);
+
+                                RollBackEvent rollBackEvent = RollBackEvent.builder()
+                                        .eventId(java.util.UUID.randomUUID())
+                                        .eventType(rollbackEventType)
+                                        .correlationId(changeQuantitySlotEvent.getCorrelationId())
+                                        .studentId(changeQuantitySlotEvent.getStudentId())
+                                        .message("ROLLBACK")
+                                        .token(changeQuantitySlotEvent.getToken())
+                                        .timestamp(System.currentTimeMillis())
+                                        .build();
+
+                                System.out.println("rollBackEvent: " + rollBackEvent);
+                                // Save outbox
+                                outboxRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(rollBackEvent)).build());
+                                transactionLogRepository.save(TransactionLog.builder().correlationId(changeQuantitySlotEvent.getCorrelationId()).status("ROLLBACK").build());
+                            }
+                            catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
                             subscription.nack(NackAction.Retry, "Exception: " + e.getMessage(), event);
                         }
                     }

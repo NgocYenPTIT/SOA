@@ -48,31 +48,30 @@ public class CourseService {
             this.increment(addCourses);
             this.decrement(deleteCourses);
 
-            //emit SUCCESS
-            System.out.println("CHANGE SUCCESS");
+            //emit COMMIT
+            System.out.println("CHANGE SUCCESS -> COMMIT");
 
-            String eventType = "RegisterStatus";
+            String eventType = "CommitChangeQuantitySlotEvent";
 
-            RegisterStatusEvent registerStatusEvent = RegisterStatusEvent.builder()
+            CommitEvent commitEvent = CommitEvent.builder()
                     .eventId(java.util.UUID.randomUUID())
                     .eventType(eventType)
                     .correlationId(event.getCorrelationId())
                     .studentId(event.getStudentId())
-                    .messages(new ArrayList<>(Collections.singleton("SUCCESS")))
+                    .message("COMMIT")
                     .token(event.getToken())
                     .timestamp(System.currentTimeMillis())
                     .build();
 
-            System.out.println("RegisterStatusEvent: " + registerStatusEvent);
+            System.out.println("commitEvent: " + commitEvent);
             // Save outbox
-            this.outboxRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(registerStatusEvent)).build());
+            this.outboxRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(commitEvent)).build());
+            this.transactionLogRepository.save(TransactionLog.builder().correlationId(event.getCorrelationId()).status("COMMIT").build());
 
         } catch (Exception e) {
-
             e.printStackTrace();
             throw e;
         }
-
     }
     private boolean validateDuplicateEvent(ChangeQuantitySlotEvent event){
         try {
