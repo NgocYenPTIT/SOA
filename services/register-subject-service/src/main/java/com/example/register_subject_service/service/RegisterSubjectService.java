@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -47,6 +48,7 @@ public class RegisterSubjectService {
 
             // Save outbox
             this.outBoxMessageRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(event)).build());
+            this.emitProcessing(event);
             //success
             return Collections.singletonList(RegisterResponse.builder().success(true).status(202L).message("Processing...").build());
         } catch (Exception e) {
@@ -55,5 +57,23 @@ public class RegisterSubjectService {
         }
     }
 
+    private void emitProcessing(CourseRegistrationEvent event) throws Exception {
+        String eventType = "UpdateReadModelEvent";
 
+        UpdateReadModelEvent updateReadModelEvent = UpdateReadModelEvent.builder()
+                .eventId(java.util.UUID.randomUUID())
+                .eventType(eventType)
+                .correlationId(event.getCorrelationId())
+                .studentId(event.getStudentId())
+                .success(true)
+                .status("PROCESSING")
+                .messages(new ArrayList<String>(Collections.singleton("")))
+                .token(event.getToken())
+                .timestamp(System.currentTimeMillis())
+                .build();
+        System.out.println("updateReadModelEvent: " + updateReadModelEvent);
+        // Save outbox
+        this.outBoxMessageRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(updateReadModelEvent)).build());
+        System.out.println("PROCESSING EVENT FOR READ-MODEL");
+    }
 }

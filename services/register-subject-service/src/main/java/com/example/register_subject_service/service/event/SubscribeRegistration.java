@@ -1,9 +1,8 @@
 package com.example.register_subject_service.service.event;
 
 import com.eventstore.dbclient.*;
-import com.example.register_subject_service.model.CourseRegistrationEvent;
-import com.example.register_subject_service.model.RegisterResponse;
-import com.example.register_subject_service.model.Schedule;
+import com.example.register_subject_service.model.*;
+import com.example.register_subject_service.repository.OutBoxMessageRepository;
 import com.example.register_subject_service.service.ProcessRegisterService;
 import com.example.register_subject_service.util.ServiceAPI;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.Base64;
@@ -33,7 +33,7 @@ public class SubscribeRegistration {
 
     private ProcessRegisterService processRegisterService;
 
-
+    private OutBoxMessageRepository outBoxMessageRepository;
 
     @Value("${app.global.schedule-service-url}")
     private String scheduleURL;
@@ -43,12 +43,14 @@ public class SubscribeRegistration {
             EventStoreDBClient eventStoreDBClient,
             EventStoreDBPersistentSubscriptionsClient persistentSubscriptionsClient,
             ServiceAPI serviceAPI,
+            OutBoxMessageRepository outBoxMessageRepository,
             ProcessRegisterService processRegisterService,
             ObjectMapper objectMapper) {
         this.eventStoreDBClient = eventStoreDBClient;
         this.persistentSubscriptionsClient = persistentSubscriptionsClient;
         this.objectMapper = objectMapper;
         this.serviceAPI = serviceAPI;
+        this.outBoxMessageRepository = outBoxMessageRepository;
         this.processRegisterService = processRegisterService;
     }
 
@@ -77,20 +79,29 @@ public class SubscribeRegistration {
 
                             processRegisterService.call(registrationEvent);
                         }
-                        else if("ReserveSlotEvent".equals(eventType)){
-                            System.out.println("current event is ServeSlotEvent");
-                        }
                         System.out.println("send ACK");
                         subscription.ack(event);
 
                     } catch (Exception e) {
                         System.err.println("Error processing event: " + e.getMessage());
                         e.printStackTrace();
-
                         // Nếu số lần thử lại vượt quá ngưỡng, có thể xử lý khác
-                        if (retryCount > 10) {
-                            System.err.println("Too many retries (" + retryCount + "), moving to park");
-                            subscription.nack(NackAction.Park, "Too many retries: " + e.getMessage(), event);
+                        if (retryCount > 9) {
+                            try {
+                                System.err.println("Too many retries (" + retryCount + "),");
+                                byte[] eventData = event.getOriginalEvent().getEventData();
+                                String baseText64 = new String(eventData, StandardCharsets.UTF_8);
+                                String jsonData = new String(Base64.getDecoder().decode(baseText64.substring(1, baseText64.length() - 1)), StandardCharsets.UTF_8);
+                                System.out.println(jsonData);
+                                CourseRegistrationEvent registrationEvent = objectMapper.readValue(jsonData, CourseRegistrationEvent.class);
+
+                                emitRollback(registrationEvent);
+                                subscription.nack(NackAction.Park, "Too many retries: " + e.getMessage(), event);
+                            }
+                            catch (Exception ex) {
+                                System.out.println("tambiet");
+                                e.printStackTrace();
+                            }
                         } else {
                             // Yêu cầu thử lại
                             subscription.nack(NackAction.Retry, "Exception: " + e.getMessage(), event);
@@ -124,6 +135,24 @@ public class SubscribeRegistration {
         }
     }
 
+    public void emitRollback(CourseRegistrationEvent event) throws Exception {
+        String eventType = "UpdateReadModelEvent";
 
+        UpdateReadModelEvent updateReadModelEvent = UpdateReadModelEvent.builder()
+                .eventId(java.util.UUID.randomUUID())
+                .eventType(eventType)
+                .correlationId(event.getCorrelationId())
+                .studentId(event.getStudentId())
+                .success(false)
+                .status("ROLLBACK")
+                .messages(new ArrayList<>(Collections.singleton("")))
+                .token(event.getToken())
+                .timestamp(System.currentTimeMillis())
+                .build();
+        System.out.println("updateReadModelEvent: " + updateReadModelEvent);
+        // Save outbox
+        outBoxMessageRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(updateReadModelEvent)).build());
+        System.out.println("ROLLBACK FOR READ-MODEL");
+    }
 
 }

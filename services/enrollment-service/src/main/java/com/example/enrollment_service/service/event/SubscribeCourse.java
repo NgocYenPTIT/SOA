@@ -82,7 +82,7 @@ public class SubscribeCourse {
                         e.printStackTrace();
 
                         // Nếu số lần thử lại vượt quá ngưỡng, có thể xử lý khác
-                        if (retryCount > 10) {
+                        if (retryCount > 9) {
                             System.err.println("Too many retries (" + retryCount + "), moving to park");
                             subscription.nack(NackAction.Park, "Too many retries: " + e.getMessage(), event);
                         } else {

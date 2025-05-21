@@ -80,11 +80,8 @@ public class SubscribeChangeQuantitySlot {
                         e.printStackTrace();
 
                         // Nếu số lần thử lại vượt quá ngưỡng, có thể xử lý khác
-                        if (retryCount > 10) {
+                        if (retryCount > 9) {
                             System.err.println("Too many retries (" + retryCount + "), moving to park");
-                            subscription.nack(NackAction.Park, "Too many retries: " + e.getMessage(), event);
-                        } else {
-                            // DEAD LETTER QUEUE
                             try {
                                 String rollbackEventType = "RollbackChangeQuantitySlotEvent";
                                 ChangeQuantitySlotEvent changeQuantitySlotEvent = objectMapper.readValue(jsonData, ChangeQuantitySlotEvent.class);
@@ -102,11 +99,14 @@ public class SubscribeChangeQuantitySlot {
                                 System.out.println("rollBackEvent: " + rollBackEvent);
                                 // Save outbox
                                 outboxRepository.save(OutBoxMessage.builder().eventType(eventType).payload(new ObjectMapper().writeValueAsString(rollBackEvent)).build());
+                                transactionLogRepository.save(TransactionLog.builder().correlationId(rollBackEvent.getCorrelationId()).status("START_TRANSACTION").build());
                                 transactionLogRepository.save(TransactionLog.builder().correlationId(changeQuantitySlotEvent.getCorrelationId()).status("ROLLBACK").build());
                             }
                             catch (Exception e1) {
                                 e1.printStackTrace();
                             }
+                            subscription.nack(NackAction.Park, "Too many retries: " + e.getMessage(), event);
+                        } else {
                             subscription.nack(NackAction.Retry, "Exception: " + e.getMessage(), event);
                         }
                     }
