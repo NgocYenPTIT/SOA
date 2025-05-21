@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -37,6 +38,14 @@ public class RegisterSubjectReadModelService {
     @Value("${app.global.schedule-service-url}")
     private String scheduleServiceUrl;
 
+    @Value("${app.global.semester}")
+    private String  semester;
+
+    @Value("${app.global.year}")
+    private String year;
+
+    @Value("${app.global.endOfEnrollmentTime}")
+    private String  endOfEnrollmentTime;
 
 
     @Autowired
@@ -45,9 +54,13 @@ public class RegisterSubjectReadModelService {
         this.serviceAPI = serviceAPI;
     }
 
-//    public RegisterSubjectView getDetail(Long studentId) {
-//        return this.registerSubjectRepository.findById(studentId).get();
-//    }
+    public RegisterSubjectView getView(Long studentId,String token) {
+        RegisterSubjectView view = this.registerSubjectRepository.findById(studentId).orElse(null);
+        if(view == null) {
+            return this.seeding(studentId, token);
+        }
+        return view;
+    }
 
     public List<OpeningSubject> getOpenSubjects(String token) throws  Exception{
             List<OpeningSubject> openingSubjects = new ArrayList<>();
@@ -281,22 +294,78 @@ public class RegisterSubjectReadModelService {
     }
 
     public  void update(UpdateReadModelEvent event) throws Exception{
-        System.out.println("UPDATING READ MODEL......");
+        System.out.println("UPDATING READ MODEL WITH STATUS..........   " + event.getStatus() +"  ......");
+        Long studentId = event.getStudentId();
+        RegisterSubjectView viewSaved = this.registerSubjectRepository.findById(studentId).orElse(null);
 
-        List<OpeningSubject> openingSubjects = getOpenSubjects(event.getToken());
+        if(viewSaved == null) {
+            return;
+        }
+        else if( event.getTimestamp() < viewSaved.getLastUpdate()) {
+            return;
+        }
+        //4 loai message : FAIL VALIDATE, COMMIT, ROLLBACK, FULL
+
+        if(event.isSuccess() && event.getStatus().equals("COMMIT")){
+            List<OpeningSubject> openingSubjects = getOpenSubjects(event.getToken());
             List<RegisteredSubject> registeredSubjects = getRegisteredSubjects(event.getToken());
-
             RegisterSubjectView view = RegisterSubjectView.builder()
                     .id(event.getStudentId())
-                    .semester("1")
-                    .year("2024-2025")
-                    .endOfEnrollmentTime("00:00:00 01-01-2026")
+                    .semester(semester)
+                    .year(year)
+                    .endOfEnrollmentTime(endOfEnrollmentTime)
                     .numOfRegisteredSubject(registeredSubjects.size())
                     .numOfRegisteredCredit(registeredSubjects.stream().mapToInt(RegisteredSubject::getAmountOfCredit).sum())
                     .openSubject(openingSubjects)
                     .registeredSubject(registeredSubjects)
+                    .status("AVAILABLE AFTER COMMIT")
+                    .messages(event.getMessages())
+                    .lastUpdate(event.getTimestamp())
                     .build();
             this.registerSubjectRepository.save(view);
+        }
+        else if(event.getStatus().equals("FAIL VALIDATE")){
+            viewSaved.setStatus("AVAILABLE AFTER FAIL VALIDATE");
+            viewSaved.setMessages(event.getMessages());
+            this.registerSubjectRepository.save(viewSaved);
+        }
+        else if(event.getStatus().equals("ROLLBACK")){
+            viewSaved.setStatus("AVAILABLE AFTER ROLLBACK");
+            viewSaved.setMessages(event.getMessages());
+            this.registerSubjectRepository.save(viewSaved);
+        }
+        else if(event.getStatus().equals("PROCESSING")){
+            viewSaved.setStatus("PROCESSING");
+            this.registerSubjectRepository.save(viewSaved);
+        }
+        else if(event.getStatus().contains("FULL")){
+            viewSaved.setStatus("AVAILABLE AFTER FULL");
+            viewSaved.setMessages(event.getMessages());
+            this.registerSubjectRepository.save(viewSaved);
+        }
     }
 
+    public RegisterSubjectView seeding(Long studentId, String token){
+        System.out.println("SEEDING.......... ");
+
+       try {
+           List<OpeningSubject> openingSubjects = getOpenSubjects(token);
+           List<RegisteredSubject> registeredSubjects = getRegisteredSubjects(token);
+           RegisterSubjectView view = RegisterSubjectView.builder()
+                   .id(studentId)
+                   .semester(semester)
+                   .year(year)
+                   .endOfEnrollmentTime(endOfEnrollmentTime)
+                   .numOfRegisteredSubject(registeredSubjects.size())
+                   .numOfRegisteredCredit(registeredSubjects.stream().mapToInt(RegisteredSubject::getAmountOfCredit).sum())
+                   .openSubject(openingSubjects)
+                   .registeredSubject(registeredSubjects)
+                   .status("AVAILABLE")
+                   .messages(new ArrayList<>(Collections.singleton("")))
+                   .lastUpdate(new Date().getTime())
+                   .build();
+           return  this.registerSubjectRepository.save(view);
+       }
+       catch (Exception e) {e.printStackTrace();return new RegisterSubjectView();}
+    }
 }

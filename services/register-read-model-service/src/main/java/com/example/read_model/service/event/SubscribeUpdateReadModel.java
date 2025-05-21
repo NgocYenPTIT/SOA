@@ -68,15 +68,8 @@ public class SubscribeUpdateReadModel {
                     } catch (Exception e) {
                         System.err.println("Error processing event: " + e.getMessage());
                         e.printStackTrace();
+                        subscription.nack(NackAction.Retry, "Exception: " + e.getMessage(), event);
 
-                        // Nếu số lần thử lại vượt quá ngưỡng, có thể xử lý khác
-                        if (retryCount > 10) {
-                            System.err.println("Too many retries (" + retryCount + "), moving to park");
-                            subscription.nack(NackAction.Park, "Too many retries: " + e.getMessage(), event);
-                        } else {
-                            // Yêu cầu thử lại
-                            subscription.nack(NackAction.Retry, "Exception: " + e.getMessage(), event);
-                        }
                     }
                 }
 

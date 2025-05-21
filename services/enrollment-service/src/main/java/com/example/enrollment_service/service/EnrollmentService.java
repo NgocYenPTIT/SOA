@@ -4,8 +4,11 @@ import com.example.enrollment_service.model.*;
 import com.example.enrollment_service.repository.EnrollmentRepository;
 import com.example.enrollment_service.repository.OutBoxRepository;
 import com.example.enrollment_service.repository.TransactionLogRepository;
+import com.example.enrollment_service.util.ServiceAPI;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,9 +21,13 @@ public class EnrollmentService {
     private  EnrollmentRepository enrollmentRepository;
     private TransactionLogRepository transactionLogRepository;
     private OutBoxRepository outBoxRepository;
+    private ServiceAPI serviceAPI;
+    @Value("${app.global.course-service-url}")
+    private String courseServiceUrl;
 
     @Autowired
-    public EnrollmentService(EnrollmentRepository enrollmentRepository, TransactionLogRepository transactionLogRepository, OutBoxRepository outBoxRepository) {
+    public EnrollmentService(EnrollmentRepository enrollmentRepository, TransactionLogRepository transactionLogRepository, OutBoxRepository outBoxRepository, ServiceAPI serviceAPI) {
+        this.serviceAPI = serviceAPI;
         this.enrollmentRepository = enrollmentRepository;
         this.transactionLogRepository = transactionLogRepository;
         this.outBoxRepository = outBoxRepository;
@@ -44,7 +51,7 @@ public class EnrollmentService {
 
                List<Long> addCourses = addAndDeleteCourses.get(0);
 
-               add(addCourses, studentId);
+               add(addCourses, studentId,event.getToken());
 
                //emit SUCCESS
                System.out.println("RESERVE SUCCESS");
@@ -196,14 +203,21 @@ public class EnrollmentService {
         }
     }
 
-    private void add(List<Long> addCourses, Long studentId)  throws  Exception{
+    private void add(List<Long> addCourses, Long studentId, String token)  throws  Exception{
         for(int i = 0; i < addCourses.size(); i++){
             Long courseId = addCourses.get(i);
             while (true) {
                 try {
                     Optional<Enrollment> freeSlot = this.enrollmentRepository.findFirstByCourseIdAndStatus(courseId, "PENDING");
                     if(!freeSlot.isPresent()){
-                        throw new Exception(courseId  + " IS FULL");
+                        Course course = (Course) this.serviceAPI.call(
+                                this.courseServiceUrl + "/course/" + courseId,
+                                HttpMethod.GET,
+                                null,
+                                Course.class,
+                                token
+                        );
+                        throw new Exception(course.getCode()  + " IS FULL");
                     }
                     //save
                     Enrollment freeEnrollment = freeSlot.get();

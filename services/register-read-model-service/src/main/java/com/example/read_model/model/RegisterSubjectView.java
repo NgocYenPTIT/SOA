@@ -15,12 +15,14 @@ import java.util.List;
 @Document(collection = "register_subject_view")
 public class RegisterSubjectView {
     private Long id;
-    private String semester ;//= "1";
-    private String year;// = "2024-2025";
-    private String endOfEnrollmentTime ;//= "00:00:00 01-01-2026";
-    private  Integer numOfRegisteredSubject;
-    private  Integer numOfRegisteredCredit;
-    private  List<OpeningSubject> openSubject;
+    private String semester ;
+    private String year;
+    private String endOfEnrollmentTime ;
+    private Integer numOfRegisteredSubject;
+    private Integer numOfRegisteredCredit;
+    private List<OpeningSubject> openSubject;
     private List<RegisteredSubject> registeredSubject;
-
+    private String status;
+    private List<String> messages;
+    private Long lastUpdate;
 }
