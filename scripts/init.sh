@@ -28,7 +28,7 @@ gnome-terminal --title="Enrollment Background Service" -- bash -c "cd $BASE_DIR/
 
 
 # # Register Read Model Service
-# gnome-terminal --title="Register Read Model Service" -- bash -c "cd $BASE_DIR/register-read-model-service && ./gradlew bootRun; exec bash"
+gnome-terminal --title="Register Read Model Service" -- bash -c "cd $BASE_DIR/register-read-model-service && ./gradlew bootRun; exec bash"
 
 # Register Subject Service
 gnome-terminal --title="Register Subject Service" -- bash -c "cd $BASE_DIR/register-subject-service && ./gradlew bootRun; exec bash"
