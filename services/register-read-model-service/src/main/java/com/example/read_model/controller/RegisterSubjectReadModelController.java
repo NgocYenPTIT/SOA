@@ -14,11 +14,13 @@ public class RegisterSubjectReadModelController {
         this.registerSubjectReadModelService = registerSubjectReadModelService;
     }
 
-    @GetMapping("/register-subject-read-model")
-    public ResponseEntity<?> getDetail(HttpServletRequest request) {
-        Long id = (Long) request.getAttribute("id");
-        return  ResponseEntity.ok(this.registerSubjectReadModelService.getRegisteredSubjects(id));
-    }
+//    @GetMapping("/register-subject-read-model")
+//    public ResponseEntity<?> getDetail(HttpServletRequest request) {
+//        Long id = (Long) request.getAttribute("id");
+//        String token = (String) request.getAttribute("token");
+//        System.out.println(token);
+//        return  ResponseEntity.ok(this.registerSubjectReadModelService.update(id,token));
+//    }
 
 
 }

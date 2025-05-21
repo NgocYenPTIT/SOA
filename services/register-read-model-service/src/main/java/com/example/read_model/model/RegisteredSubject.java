@@ -12,13 +12,14 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class RegisteredSubject {
-    private Long subjectId;
-    private String subjectName;
-    private String subjectCode;
+    private Long courseId;
     private String courseCode;
     private String courseGroup;
     private String practiseGroup;
+    private String subjectName;
+    private String subjectCode;
     private String enrollmentDate;
     private String Status;
+    private Integer amountOfCredit;
     private List<ScheduleResponse> scheduleResponses;
 }

@@ -40,7 +40,7 @@ Register Subject Background Service
 gnome-terminal --title="Register Subject Background Service" -- bash -c "cd $BASE_DIR/register-subject-background-service && ./gradlew bootRun; exec bash"
 
 # Room Service
-# gnome-terminal --title="Room Service" -- bash -c "cd $BASE_DIR/room-service && ./gradlew bootRun; exec bash"
+gnome-terminal --title="Room Service" -- bash -c "cd $BASE_DIR/room-service && ./gradlew bootRun; exec bash"
 
 # Schedule Service
 gnome-terminal --title="Schedule Service" -- bash -c "cd $BASE_DIR/schedule-service && ./gradlew bootRun; exec bash"

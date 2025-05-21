@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface RegisterSubjectRepository extends MongoRepository<RegisterSubjectView, Long> {
-    List<RegisterSubjectView> findByStudentId(Long studentId);
+//    RegisterSubjectView findByStudentId(Long studentId);
 }

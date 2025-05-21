@@ -1,3 +1,3 @@
 1) Yên: Register + Course + schedule + wish-subject
 2) Vũ: UI + credit rule + readmodel + subject + semester
-3) Thiết: User + Auth  + room + Major + Enrollment
+3) Thiết: User + Auth  + room  + Enrollment

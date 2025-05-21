@@ -55,7 +55,7 @@ public class SubscribeUpdateReadModel {
                         System.out.println("Retry count: " + retryCount);
 
 //                         Nếu là CourseRegistrationEvent, xử lý
-                        if ("UpdateReadModel".equals(eventType)) {
+                        if ("UpdateReadModelEvent".equals(eventType)) {
                             UpdateReadModelEvent updateReadModelEvent = objectMapper.readValue(jsonData, UpdateReadModelEvent.class);
                             System.out.println("this is updateReadModelEvent");
                             System.out.println(updateReadModelEvent);

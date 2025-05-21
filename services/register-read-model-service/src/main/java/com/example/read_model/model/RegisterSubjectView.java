@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @Document(collection = "register_subject_view")
 public class RegisterSubjectView {
-    private Long studentId;
+    private Long id;
     private String semester ;//= "1";
     private String year;// = "2024-2025";
     private String endOfEnrollmentTime ;//= "00:00:00 01-01-2026";

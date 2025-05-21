@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class OpeningSubject {
-    private Long subjectId;
+    private Long courseId;
     private String subjectName;
     private String subjectCode;
     private String courseCode;

@@ -49,7 +49,6 @@ public class DataInitializer {
 
             // Tạo các môn học mở
             OpeningSubject subject1 = OpeningSubject.builder()
-                    .subjectId(1001L)
                     .subjectName("Lập trình Java")
                     .subjectCode("IT1101")
                     .courseCode("IT1101_01")
@@ -62,7 +61,6 @@ public class DataInitializer {
                     .build();
 
             OpeningSubject subject2 = OpeningSubject.builder()
-                    .subjectId(1002L)
                     .subjectName("Cơ sở dữ liệu")
                     .subjectCode("IT1102")
                     .courseCode("IT1102_01")
@@ -75,7 +73,6 @@ public class DataInitializer {
                     .build();
 
             OpeningSubject subject3 = OpeningSubject.builder()
-                    .subjectId(1003L)
                     .subjectName("Kỹ thuật lập trình")
                     .subjectCode("IT1103")
                     .courseCode("IT1103_01")
@@ -89,7 +86,7 @@ public class DataInitializer {
 
             // Tạo 1 môn học đã đăng ký
             RegisteredSubject registeredSubject = RegisteredSubject.builder()
-                    .subjectId(1001L)
+
                     .subjectName("Lập trình Java")
                     .subjectCode("IT1101")
                     .courseCode("IT1101_01")
@@ -107,7 +104,7 @@ public class DataInitializer {
 
             // Tạo thông tin đăng ký học phần cho 1 sinh viên
             RegisterSubjectView studentView = RegisterSubjectView.builder()
-                    .studentId(100L)
+                    .id(100L)
                     .semester("HK1")
                     .year("2024-2025")
                     .openSubject(Arrays.asList(subject1, subject2, subject3))
