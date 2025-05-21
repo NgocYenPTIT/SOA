@@ -61,31 +61,7 @@ public class ClientController {
         }
     }
 
-    // Hiển thị trang hello
-    @GetMapping("/home")
-    public String showHomePage(Model model) {
-        // Kiểm tra người dùng đã đăng nhập chưa
-        User user = (User) session.getAttribute("user");
 
-        if (user != null) {
-            // Người dùng đã đăng nhập
-            model.addAttribute("username", user.getUsername());
-            return "home";
-        } else {
-            // Chưa đăng nhập, quay lại trang login.html
-            return "redirect:/";
-        }
-    }
-
-    // Xử lý đăng xuất
-    @PostMapping("/logout")
-    public String logout() {
-        // Xóa session
-        session.invalidate();
-
-        // Quay lại trang đăng nhập
-        return "redirect:/";
-    }
 
     // Hiển thị trang đăng ký
     @GetMapping("/register")
@@ -100,10 +76,21 @@ public class ClientController {
                     RegisterSubjectView.class,
                     (String) session.getAttribute("token")
             );
+            System.out.println("xinchao");
             System.out.println(view);
             model.addAttribute("view", view);
             return "register" ;
         }
+        return "redirect:/";
+    }
+
+    // Xử lý đăng xuất
+    @PostMapping("/logout")
+    public String logout() {
+        // Xóa session
+        session.invalidate();
+
+        // Quay lại trang đăng nhập
         return "redirect:/";
     }
 }
