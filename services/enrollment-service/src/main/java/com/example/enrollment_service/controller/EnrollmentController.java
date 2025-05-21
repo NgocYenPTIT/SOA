@@ -19,6 +19,11 @@ public class EnrollmentController {
 
     @GetMapping("/enrollment")
     public ResponseEntity<?> getList(HttpServletRequest request) {
-        return ResponseEntity.ok(enrollmentService.getList(request));
+        return ResponseEntity.ok(enrollmentService.getListRegistered(request));
     }
+
+//    @GetMapping("/enrollment-open")
+//    public ResponseEntity<?> getListOpen(HttpServletRequest request) {
+//        return ResponseEntity.ok(enrollmentService.getListOpen(request));
+//    }
 }

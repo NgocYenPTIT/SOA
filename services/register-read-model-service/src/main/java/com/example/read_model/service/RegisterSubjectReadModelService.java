@@ -65,34 +65,29 @@ public class RegisterSubjectReadModelService {
     public List<OpeningSubject> getOpenSubjects(String token) throws  Exception{
             List<OpeningSubject> openingSubjects = new ArrayList<>();
 //         Lay ra cac enrollment
-            List<Enrollment> enrollments = (List<Enrollment>) this.serviceAPI.callForList(
-                    this.enrollmentServiceUrl + "/enrollment",
+            List<Course> courses = (List<Course>) this.serviceAPI.callForList(
+                    this.courseServiceUrl + "/course-open",
                     HttpMethod.GET,
                     null,
-                    Enrollment.class,
+                    Course.class,
                     token
             );
+        System.out.println("xinchao");
+        System.out.println(courses);
 
-            for(int i = 0 ; i < enrollments.size(); i++) {
+            for(int i = 0 ; i < courses.size(); i++) {
                 OpeningSubject openingSubject = new OpeningSubject();
 
-                LinkedHashMap<String, Integer> hashmap = new LinkedHashMap<>((Map<String, Integer>) enrollments.get(i));
+                LinkedHashMap<String, Object> hashmap = new LinkedHashMap<>((Map<String, Integer>) courses.get(i));
 //             lay ra cac course ung voi cac enrollment do
-                Course course = (Course) this.serviceAPI.call(
-                        this.courseServiceUrl + "/course/" + hashmap.get("courseId"),
-                        HttpMethod.GET,
-                        null,
-                        Course.class,
-                        token
-                );
-                openingSubject.setCourseId(course.getId());
-                openingSubject.setCourseCode(course.getCode());
-                openingSubject.setCourseGroup(course.getCourseGroup());
-                openingSubject.setPractiseGroup(course.getPractiseGroup());
+                openingSubject.setCourseId(((Number)hashmap.get("id")).longValue());
+                openingSubject.setCourseCode((String)hashmap.get("code"));
+                openingSubject.setCourseGroup((String)hashmap.get("courseGroup"));
+                openingSubject.setPractiseGroup((String)hashmap.get("practiseGroup"));
 
                 // lay ra cac subject ung voi cac course do
                 Subject subject = (Subject) this.serviceAPI.call(
-                        this.subjectServiceUrl + "/subject/" + course.getSubjectId(),
+                        this.subjectServiceUrl + "/subject/" + hashmap.get("subjectId"),
                         HttpMethod.GET,
                         null,
                         Subject.class,
@@ -101,13 +96,13 @@ public class RegisterSubjectReadModelService {
                 openingSubject.setSubjectCode(subject.getSubjectCode());
                 openingSubject.setSubjectName(subject.getSubjectName());
                 openingSubject.setAmountOfCredit(subject.getCredit());
-                openingSubject.setRemainSlot(course.getRemainSlot());
-                openingSubject.setMaxStudent(course.getMaxStudents());
+                openingSubject.setRemainSlot((Integer) hashmap.get("remainSlot"));
+                openingSubject.setMaxStudent((Integer) hashmap.get("maxStudents"));
 
                 // lay ra schedule ung voi cac course do
                 List<ScheduleResponse> scheduleResponses = new ArrayList<>();
                 List<Schedule> schedules = (List<Schedule>) this.serviceAPI.callForList(
-                        this.scheduleServiceUrl + "/schedule?courseId=" + course.getId(),
+                        this.scheduleServiceUrl + "/schedule?courseId=" + hashmap.get("id"),
                         HttpMethod.GET,
                         null,
                         Schedule.class,
@@ -360,7 +355,7 @@ public class RegisterSubjectReadModelService {
                    .numOfRegisteredCredit(registeredSubjects.stream().mapToInt(RegisteredSubject::getAmountOfCredit).sum())
                    .openSubject(openingSubjects)
                    .registeredSubject(registeredSubjects)
-                   .status("AVAILABLE")
+                   .status("AVAILABLE FROM SEED")
                    .messages(new ArrayList<>(Collections.singleton("")))
                    .lastUpdate(new Date().getTime())
                    .build();

@@ -30,4 +30,11 @@ public class CourseController {
         Course course = courseService.getDetail(id);
         return ResponseEntity.ok(course);
     }
+
+    @GetMapping("course-open")
+    public ResponseEntity<?> listOpen(HttpServletRequest request) {
+        Long studentId = (Long)request.getAttribute("id");
+        String token = (String)request.getAttribute("token");
+        return ResponseEntity.ok(this.courseService.getListOpenCourse(studentId,token));
+    }
 }

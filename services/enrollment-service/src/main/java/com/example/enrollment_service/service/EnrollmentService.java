@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class EnrollmentService {
@@ -22,8 +23,18 @@ public class EnrollmentService {
     private TransactionLogRepository transactionLogRepository;
     private OutBoxRepository outBoxRepository;
     private ServiceAPI serviceAPI;
+
     @Value("${app.global.course-service-url}")
     private String courseServiceUrl;
+
+    @Value("${app.global.user-service-url}")
+    private String userServiceUrl;
+
+    @Value("${app.global.wish-subject-service-url}")
+    private String wishSubjectURL;
+
+    @Value("${app.global.subject-service-url}")
+    private String subjectURL;
 
     @Autowired
     public EnrollmentService(EnrollmentRepository enrollmentRepository, TransactionLogRepository transactionLogRepository, OutBoxRepository outBoxRepository, ServiceAPI serviceAPI) {
@@ -33,8 +44,56 @@ public class EnrollmentService {
         this.outBoxRepository = outBoxRepository;
     }
 
-    public List<Enrollment> getList(HttpServletRequest request){
+    public List<Enrollment> getListRegistered(HttpServletRequest request){
         return this.enrollmentRepository.findByStudentIdAndDeletedAtIsNullAndStatus((Long)request.getAttribute("id"), "REGISTERED");
+    }
+
+    public List<Enrollment> getListOpen(HttpServletRequest request){
+        String token = (String)request.getAttribute("token");
+        User user = (User) this.serviceAPI.call(
+                this.userServiceUrl + "/user/" + request.getAttribute("id"),
+                HttpMethod.GET,
+                null,
+                User.class,
+                token
+        );
+        List<WishSubject> wishSubjects = (List<WishSubject>) this.serviceAPI.callForList(
+                this.wishSubjectURL + "/wish-subject",
+                HttpMethod.GET,
+                null,
+                WishSubject.class,
+                token
+        );
+        if(wishSubjects.isEmpty()){
+            return new ArrayList<>();
+        }
+        List<Course> courses =(List<Course>)this.serviceAPI.callForList(
+                this.courseServiceUrl + "/semester/" + user.getSemesterId(),
+                HttpMethod.GET,
+                null,
+                Course.class,
+                token
+        );
+        List<Long> allCourseIds = new ArrayList<>();
+        List<Long> wishSubjectIds = new ArrayList<>();
+
+        for(int i = 0 ; i < courses.size(); i++){
+            LinkedHashMap<String, Integer> hashmap = new LinkedHashMap<>((Map) courses.get(i));
+            allCourseIds.add((long)hashmap.get("id"));
+        }
+
+        for(int i = 0 ; i < wishSubjects.size(); i++){
+            LinkedHashMap<String, Integer> hashmap = new LinkedHashMap<>((Map) wishSubjects.get(i));
+            wishSubjectIds.add((long)hashmap.get("subjectId"));
+        }
+        List<Long> courseIds = new ArrayList<>();
+        for(int i = 0 ; i < allCourseIds.size(); i++){
+            if(wishSubjectIds.contains(allCourseIds.get(i))){
+                courseIds.add(allCourseIds.get(i));
+            }
+        }
+
+        return this.enrollmentRepository.findByCourseIdInAndDeletedAtIsNullAndStudentIdIsNullAndStatus(courseIds, "PENDING");
     }
 
     @Transactional

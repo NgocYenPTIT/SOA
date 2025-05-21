@@ -4,8 +4,11 @@ import com.example.course_service.model.*;
 import com.example.course_service.repository.CourseRepository;
 import com.example.course_service.repository.OutboxRepository;
 import com.example.course_service.repository.TransactionLogRepository;
+import com.example.course_service.util.ServiceAPI;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -17,8 +20,16 @@ public class CourseService {
     private OutboxRepository outboxRepository;
 
     private final TransactionLogRepository transactionLogRepository;
+
+    private final ServiceAPI serviceAPI ;
+
+    @Value("${app.global.wish-subject-service-url}")
+    private String wishSubjectURL;
+
+
     @Autowired
-    public CourseService(CourseRepository courseRepository, TransactionLogRepository transactionLogRepository, OutboxRepository outboxRepository) {
+    public CourseService(CourseRepository courseRepository, TransactionLogRepository transactionLogRepository, OutboxRepository outboxRepository, ServiceAPI serviceAPI) {
+        this.serviceAPI = serviceAPI;
         this.outboxRepository = outboxRepository;
         this.transactionLogRepository = transactionLogRepository;
         this.courseRepository = courseRepository;
@@ -97,4 +108,24 @@ public class CourseService {
             this.courseRepository.decrementCurrentStudents(courseId);
         }
     }
+
+    public List<Course> getListOpenCourse(Long studentId , String token) {
+        List<WishSubject> wishSubjects = (List<WishSubject>) this.serviceAPI.callForList(
+                this.wishSubjectURL + "/wish-subject",
+                HttpMethod.GET,
+                null,
+                WishSubject.class,
+               token
+        );
+        List<Long> subjectIds = new ArrayList<>();
+        for(int i = 0 ; i < wishSubjects.size(); i++){
+            LinkedHashMap<String, Object> hashmap = new LinkedHashMap<>((Map) wishSubjects.get(i));
+            subjectIds.add(((Number) hashmap.get("subjectId")).longValue()) ;
+
+        }
+
+        List<Course> courses = this.courseRepository.findAllBySubjectIdInAndDeletedAtIsNull(subjectIds);
+        return  courses;
+    }
+
 }

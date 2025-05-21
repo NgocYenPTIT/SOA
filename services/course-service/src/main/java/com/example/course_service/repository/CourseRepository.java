@@ -29,4 +29,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "c.updatedAt = CURRENT_TIMESTAMP " +
             "WHERE c.id = :courseId")
     int decrementCurrentStudents(@Param("courseId") Long courseId);
+
+    List<Course> findAllBySubjectIdInAndDeletedAtIsNull(List<Long> subjectIds);
 }

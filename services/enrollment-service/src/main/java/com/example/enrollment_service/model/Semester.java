@@ -1,9 +1,10 @@
-package com.example.subject_service.model;
+package com.example.enrollment_service.model;
 
 import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,53 +17,40 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "subjects")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Subject {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class Semester {
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    private String semesterCode;
 
-    @Column(nullable = false)
-    private String password;
+    private String semesterName;
 
-    @Column(nullable = false)
-    private String fullName;
-
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    private String phone;
-
-    private String role;
-
-    @Column(unique = true)
-    private String studentId;
-
-    @Column(nullable = false)
     private Long majorId;
 
-    @Column(columnDefinition = "boolean default true")
-    private boolean isActive = true;
+    private String academicYear;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date startDate;
+
+    private Date endDate;
+
+    private Date registrationStartDate;
+
+    private Date registrationEndDate;
+
+    private SemesterStatus status;
+
+
     private Date createdAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at")
+
     private Date updatedAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "deleted_at")
+
     private Date deletedAt;
+
+    private boolean isActive = true;
 
     @PrePersist
     protected void onCreate() {
@@ -86,5 +74,9 @@ public class Subject {
 
     public boolean isDeleted() {
         return this.deletedAt != null;
+    }
+
+    public enum SemesterStatus {
+        UPCOMING, ONGOING, COMPLETED
     }
 }
