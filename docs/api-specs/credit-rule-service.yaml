@@ -1,0 +1,65 @@
+---
+openapi: 3.0.1
+info:
+  title: API Application
+  version: '1.0'
+servers:
+- url: http://localhost:8892
+  description: Generated server url
+security:
+- bearer-jwt: []
+paths:
+  "/credit-rule/semester/{id}":
+    get:
+      tags:
+      - credit-rule-controller
+      operationId: getCreditRulesBySemesterId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/CreditRule"
+components:
+  schemas:
+    CreditRule:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        minCredits:
+          type: integer
+          format: int32
+        maxCredits:
+          type: integer
+          format: int32
+        semesterId:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+        active:
+          type: boolean
+  securitySchemes:
+    bearer-jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

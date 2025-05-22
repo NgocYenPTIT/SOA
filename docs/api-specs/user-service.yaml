@@ -1,0 +1,54 @@
+---
+openapi: 3.0.1
+info:
+  title: API Application
+  version: '1.0'
+servers:
+- url: http://localhost:8889
+  description: Generated server url
+security:
+- bearer-jwt: []
+paths:
+  "/user":
+    get:
+      tags:
+      - user-controller
+      operationId: getUserByUsername
+      parameters:
+      - name: username
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+  "/user/{id}":
+    get:
+      tags:
+      - user-controller
+      operationId: getUserById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+components:
+  securitySchemes:
+    bearer-jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

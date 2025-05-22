@@ -1,0 +1,42 @@
+---
+openapi: 3.0.1
+info:
+  title: API Application
+  version: '1.0'
+servers:
+- url: http://localhost:8896
+  description: Generated server url
+security:
+- bearer-jwt: []
+paths:
+  "/schedule":
+    get:
+      tags:
+      - schedule-controller
+      operationId: getList
+      parameters:
+      - name: form
+        in: query
+        required: true
+        schema:
+          "$ref": "#/components/schemas/GetScheduleDto"
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+components:
+  schemas:
+    GetScheduleDto:
+      type: object
+      properties:
+        courseId:
+          type: integer
+          format: int64
+  securitySchemes:
+    bearer-jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

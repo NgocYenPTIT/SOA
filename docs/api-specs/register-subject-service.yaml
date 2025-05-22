@@ -1,0 +1,55 @@
+---
+openapi: 3.0.1
+info:
+  title: API Application
+  version: '1.0'
+servers:
+- url: http://localhost:8899
+  description: Generated server url
+security:
+- bearer-jwt: []
+paths:
+  "/register":
+    get:
+      tags:
+      - register-subject-controller
+      operationId: validateFirst
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+    post:
+      tags:
+      - register-subject-controller
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RegisterSubjectRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+components:
+  schemas:
+    RegisterSubjectRequest:
+      type: object
+      properties:
+        courseIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+  securitySchemes:
+    bearer-jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

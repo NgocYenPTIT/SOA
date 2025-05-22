@@ -1,0 +1,74 @@
+---
+openapi: 3.0.1
+info:
+  title: API Application
+  version: '1.0'
+servers:
+- url: http://localhost:8888
+  description: Generated server url
+security:
+- bearer-jwt: []
+paths:
+  "/validate-active-user/{id}":
+    post:
+      tags:
+      - auth-controller
+      operationId: validateActiveUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+  "/login":
+    post:
+      tags:
+      - auth-controller
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+  "/test-token":
+    get:
+      tags:
+      - auth-controller
+      operationId: testToken
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+  securitySchemes:
+    bearer-jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
