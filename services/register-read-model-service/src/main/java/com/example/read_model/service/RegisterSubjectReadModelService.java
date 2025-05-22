@@ -38,6 +38,9 @@ public class RegisterSubjectReadModelService {
     @Value("${app.global.schedule-service-url}")
     private String scheduleServiceUrl;
 
+    @Value("${app.global.credit-rule-service-url}")
+    private String creditRuleServiceUrl;
+
     @Value("${app.global.semester}")
     private String  semester;
 
@@ -304,10 +307,30 @@ public class RegisterSubjectReadModelService {
         if(event.isSuccess() && event.getStatus().equals("COMMIT")){
             List<OpeningSubject> openingSubjects = getOpenSubjects(event.getToken());
             List<RegisteredSubject> registeredSubjects = getRegisteredSubjects(event.getToken());
+            User student = (User)this.serviceAPI.call(
+                    this.userServiceUrl + "/user/" + event.getStudentId(),
+                    HttpMethod.GET,
+                    null,
+                    User.class,
+                    event.getToken()
+            );
+
+            Long semesterId = student.getSemesterId();
+
+            CreditRule creditRule = this.serviceAPI.call(
+                    this.creditRuleServiceUrl + "/credit-rule/semester/" + semesterId,
+                    HttpMethod.GET,
+                    null,
+                    CreditRule.class,
+                    event.getToken()
+            );
+
+
             RegisterSubjectView view = RegisterSubjectView.builder()
                     .id(event.getStudentId())
                     .semester(semester)
                     .year(year)
+                    .minimumCreditSemester(creditRule.getMinCredits())
                     .endOfEnrollmentTime(endOfEnrollmentTime)
                     .numOfRegisteredSubject(registeredSubjects.size())
                     .numOfRegisteredCredit(registeredSubjects.stream().mapToInt(RegisteredSubject::getAmountOfCredit).sum())
@@ -346,10 +369,28 @@ public class RegisterSubjectReadModelService {
        try {
            List<OpeningSubject> openingSubjects = getOpenSubjects(token);
            List<RegisteredSubject> registeredSubjects = getRegisteredSubjects(token);
+           User student = (User)this.serviceAPI.call(
+                   this.userServiceUrl + "/user/" + studentId,
+                   HttpMethod.GET,
+                   null,
+                   User.class,
+                   token
+           );
+
+           Long semesterId = student.getSemesterId();
+
+           CreditRule creditRule = this.serviceAPI.call(
+                   this.creditRuleServiceUrl + "/credit-rule/semester/" + semesterId,
+                   HttpMethod.GET,
+                   null,
+                   CreditRule.class,
+                   token
+           );
            RegisterSubjectView view = RegisterSubjectView.builder()
                    .id(studentId)
                    .semester(semester)
                    .year(year)
+                   .minimumCreditSemester(creditRule.getMinCredits())
                    .endOfEnrollmentTime(endOfEnrollmentTime)
                    .numOfRegisteredSubject(registeredSubjects.size())
                    .numOfRegisteredCredit(registeredSubjects.stream().mapToInt(RegisteredSubject::getAmountOfCredit).sum())

@@ -55,8 +55,6 @@ public class ClientController {
             session.setAttribute("token", token.getToken());
             session.setAttribute("user", token.getUser());
 
-            //TODO: Validate tổng số tín chỉ của các môn nguyện vọng của sinh viên, nếu không đủ, redirect tới trang not-enough-credit.html
-            
             // Chuyển đến trang register
             return  "redirect:/register";
         } catch (Exception e) {

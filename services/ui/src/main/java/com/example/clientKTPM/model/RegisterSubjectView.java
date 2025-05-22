@@ -17,6 +17,7 @@ public class RegisterSubjectView {
     private String year;
     private String endOfEnrollmentTime ;
     private Integer numOfRegisteredSubject;
+    private Integer minimumCreditSemester; ;
     private Integer numOfRegisteredCredit;
     private List<OpeningSubject> openSubject;
     private List<RegisteredSubject> registeredSubject;
