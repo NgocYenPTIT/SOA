@@ -33,7 +33,7 @@ public class OutboxProcessor {
     private static final int BATCH_SIZE = 100; // Process 100 records at a time
 
     // This method will run every 1 second (1000 milliseconds)
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 200)
     public void processOutbox() {
         System.out.println("processing outbox");
         boolean isContinue = true;
