@@ -158,6 +158,22 @@
             color: var(--success);
             font-weight: 600;
         }
+
+        /* Credit status styling */
+        .credit-status-sufficient {
+            color: var(--success) !important;
+            background-color: rgba(39, 174, 96, 0.1) !important;
+        }
+
+        .credit-status-insufficient {
+            color: var(--danger) !important;
+            background-color: rgba(231, 76, 60, 0.1) !important;
+        }
+
+        .minimum-credit-info {
+            font-size: 11px;
+            padding: 4px 8px;
+        }
     </style>
 </head>
 <body>
@@ -297,6 +313,11 @@
                         <span class="badge bg-info ms-2" id="registeredCoursesCount" th:text="${view.numOfRegisteredSubject} + ' môn, ' + ${view.numOfRegisteredCredit} + ' tín chỉ'">
                             2 môn, 6 tín chỉ
                         </span>
+                        <!-- Minimum credit requirement badge -->
+                        <span class="badge bg-warning ms-2 minimum-credit-info" id="minimumCreditBadge">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Tối thiểu: <span th:text="${view.minimumCreditSemester ?: 12}">12</span> TC
+                        </span>
                     </div>
                     <div class="d-flex align-items-center">
                         <span class="badge bg-warning me-2" id="registration-deadline-badge">
@@ -386,6 +407,9 @@
             
             // Event handlers for adding/removing subjects
             updateEventHandlers();
+            
+            // Initialize credit status
+            updateRegisteredCount();
         });
         
         function initializeCourseData() {
@@ -593,7 +617,28 @@
                 totalCredits += parseInt(creditCell.textContent) || 0;
             }
             
-            document.getElementById('registeredCoursesCount').textContent = `${rows.length} môn, ${totalCredits} tín chỉ`;
+            // Get minimum credit from Thymeleaf
+            const minimumCredit = /*[[${view.minimumCreditSemester}]]*/ 12;
+            
+            // Update count display
+            const countBadge = document.getElementById('registeredCoursesCount');
+            countBadge.textContent = `${rows.length} môn, ${totalCredits} tín chỉ`;
+            
+            // Update minimum credit badge color and icon based on requirement
+            const minimumBadge = document.getElementById('minimumCreditBadge');
+            if (totalCredits >= minimumCredit) {
+                minimumBadge.className = 'badge bg-success ms-2 minimum-credit-info';
+                minimumBadge.innerHTML = `
+                    <i class="fas fa-check-circle me-1"></i>
+                    Tối thiểu: ${minimumCredit} TC (Đủ điều kiện)
+                `;
+            } else {
+                minimumBadge.className = 'badge bg-warning ms-2 minimum-credit-info';
+                minimumBadge.innerHTML = `
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    Tối thiểu: ${minimumCredit} TC (Thiếu ${minimumCredit - totalCredits} TC)
+                `;
+            }
         }
         
         function showConfirmationModal() {
@@ -605,17 +650,37 @@
                 return;
             }
             
+            // Calculate total credits
+            let totalCredits = 0;
+            for (let row of rows) {
+                const creditCell = row.getElementsByTagName('td')[6];
+                totalCredits += parseInt(creditCell.textContent) || 0;
+            }
+            
+            const minimumCredit = /*[[${view.minimumCreditSemester}]]*/ 12;
+            
             // Get list of course IDs to register
             const courseIds = [];
             for (let row of rows) {
                 courseIds.push(row.getAttribute('data-course-id'));
             }
             
+            let warningMessage = '';
+            if (totalCredits < minimumCredit) {
+                warningMessage = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Cảnh báo:</strong> Bạn chỉ đăng ký ${totalCredits} tín chỉ, chưa đủ tối thiểu ${minimumCredit} tín chỉ (thiếu ${minimumCredit - totalCredits} tín chỉ).
+                    </div>
+                `;
+            }
+            
             // Update confirmation modal content
             document.getElementById('confirmationMessage').innerHTML = `
+                ${warningMessage}
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
-                    Bạn có chắc chắn muốn đăng ký <strong>${rows.length} môn học</strong> này không?
+                    Bạn có chắc chắn muốn đăng ký <strong>${rows.length} môn học</strong> (${totalCredits} tín chỉ) này không?
                 </div>
             `;
             
