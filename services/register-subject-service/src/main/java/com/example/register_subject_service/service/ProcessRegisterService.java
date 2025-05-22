@@ -376,4 +376,57 @@ public class ProcessRegisterService {
         }
         return true;
     }
+    public boolean validateFirst(Long studentId, String token){
+        // Lay ra cac mon nguyen vong cua sinh vien
+        // Kiem tra tong so tin chi
+        // Neu tong < minCredits thi return false
+        List<WishSubject> wishSubjects = (List<WishSubject>) this.serviceAPI.callForList(
+                this.wishSubjectURL + "/wish-subject",
+                HttpMethod.GET,
+                null,
+                WishSubject.class,
+                token
+        );
+
+        Integer sumCredits = 0;
+        for(int i = 0 ; i < wishSubjects.size(); i++){
+            LinkedHashMap<String, Integer> hashmap = new LinkedHashMap<>((Map) wishSubjects.get(i));
+            Subject subject = this.serviceAPI.call(
+                    this.subjectURL + "/subject/" + hashmap.get("subjectId"),
+                    HttpMethod.GET,
+                    null,
+                    Subject.class,
+                    token
+            );
+            sumCredits += subject.getCredit();
+        }
+        System.out.println("sumCredits: " + sumCredits);
+
+        User student = (User)this.serviceAPI.call(
+                this.userURL + "/user/" + studentId,
+                HttpMethod.GET,
+                null,
+                User.class,
+                token
+        );
+
+        Long semesterId = student.getSemesterId();
+
+        CreditRule creditRule = this.serviceAPI.call(
+                this.creditRuleURL + "/credit-rule/semester/" + semesterId,
+                HttpMethod.GET,
+                null,
+                CreditRule.class,
+                token
+        );
+        System.out.println(creditRule);
+
+        Integer minCredits = creditRule.getMinCredits();
+
+        if (sumCredits < minCredits) {
+            return false;
+        }
+        return true;
+    }
+
 }

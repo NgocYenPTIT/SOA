@@ -15,25 +15,25 @@
             --success: #27ae60;
             --danger: #e74c3c;
         }
-        
+
         body {
             background-color: #f5f7fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .header {
             background-color: var(--primary);
             color: white;
             padding: 15px;
         }
-        
+
         .card {
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             border: none;
         }
-        
+
         .card-header {
             background-color: var(--primary);
             color: white;
@@ -41,7 +41,7 @@
             border: none;
             padding: 10px 15px;
         }
-        
+
         .table thead th {
             font-weight: 600;
             color: var(--dark);
@@ -49,30 +49,30 @@
             vertical-align: middle;
             text-align: center;
         }
-        
+
         .table tbody td {
             text-align: center;
             vertical-align: middle;
         }
-        
+
         .search-box {
             position: relative;
             margin-bottom: 20px;
         }
-        
+
         .search-box input {
             border-radius: 20px;
             padding-left: 40px;
             border: 1px solid #ddd;
         }
-        
+
         .search-box i {
             position: absolute;
             left: 15px;
             top: 12px;
             color: #999;
         }
-        
+
         .btn-add {
             background-color: var(--primary);
             color: white;
@@ -85,7 +85,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .btn-remove {
             background-color: var(--danger);
             color: white;
@@ -98,7 +98,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .schedule-item {
             background-color: rgba(52, 152, 219, 0.1);
             padding: 6px 10px;
@@ -106,7 +106,7 @@
             border-radius: 4px;
             display: block;
         }
-        
+
         #saveButton {
             background-color: var(--success);
             color: white;
@@ -114,24 +114,24 @@
             padding: 5px 12px;
             border-radius: 4px;
         }
-        
+
         /* Style for modal */
         .modal-content {
             border-radius: 8px;
             border: none;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        
+
         .modal-header {
             border-bottom: none;
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
         }
-        
+
         .modal-footer {
             border-top: none;
         }
-        
+
         .btn-calendar {
             background-color: var(--primary);
             color: white;
@@ -156,296 +156,355 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid p-0">
-        <!-- Header Section -->
-        <div class="header mb-4">
-            <div class="container">
-                <h1 class="mb-0">
-                    <i class="fas fa-graduation-cap me-2"></i>
-                    ĐĂNG KÝ MÔN HỌC HỌC KỲ <span th:text="${view.semester}"></span> - NĂM HỌC <span th:text="${view.year}"></span>
-                </h1>
+<div class="container-fluid p-0">
+    <!-- Header Section -->
+    <div class="header mb-4">
+        <div class="container">
+            <h1 class="mb-0">
+                <i class="fas fa-graduation-cap me-2"></i>
+                ĐĂNG KÝ MÔN HỌC HỌC KỲ <span th:text="${view.semester}"></span> - NĂM HỌC <span th:text="${view.year}"></span>
+            </h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Available Courses Section -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-book me-2"></i>
+                Danh sách môn học mở cho đăng ký
+            </div>
+            <div class="card-body">
+                <!-- Status and Last Update Section -->
+                <div th:if="${view.status != null and !#strings.contains(view.status, 'SEED')}"
+                     class="alert mb-3"
+                     th:classappend="${#strings.contains(view.status, 'COMMIT') ? 'alert-success' :
+                                         (#strings.contains(view.status, 'PROCESSING') ? 'alert-info' :
+                                         (#strings.contains(view.status, 'ROLLBACK') ? 'alert-danger' : 'alert-warning'))}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="alert-heading mb-2">
+                                <i th:class="${#strings.contains(view.status, 'COMMIT') ? 'fas fa-check-circle' :
+                                                  (#strings.contains(view.status, 'PROCESSING') ? 'fas fa-spinner fa-spin' :
+                                                  (#strings.contains(view.status, 'ROLLBACK') ? 'fas fa-times-circle' : 'fas fa-exclamation-triangle'))}"
+                                   class="me-2"></i>
+                                Trạng thái cập nhật cuối
+                            </h6>
+                            <div th:if="${#strings.contains(view.status, 'COMMIT')}">
+                                <strong>Thành công:</strong> Đăng ký môn học đã được xử lý thành công.
+                            </div>
+                            <div th:if="${#strings.contains(view.status, 'PROCESSING')}">
+                                <strong>Đang xử lí:</strong> Hệ thống đang xử lý yêu cầu đăng ký của bạn, vui lòng tải lại trang để cập nhật trạng thái.
+                            </div>
+                            <div th:if="${#strings.contains(view.status, 'ROLLBACK')}">
+                                <strong>Thất bại:</strong> Đăng ký môn học không thành công, vui lòng thử lại.
+                            </div>
+                            <div th:if="${#strings.contains(view.status, 'FULL')}">
+                                <strong>Hết slot:</strong>
+                                <span th:if="${view.messages != null and !view.messages.isEmpty()}"
+                                      th:text="'Môn ' + ${view.messages[0]} + ' đã hết chỗ.'">
+                                        Một số môn học đã hết chỗ.
+                                    </span>
+                                <span th:if="${view.messages == null or view.messages.isEmpty()}">
+                                        Một số môn học đã hết chỗ.
+                                    </span>
+                            </div>
+                            <div th:if="${#strings.contains(view.status, 'VALIDATE')}">
+                                <strong>Lỗi xác thực:</strong>
+                                <ul class="mb-0 mt-2" th:if="${view.messages != null and !view.messages.isEmpty()}">
+                                    <li th:each="message : ${view.messages}" th:text="${message}">
+                                        Thông báo lỗi
+                                    </li>
+                                </ul>
+                                <span th:if="${view.messages == null or view.messages.isEmpty()}">
+                                        Có lỗi xảy ra trong quá trình xác thực.
+                                    </span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                <span th:text="${view.lastUpdate != null ?
+                                                   #temporals.format(T(java.time.Instant).ofEpochMilli(view.lastUpdate).atZone(T(java.time.ZoneId).systemDefault()).toLocalDateTime(), 'dd/MM/yyyy HH:mm:ss') :
+                                                   'Không xác định'}">
+                                        23/05/2025 14:30:25
+                                    </span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table" id="availableCoursesTable">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>Mã MH</th>
+                            <th>Mã học phần</th>
+                            <th>Tên môn học</th>
+                            <th>Nhóm</th>
+                            <th>Tổ</th>
+                            <th>Số TC</th>
+                            <th>Số lượng</th>
+                            <th>Còn lại</th>
+                            <th>Thời khóa biểu</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Available courses data - filtered to exclude registered courses -->
+                        <tr th:each="course : ${view.openSubject}"
+                            th:if="${!#lists.contains(#lists.toList(view.registeredSubject.![courseCode]), course.courseCode)}"
+                            th:attr="data-course-id=${course.courseId}, data-course-code=${course.courseCode}">
+                            <td>
+                                <button class="btn btn-add" th:attr="data-subject-id=${course.courseId}">
+                                    +
+                                </button>
+                            </td>
+                            <td th:text="${course.subjectCode}">IT1110</td>
+                            <td th:text="${course.courseCode}">IT1110.1</td>
+                            <td th:text="${course.subjectName}">Lập trình Java</td>
+                            <td th:text="${course.courseGroup}">L01</td>
+                            <td th:text="${course.practiseGroup}">P01</td>
+                            <td th:text="${course.amountOfCredit}">3</td>
+                            <td th:text="${course.maxStudent}">40</td>
+                            <td th:text="${course.remainSlot}">25</td>
+                            <td>
+                                <div th:each="schedule : ${course.getScheduleResponses()}"
+                                     th:text="${schedule.content}"
+                                     th:attr="data-start-time=${schedule.startTime}, data-end-time=${schedule.endTime}"
+                                     class="schedule-item">
+                                    Thứ 2, tiết 1-3, phòng A1.01
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div class="container">
-            <!-- Available Courses Section -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-book me-2"></i>
-                    Danh sách môn học mở cho đăng ký
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table" id="availableCoursesTable">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>Mã MH</th>
-                                    <th>Mã học phần</th>
-                                    <th>Tên môn học</th>
-                                    <th>Nhóm</th>
-                                    <th>Tổ</th>
-                                    <th>Số TC</th>
-                                    <th>Số lượng</th>
-                                    <th>Còn lại</th>
-                                    <th>Thời khóa biểu</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Available courses data - filtered to exclude registered courses -->
-                                <tr th:each="course : ${view.openSubject}" 
-                                    th:if="${!#lists.contains(#lists.toList(view.registeredSubject.![courseCode]), course.courseCode)}"
-                                    th:attr="data-course-id=${course.courseId}, data-course-code=${course.courseCode}">
-                                    <td>
-                                        <button class="btn btn-add" th:attr="data-subject-id=${course.courseId}">
-                                            +
-                                        </button>
-                                    </td>
-                                    <td th:text="${course.subjectCode}">IT1110</td>
-                                    <td th:text="${course.courseCode}">IT1110.1</td>
-                                    <td th:text="${course.subjectName}">Lập trình Java</td>
-                                    <td th:text="${course.courseGroup}">L01</td>
-                                    <td th:text="${course.practiseGroup}">P01</td>
-                                    <td th:text="${course.amountOfCredit}">3</td>
-                                    <td th:text="${course.maxStudent}">40</td>
-                                    <td th:text="${course.remainSlot}">25</td>
-                                    <td>
-                                        <div th:each="schedule : ${course.getScheduleResponses()}"
-                                             th:text="${schedule.content}"
-                                             th:attr="data-start-time=${schedule.startTime}, data-end-time=${schedule.endTime}"
-                                             class="schedule-item">
-                                            Thứ 2, tiết 1-3, phòng A1.01
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Registered Courses Section -->
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div>
-                        <i class="fas fa-clipboard-list me-2"></i>
-                        Danh sách môn học đã đăng ký: 
-                        <span class="badge bg-info ms-2" id="registeredCoursesCount" th:text="${view.numOfRegisteredSubject} + ' môn, ' + ${view.numOfRegisteredCredit} + ' tín chỉ'">
+        <!-- Registered Courses Section -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-clipboard-list me-2"></i>
+                    Danh sách môn học đã đăng ký:
+                    <span class="badge bg-info ms-2" id="registeredCoursesCount" th:text="${view.numOfRegisteredSubject} + ' môn, ' + ${view.numOfRegisteredCredit} + ' tín chỉ'">
                             2 môn, 6 tín chỉ
                         </span>
-                    </div>
-                    <div class="d-flex align-items-center">
+                </div>
+                <div class="d-flex align-items-center">
                         <span class="badge bg-warning me-2" id="registration-deadline-badge">
                             <span>Hạn đăng ký: </span>
                             <span th:text="${view.endOfEnrollmentTime != null ? view.endOfEnrollmentTime : '00:00:00 01-01-2026'}">00:00:00 01-01-2026</span>
                         </span>
-                        <button id="saveButton" class="btn">
-                            <i class="fas fa-save me-1"></i>Lưu đăng ký
-                        </button>
-                    </div>
+                    <button id="saveButton" class="btn">
+                        <i class="fas fa-save me-1"></i>Lưu đăng ký
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table" id="registeredCoursesTable">
-                            <thead>
-                                <tr>
-                                    <th>Xóa</th>
-                                    <th>Mã MH</th>
-                                    <th>Mã học phần</th>
-                                    <th>Tên môn học</th>
-                                    <th>Nhóm</th>
-                                    <th>Tổ</th>
-                                    <th>Số TC</th>
-                                    <th>Ngày ĐK</th>
-                                    <th>Trạng thái</th>
-                                    <th>Thời khóa biểu</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Registered courses data -->
-                                <tr th:each="course : ${view.registeredSubject}" 
-                                    th:attr="data-course-id=${course.courseId}, data-course-code=${course.courseCode}">
-                                    <td>
-                                        <button class="btn btn-remove" th:attr="data-subject-id=${course.courseId}">
-                                            ×
-                                        </button>
-                                    </td>
-                                    <td th:text="${course.subjectCode}">IT1130</td>
-                                    <td th:text="${course.courseCode}">IT1130.1</td>
-                                    <td th:text="${course.subjectName}">Mạng máy tính</td>
-                                    <td th:text="${course.courseGroup}">L03</td>
-                                    <td th:text="${course.practiseGroup}">P03</td>
-                                    <td th:text="${course.amountOfCredit}">3</td>
-                                    <td th:text="${course.enrollmentDate}">2022-08-15</td>
-                                    <td>
-                                        <span th:text="${course.status}" 
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table" id="registeredCoursesTable">
+                        <thead>
+                        <tr>
+                            <th>Xóa</th>
+                            <th>Mã MH</th>
+                            <th>Mã học phần</th>
+                            <th>Tên môn học</th>
+                            <th>Nhóm</th>
+                            <th>Tổ</th>
+                            <th>Số TC</th>
+                            <th>Ngày ĐK</th>
+                            <th>Trạng thái</th>
+                            <th>Thời khóa biểu</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Registered courses data -->
+                        <tr th:each="course : ${view.registeredSubject}"
+                            th:attr="data-course-id=${course.courseId}, data-course-code=${course.courseCode}">
+                            <td>
+                                <button class="btn btn-remove" th:attr="data-subject-id=${course.courseId}">
+                                    ×
+                                </button>
+                            </td>
+                            <td th:text="${course.subjectCode}">IT1130</td>
+                            <td th:text="${course.courseCode}">IT1130.1</td>
+                            <td th:text="${course.subjectName}">Mạng máy tính</td>
+                            <td th:text="${course.courseGroup}">L03</td>
+                            <td th:text="${course.practiseGroup}">P03</td>
+                            <td th:text="${course.amountOfCredit}">3</td>
+                            <td th:text="${course.enrollmentDate}">2022-08-15</td>
+                            <td>
+                                        <span th:text="${course.status}"
                                               th:class="${course.status == 'REGISTERED' ? 'status-registered' : 'status-unregistered'}">
                                             REGISTERED
                                         </span>
-                                    </td>
-                                    <td>
-                                        <div th:each="schedule : ${course.getScheduleResponses()}"
-                                             th:text="${schedule.content}"
-                                             th:attr="data-start-time=${schedule.startTime}, data-end-time=${schedule.endTime}"
-                                             class="schedule-item">
-                                            Thứ 3, tiết 4-6, phòng B2.02
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                            </td>
+                            <td>
+                                <div th:each="schedule : ${course.getScheduleResponses()}"
+                                     th:text="${schedule.content}"
+                                     th:attr="data-start-time=${schedule.startTime}, data-end-time=${schedule.endTime}"
+                                     class="schedule-item">
+                                    Thứ 3, tiết 4-6, phòng B2.02
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Hidden form for submission -->
-    <form id="registrationForm" action="/regist" method="POST" style="display: none;">
-        <input type="hidden" name="courseIds" id="courseIdsInput">
-    </form>
+<!-- Hidden form for submission -->
+<form id="registrationForm" action="/regist" method="POST" style="display: none;">
+    <input type="hidden" name="courseIds" id="courseIdsInput">
+</form>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script th:inline="javascript">
-        // Store original course data with schedules
-        let originalCourseData = {};
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize course data
-            initializeCourseData();
-            
-            // Add event listener for save button
-            const saveButton = document.getElementById('saveButton');
-            saveButton.addEventListener('click', function() {
-                showConfirmationModal();
-            });
-            
-            // Event handlers for adding/removing subjects
-            updateEventHandlers();
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    // Store original course data with schedules
+    let originalCourseData = {};
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize course data
+        initializeCourseData();
+
+        // Add event listener for save button
+        const saveButton = document.getElementById('saveButton');
+        saveButton.addEventListener('click', function() {
+            showConfirmationModal();
         });
-        
-        function initializeCourseData() {
-            // Get initial data from Thymeleaf objects and store with schedule info
-            const registeredSubjects = /*[[${view.registeredSubject}]]*/ [];
-            const openSubjects = /*[[${view.openSubject}]]*/ [];
-            
-            // Store all course data for schedule validation
-            [...registeredSubjects, ...openSubjects].forEach(course => {
-                originalCourseData[course.courseId] = {
-                    ...course,
-                    schedules: course.scheduleResponses || []
-                };
-            });
+
+        // Event handlers for adding/removing subjects
+        updateEventHandlers();
+    });
+
+    function initializeCourseData() {
+        // Get initial data from Thymeleaf objects and store with schedule info
+        const registeredSubjects = /*[[${view.registeredSubject}]]*/ [];
+        const openSubjects = /*[[${view.openSubject}]]*/ [];
+
+        // Store all course data for schedule validation
+        [...registeredSubjects, ...openSubjects].forEach(course => {
+            originalCourseData[course.courseId] = {
+                ...course,
+                schedules: course.scheduleResponses || []
+            };
+        });
+    }
+
+    // Function to check if two time ranges conflict
+    function isConflictTime(startTime1, endTime1, startTime2, endTime2) {
+        console.log("is validating conflict time");
+        return !(endTime1 <= startTime2 || startTime1 >= endTime2);
+    }
+
+    // Function to validate schedule conflicts
+    function validateScheduleConflict(newCourseId) {
+        const registeredTable = document.getElementById('registeredCoursesTable').getElementsByTagName('tbody')[0];
+        const registeredRows = Array.from(registeredTable.getElementsByTagName('tr'));
+
+        const newCourse = originalCourseData[newCourseId];
+        if (!newCourse || !newCourse.schedules) {
+            return { hasConflict: false };
         }
-        
-        // Function to check if two time ranges conflict
-        function isConflictTime(startTime1, endTime1, startTime2, endTime2) {
-            console.log("is validating conflict time");
-            return !(endTime1 <= startTime2 || startTime1 >= endTime2);
-        }
-        
-        // Function to validate schedule conflicts
-        function validateScheduleConflict(newCourseId) {
-            const registeredTable = document.getElementById('registeredCoursesTable').getElementsByTagName('tbody')[0];
-            const registeredRows = Array.from(registeredTable.getElementsByTagName('tr'));
-            
-            const newCourse = originalCourseData[newCourseId];
-            if (!newCourse || !newCourse.schedules) {
-                return { hasConflict: false };
-            }
-            
-            // Check conflicts with all currently registered courses
-            for (let row of registeredRows) {
-                const registeredCourseId = row.getAttribute('data-course-id');
-                const registeredCourse = originalCourseData[registeredCourseId];
-                
-                if (!registeredCourse || !registeredCourse.schedules) continue;
-                
-                // Compare schedules between new course and registered course
-                for (let newSchedule of newCourse.schedules) {
-                    for (let registeredSchedule of registeredCourse.schedules) {
-                        const startTime1 = newSchedule.startTime;
-                        const endTime1 = newSchedule.endTime;
-                        const startTime2 = registeredSchedule.startTime;
-                        const endTime2 = registeredSchedule.endTime;
-                        
-                        if (isConflictTime(startTime1, endTime1, startTime2, endTime2)) {
-                            return {
-                                hasConflict: true,
-                                conflictWith: registeredCourse.subjectName,
-                                newCourse: newCourse.subjectName
-                            };
-                        }
+
+        // Check conflicts with all currently registered courses
+        for (let row of registeredRows) {
+            const registeredCourseId = row.getAttribute('data-course-id');
+            const registeredCourse = originalCourseData[registeredCourseId];
+
+            if (!registeredCourse || !registeredCourse.schedules) continue;
+
+            // Compare schedules between new course and registered course
+            for (let newSchedule of newCourse.schedules) {
+                for (let registeredSchedule of registeredCourse.schedules) {
+                    const startTime1 = newSchedule.startTime;
+                    const endTime1 = newSchedule.endTime;
+                    const startTime2 = registeredSchedule.startTime;
+                    const endTime2 = registeredSchedule.endTime;
+
+                    if (isConflictTime(startTime1, endTime1, startTime2, endTime2)) {
+                        return {
+                            hasConflict: true,
+                            conflictWith: registeredCourse.subjectName,
+                            newCourse: newCourse.subjectName
+                        };
                     }
                 }
             }
-            
-            return { hasConflict: false };
         }
-        
-        function updateEventHandlers() {
-            // Remove old event listeners and add new ones
-            const addButtons = document.querySelectorAll('.btn-add');
-            addButtons.forEach(button => {
-                button.replaceWith(button.cloneNode(true));
+
+        return { hasConflict: false };
+    }
+
+    function updateEventHandlers() {
+        // Remove old event listeners and add new ones
+        const addButtons = document.querySelectorAll('.btn-add');
+        addButtons.forEach(button => {
+            button.replaceWith(button.cloneNode(true));
+        });
+
+        const removeButtons = document.querySelectorAll('.btn-remove');
+        removeButtons.forEach(button => {
+            button.replaceWith(button.cloneNode(true));
+        });
+
+        // Add new event listeners
+        document.querySelectorAll('.btn-add').forEach(button => {
+            button.addEventListener('click', function() {
+                const subjectId = this.getAttribute('data-subject-id');
+
+                // Validate schedule conflict before adding
+                const validation = validateScheduleConflict(subjectId);
+                if (validation.hasConflict) {
+                    showSaveResultModal(false,
+                        `Không thể đăng ký môn "${validation.newCourse}" do trùng lịch với môn "${validation.conflictWith}"!`);
+                    return;
+                }
+
+                moveToRegistered(subjectId);
             });
-            
-            const removeButtons = document.querySelectorAll('.btn-remove');
-            removeButtons.forEach(button => {
-                button.replaceWith(button.cloneNode(true));
+        });
+
+        document.querySelectorAll('.btn-remove').forEach(button => {
+            button.addEventListener('click', function() {
+                const subjectId = this.getAttribute('data-subject-id');
+                moveToAvailable(subjectId);
             });
-            
-            // Add new event listeners
-            document.querySelectorAll('.btn-add').forEach(button => {
-                button.addEventListener('click', function() {
-                    const subjectId = this.getAttribute('data-subject-id');
-                    
-                    // Validate schedule conflict before adding
-                    const validation = validateScheduleConflict(subjectId);
-                    if (validation.hasConflict) {
-                        showSaveResultModal(false, 
-                            `Không thể đăng ký môn "${validation.newCourse}" do trùng lịch với môn "${validation.conflictWith}"!`);
-                        return;
-                    }
-                    
-                    moveToRegistered(subjectId);
-                });
-            });
-            
-            document.querySelectorAll('.btn-remove').forEach(button => {
-                button.addEventListener('click', function() {
-                    const subjectId = this.getAttribute('data-subject-id');
-                    moveToAvailable(subjectId);
-                });
-            });
-        }
-        
-        function moveToRegistered(subjectId) {
-            const availableTable = document.getElementById('availableCoursesTable').getElementsByTagName('tbody')[0];
-            const registeredTable = document.getElementById('registeredCoursesTable').getElementsByTagName('tbody')[0];
-            
-            // Find the course row in available table
-            const courseRow = availableTable.querySelector(`tr[data-course-id="${subjectId}"]`);
-            if (!courseRow) return;
-            
-            // Get course data
-            const cells = courseRow.getElementsByTagName('td');
-            const subjectCode = cells[1].textContent;
-            const courseCode = cells[2].textContent;
-            const subjectName = cells[3].textContent;
-            const courseGroup = cells[4].textContent;
-            const practiseGroup = cells[5].textContent;
-            const amountOfCredit = cells[6].textContent;
-            const scheduleItems = cells[9].innerHTML;
-            
-            // Remove from available table
-            courseRow.remove();
-            
-            // Add to registered table
-            const newRow = registeredTable.insertRow();
-            newRow.setAttribute('data-course-id', subjectId);
-            newRow.setAttribute('data-course-code', courseCode);
-            newRow.innerHTML = `
+        });
+    }
+
+    function moveToRegistered(subjectId) {
+        const availableTable = document.getElementById('availableCoursesTable').getElementsByTagName('tbody')[0];
+        const registeredTable = document.getElementById('registeredCoursesTable').getElementsByTagName('tbody')[0];
+
+        // Find the course row in available table
+        const courseRow = availableTable.querySelector(`tr[data-course-id="${subjectId}"]`);
+        if (!courseRow) return;
+
+        // Get course data
+        const cells = courseRow.getElementsByTagName('td');
+        const subjectCode = cells[1].textContent;
+        const courseCode = cells[2].textContent;
+        const subjectName = cells[3].textContent;
+        const courseGroup = cells[4].textContent;
+        const practiseGroup = cells[5].textContent;
+        const amountOfCredit = cells[6].textContent;
+        const scheduleItems = cells[9].innerHTML;
+
+        // Remove from available table
+        courseRow.remove();
+
+        // Add to registered table
+        const newRow = registeredTable.insertRow();
+        newRow.setAttribute('data-course-id', subjectId);
+        newRow.setAttribute('data-course-code', courseCode);
+        newRow.innerHTML = `
                 <td>
                     <button class="btn btn-remove" data-subject-id="${subjectId}">
                         ×
@@ -461,42 +520,42 @@
                 <td><span class="status-unregistered">UNREGISTERED</span></td>
                 <td>${scheduleItems}</td>
             `;
-            
-            updateEventHandlers();
-            updateRegisteredCount();
-        }
-        
-        function moveToAvailable(subjectId) {
-            const availableTable = document.getElementById('availableCoursesTable').getElementsByTagName('tbody')[0];
-            const registeredTable = document.getElementById('registeredCoursesTable').getElementsByTagName('tbody')[0];
-            
-            // Find the course row in registered table
-            const courseRow = registeredTable.querySelector(`tr[data-course-id="${subjectId}"]`);
-            if (!courseRow) return;
-            
-            // Get course data
-            const cells = courseRow.getElementsByTagName('td');
-            const subjectCode = cells[1].textContent;
-            const courseCode = cells[2].textContent;
-            const subjectName = cells[3].textContent;
-            const courseGroup = cells[4].textContent;
-            const practiseGroup = cells[5].textContent;
-            const amountOfCredit = cells[6].textContent;
-            const scheduleItems = cells[9].innerHTML;
-            
-            // Remove from registered table
-            courseRow.remove();
-            
-            // Get original course data for max students and remaining slots
-            const originalCourse = originalCourseData[subjectId];
-            const maxStudent = originalCourse ? originalCourse.maxStudent : 40;
-            const remainSlot = originalCourse ? originalCourse.remainSlot : 25;
-            
-            // Add to available table
-            const newRow = availableTable.insertRow();
-            newRow.setAttribute('data-course-id', subjectId);
-            newRow.setAttribute('data-course-code', courseCode);
-            newRow.innerHTML = `
+
+        updateEventHandlers();
+        updateRegisteredCount();
+    }
+
+    function moveToAvailable(subjectId) {
+        const availableTable = document.getElementById('availableCoursesTable').getElementsByTagName('tbody')[0];
+        const registeredTable = document.getElementById('registeredCoursesTable').getElementsByTagName('tbody')[0];
+
+        // Find the course row in registered table
+        const courseRow = registeredTable.querySelector(`tr[data-course-id="${subjectId}"]`);
+        if (!courseRow) return;
+
+        // Get course data
+        const cells = courseRow.getElementsByTagName('td');
+        const subjectCode = cells[1].textContent;
+        const courseCode = cells[2].textContent;
+        const subjectName = cells[3].textContent;
+        const courseGroup = cells[4].textContent;
+        const practiseGroup = cells[5].textContent;
+        const amountOfCredit = cells[6].textContent;
+        const scheduleItems = cells[9].innerHTML;
+
+        // Remove from registered table
+        courseRow.remove();
+
+        // Get original course data for max students and remaining slots
+        const originalCourse = originalCourseData[subjectId];
+        const maxStudent = originalCourse ? originalCourse.maxStudent : 40;
+        const remainSlot = originalCourse ? originalCourse.remainSlot : 25;
+
+        // Add to available table
+        const newRow = availableTable.insertRow();
+        newRow.setAttribute('data-course-id', subjectId);
+        newRow.setAttribute('data-course-code', courseCode);
+        newRow.innerHTML = `
                 <td>
                     <button class="btn btn-add" data-subject-id="${subjectId}">
                         +
@@ -512,130 +571,130 @@
                 <td>${remainSlot}</td>
                 <td>${scheduleItems}</td>
             `;
-            
-            updateEventHandlers();
-            updateRegisteredCount();
+
+        updateEventHandlers();
+        updateRegisteredCount();
+    }
+
+    function updateRegisteredCount() {
+        const registeredTable = document.getElementById('registeredCoursesTable').getElementsByTagName('tbody')[0];
+        const rows = registeredTable.getElementsByTagName('tr');
+        let totalCredits = 0;
+
+        for (let row of rows) {
+            const creditCell = row.getElementsByTagName('td')[6];
+            totalCredits += parseInt(creditCell.textContent) || 0;
         }
-        
-        function updateRegisteredCount() {
-            const registeredTable = document.getElementById('registeredCoursesTable').getElementsByTagName('tbody')[0];
-            const rows = registeredTable.getElementsByTagName('tr');
-            let totalCredits = 0;
-            
-            for (let row of rows) {
-                const creditCell = row.getElementsByTagName('td')[6];
-                totalCredits += parseInt(creditCell.textContent) || 0;
-            }
-            
-            document.getElementById('registeredCoursesCount').textContent = `${rows.length} môn, ${totalCredits} tín chỉ`;
+
+        document.getElementById('registeredCoursesCount').textContent = `${rows.length} môn, ${totalCredits} tín chỉ`;
+    }
+
+    function showConfirmationModal() {
+        const registeredTable = document.getElementById('registeredCoursesTable').getElementsByTagName('tbody')[0];
+        const rows = registeredTable.getElementsByTagName('tr');
+
+        if (rows.length === 0) {
+            showSaveResultModal(false, "Bạn chưa đăng ký môn học nào!");
+            return;
         }
-        
-        function showConfirmationModal() {
-            const registeredTable = document.getElementById('registeredCoursesTable').getElementsByTagName('tbody')[0];
-            const rows = registeredTable.getElementsByTagName('tr');
-            
-            if (rows.length === 0) {
-                showSaveResultModal(false, "Bạn chưa đăng ký môn học nào!");
-                return;
-            }
-            
-            // Get list of course IDs to register
-            const courseIds = [];
-            for (let row of rows) {
-                courseIds.push(row.getAttribute('data-course-id'));
-            }
-            
-            // Update confirmation modal content
-            document.getElementById('confirmationMessage').innerHTML = `
+
+        // Get list of course IDs to register
+        const courseIds = [];
+        for (let row of rows) {
+            courseIds.push(row.getAttribute('data-course-id'));
+        }
+
+        // Update confirmation modal content
+        document.getElementById('confirmationMessage').innerHTML = `
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
                     Bạn có chắc chắn muốn đăng ký <strong>${rows.length} môn học</strong> này không?
                 </div>
             `;
-            
-            // Store course IDs for later use
-            window.coursesToRegister = courseIds;
-            
-            // Show confirmation modal
-            const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-            confirmationModal.show();
+
+        // Store course IDs for later use
+        window.coursesToRegister = courseIds;
+
+        // Show confirmation modal
+        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+        confirmationModal.show();
+    }
+
+    function confirmRegistration() {
+        const courseIds = window.coursesToRegister || [];
+
+        // Set the course IDs in the hidden form
+        document.getElementById('courseIdsInput').value = courseIds.join(',');
+
+        // Submit the form to redirect to /regist
+        document.getElementById('registrationForm').submit();
+    }
+
+    // Hàm hiển thị modal kết quả lưu đăng ký
+    function showSaveResultModal(success, message) {
+        // Cập nhật tiêu đề và màu sắc header
+        const modalHeader = document.getElementById('saveResultModalHeader');
+        if (success) {
+            modalHeader.style.backgroundColor = 'var(--success)';
+            modalHeader.style.color = 'white';
+            document.getElementById('saveResultModalLabel').textContent = 'Thành công';
+        } else {
+            modalHeader.style.backgroundColor = 'var(--danger)';
+            modalHeader.style.color = 'white';
+            document.getElementById('saveResultModalLabel').textContent = 'Lỗi';
         }
-        
-        function confirmRegistration() {
-            const courseIds = window.coursesToRegister || [];
-            
-            // Set the course IDs in the hidden form
-            document.getElementById('courseIdsInput').value = courseIds.join(',');
-            
-            // Submit the form to redirect to /regist
-            document.getElementById('registrationForm').submit();
+
+        // Cập nhật nội dung thông báo
+        const messageDiv = document.getElementById('saveResultMessage');
+        if (success) {
+            messageDiv.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>${message}</div>`;
+        } else {
+            messageDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>${message}</div>`;
         }
-        
-        // Hàm hiển thị modal kết quả lưu đăng ký
-        function showSaveResultModal(success, message) {
-            // Cập nhật tiêu đề và màu sắc header
-            const modalHeader = document.getElementById('saveResultModalHeader');
-            if (success) {
-                modalHeader.style.backgroundColor = 'var(--success)';
-                modalHeader.style.color = 'white';
-                document.getElementById('saveResultModalLabel').textContent = 'Thành công';
-            } else {
-                modalHeader.style.backgroundColor = 'var(--danger)';
-                modalHeader.style.color = 'white';
-                document.getElementById('saveResultModalLabel').textContent = 'Lỗi';
-            }
-            
-            // Cập nhật nội dung thông báo
-            const messageDiv = document.getElementById('saveResultMessage');
-            if (success) {
-                messageDiv.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>${message}</div>`;
-            } else {
-                messageDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>${message}</div>`;
-            }
-            
-            // Hiển thị modal
-            const saveResultModal = new bootstrap.Modal(document.getElementById('saveResultModal'));
-            saveResultModal.show();
-        }
-    </script>
-    
-    <!-- Confirmation Modal -->
-    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: var(--primary); color: white;">
-                    <h5 class="modal-title" id="confirmationModalLabel">Xác nhận đăng ký</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+
+        // Hiển thị modal
+        const saveResultModal = new bootstrap.Modal(document.getElementById('saveResultModal'));
+        saveResultModal.show();
+    }
+</script>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: var(--primary); color: white;">
+                <h5 class="modal-title" id="confirmationModalLabel">Xác nhận đăng ký</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="confirmationMessage">
+                    <!-- Confirmation message will be inserted here -->
                 </div>
-                <div class="modal-body">
-                    <div id="confirmationMessage">
-                        <!-- Confirmation message will be inserted here -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="confirmRegistration()">Xác nhận đăng ký</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="confirmRegistration()">Xác nhận đăng ký</button>
             </div>
         </div>
     </div>
-    
-    <!-- Save Result Modal -->
-    <div class="modal fade" id="saveResultModal" tabindex="-1" aria-labelledby="saveResultModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header" id="saveResultModalHeader">
-                    <h5 class="modal-title" id="saveResultModalLabel">Kết quả đăng ký</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="saveResultMessage"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                </div>
+</div>
+
+<!-- Save Result Modal -->
+<div class="modal fade" id="saveResultModal" tabindex="-1" aria-labelledby="saveResultModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" id="saveResultModalHeader">
+                <h5 class="modal-title" id="saveResultModalLabel">Kết quả đăng ký</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="saveResultMessage"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
+</div>
 </body>
 </html>

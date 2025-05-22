@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 public class ClientController {
@@ -26,8 +27,11 @@ public class ClientController {
     @Value("${app.global.url.auth-service}")
     private String authServiceUrl;
 
-    @Value("${app.global.url.register-subject-read-model-service}")
+    @Value("${app.global.register-read-model-service-url}")
     private String urlRegisterReadModelService;
+
+    @Value("${app.global.register-subject-service-url}")
+    private String registerSubjectServiceUrl;
 
     // Hiển thị trang đăng nhập
     @GetMapping("/")
@@ -61,7 +65,34 @@ public class ClientController {
         }
     }
 
-
+    @PostMapping("/regist")
+    public String registLogic(@RequestParam List<Long> courseIds,
+                        Model model) {
+        // Kiểm tra đăng nhập đơn giản (username: admin, password: password)
+        try {
+            System.out.println(courseIds);
+            System.out.println("herre");
+             try {
+                 this.serviceAPI.call(
+                         this.registerSubjectServiceUrl + "/register",
+                         HttpMethod.POST,
+                         bodyPost.builder()
+                                 .courseIds(courseIds)
+                                 .build(),
+                         RegisterSubjectView.class,
+                         (String) session.getAttribute("token")
+                 );
+             }
+             catch (Exception e) {
+                 System.out.println(e.getMessage());
+             }
+            // Chuyển đến trang register
+            return  "waiting";
+        } catch (Exception e) {
+            model.addAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng!");
+            return "login";
+        }
+    }
 
     // Hiển thị trang đăng ký
     @GetMapping("/register")
@@ -69,8 +100,26 @@ public class ClientController {
         // Kiểm tra nếu đã đăng nhập thì chuyển đến trang hello
         if (session.getAttribute("user") != null) {
             System.out.println(session.getAttribute("user"));
+
+            try{
+                ValidateFirstForm validateFirstForm = this.serviceAPI.call(
+                        this.registerSubjectServiceUrl + "/register",
+                        HttpMethod.GET,
+                        null,
+                        ValidateFirstForm.class,
+                        (String) session.getAttribute("token")
+                );
+                if (!validateFirstForm.getSuccess().equals("SUCCESS")) {
+                    return "not-enough-credit";
+                }
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+
+
             RegisterSubjectView view = this.serviceAPI.call(
-                    this.urlRegisterReadModelService + "register-subject-read-model",
+                    this.urlRegisterReadModelService + "/register-subject-read-model",
                     HttpMethod.GET,
                     null,
                     RegisterSubjectView.class,
